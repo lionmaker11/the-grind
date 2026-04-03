@@ -1,17 +1,17 @@
 {
   "date": "2026-04-03",
-  "last_synced": "2026-04-03T20:00:00Z",
+  "last_synced": "2026-04-03T21:00:00Z",
   "tasks": [
     {
       "id": "task-001",
-      "text": "Test sync",
+      "text": "Review MARCUS",
       "status": "completed",
-      "pomos_done": 1,
-      "pomos_estimated": 1
+      "pomos_done": 2,
+      "pomos_estimated": 2
     }
   ],
   "summary": {
-    "pomodoros_completed": 1,
-    "daily_score": 20
+    "pomodoros_completed": 2,
+    "daily_score": 30
   }
 }
