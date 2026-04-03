@@ -3119,13 +3119,31 @@ function executeChiefActions(actions) {
   if (!Array.isArray(actions)) return;
   const messagesEl = document.getElementById('chiefMessages');
 
-  actions.forEach(action => {
+  actions.forEach(rawAction => {
+    // Normalize: merge payload into action if present, handle various model formats
+    let action;
+    if (rawAction.payload && typeof rawAction.payload === 'object') {
+      action = { type: rawAction.type, ...rawAction.payload };
+    } else {
+      // Handle {complete_task: {task_id}} format
+      const keys = Object.keys(rawAction);
+      const actionKey = keys.find(k => ['add_task','remove_task','reorder_tasks','skip_task','complete_task','update_finance','launch_task'].includes(k));
+      if (actionKey && typeof rawAction[actionKey] === 'object') {
+        action = { type: actionKey, ...rawAction[actionKey] };
+      } else {
+        action = { ...rawAction };
+      }
+    }
+    // Normalize task_id → id
+    if (action.task_id && !action.id) action.id = action.task_id;
+
     switch(action.type) {
       case 'add_task': {
+        const taskType = (action.task_type || action.pomodoro_type || 'pomodoro');
         const newTask = {
-          id: action.id || 'chief-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+          id: 'chief-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
           text: action.text,
-          type: action.task_type || 'pomodoro',
+          type: ['quick','pomodoro'].includes(taskType) ? taskType : 'pomodoro',
           estimated_pomodoros: action.estimated_pomodoros || 1,
           priority: action.priority || queueTasks.length + 1,
           health: action.health || 'gray',
