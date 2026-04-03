@@ -1196,7 +1196,7 @@
   .chief-fab:hover { transform: scale(1.08); filter: brightness(1.2); }
   .chief-fab:active { transform: scale(0.95); }
   .chief-fab.chief-open {
-    z-index: 90;
+    display: none;
   }
   .chief-fab.timer-active {
     width: 40px;
@@ -1756,9 +1756,9 @@ let pollInterval = null;
 let chiefOpen = false;
 let chiefConversation = [];
 let chiefStreaming = false;
-let chiefAwaitingToken = false;
 const CHIEF_STORAGE = 'the-grind-chief-chat';
 const CHIEF_TOKEN_KEY = 'the-grind-chief-token';
+const CHIEF_TOKEN = 'grind2026chief';
 
 // ==================== PERSISTENCE ====================
 function saveState() {
@@ -2866,7 +2866,7 @@ async function syncResults() {
   syncInFlight = true;
   try {
     const payload = buildResultsPayload();
-    const chiefToken = localStorage.getItem(CHIEF_TOKEN_KEY);
+    const chiefToken = CHIEF_TOKEN;
     const headers = { 'Content-Type': 'application/json' };
     if (chiefToken) headers['X-Chief-Token'] = chiefToken;
     const res = await fetch('/api/sync', {
@@ -2936,13 +2936,10 @@ let chiefVerified = false;
 
 function updateChiefStatus() {
   const el = document.getElementById('chiefStatus');
-  const token = localStorage.getItem(CHIEF_TOKEN_KEY);
+  const token = CHIEF_TOKEN;
   if (!navigator.onLine) {
     el.textContent = '// offline';
     el.style.color = 'var(--red)';
-  } else if (!token) {
-    el.textContent = '// no token';
-    el.style.color = 'var(--yellow)';
   } else if (chiefVerified) {
     el.textContent = '// online';
     el.style.color = 'var(--green)';
@@ -2953,7 +2950,7 @@ function updateChiefStatus() {
 }
 
 async function verifyChiefConnection() {
-  const token = localStorage.getItem(CHIEF_TOKEN_KEY);
+  const token = CHIEF_TOKEN;
   if (!token || !navigator.onLine) { chiefVerified = false; updateChiefStatus(); return; }
   try {
     const res = await fetch('/api/chief', {
@@ -2986,12 +2983,7 @@ function toggleChief() {
     } catch(e) {}
 
     if (chiefConversation.length === 0) {
-      const token = localStorage.getItem(CHIEF_TOKEN_KEY);
-      if (!token) {
-        addChiefSystemMessage('// Set your Chief auth token first. Enter it below and send.');
-      } else {
-        addChiefSystemMessage('// CHIEF online. What do you need?');
-      }
+      addChiefSystemMessage('// CHIEF online. What do you need?');
     }
 
     setTimeout(() => document.getElementById('chiefInput').focus(), 350);
@@ -3030,21 +3022,7 @@ async function sendChiefMessage() {
   const text = input.value.trim();
   if (!text || chiefStreaming) return;
 
-  // Check for token
-  const token = localStorage.getItem(CHIEF_TOKEN_KEY);
-  if (!token) {
-    if (chiefAwaitingToken) {
-      localStorage.setItem(CHIEF_TOKEN_KEY, text);
-      input.value = '';
-      chiefAwaitingToken = false;
-      addChiefSystemMessage('// Connected. Talk to Chief.');
-      return;
-    }
-    input.value = '';
-    chiefAwaitingToken = true;
-    addChiefSystemMessage('// Enter your Chief token to connect');
-    return;
-  }
+  const token = CHIEF_TOKEN;
 
   input.value = '';
 
@@ -3086,8 +3064,9 @@ async function sendChiefMessage() {
     typingEl.remove();
 
     if (!res.ok) {
-      const errText = await res.text().catch(() => 'Unknown error');
-      addChiefSystemMessage(`// Error: ${res.status} - ${errText}`);
+      chiefVerified = false;
+      updateChiefStatus();
+      addChiefSystemMessage(`// Error: ${res.status}. Check Vercel env vars.`);
       chiefStreaming = false;
       document.getElementById('chiefSendBtn').disabled = false;
       return;
