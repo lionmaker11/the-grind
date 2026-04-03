@@ -1,55 +1,77 @@
 {
   "date": "2026-04-03",
-  "last_synced": "2026-04-03T20:09:53.496Z",
+  "last_synced": "2026-04-03T20:12:15.040Z",
   "tasks": [
     {
       "id": "task-001",
-      "text": "Workout — missed this morning. Do it before dinner.",
+      "text": "Provide Hyperliquid API key + MARCUS login to Chief",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On Business",
+      "project_name": "MARCUS"
+    },
+    {
+      "id": "task-002",
+      "text": "Call Sam — countertop answer due EOD + framing/drywall status",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In Business",
+      "project_name": "708 Pallister"
+    },
+    {
+      "id": "task-003",
+      "text": "Follow up 10DLC SMS switch — new Twilio account status",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In Business",
+      "project_name": "Motor City Deals"
+    },
+    {
+      "id": "task-004",
+      "text": "DPE Sprint 2 — build next product set",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On Business",
+      "project_name": "Digital Product Empire"
+    },
+    {
+      "id": "task-005",
+      "text": "708P budget spreadsheet — overdue, get it done",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Finances",
+      "project_name": "708 Pallister"
+    },
+    {
+      "id": "task-006",
+      "text": "List all unpaid bills (water, trash, cards) — bill audit prep",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Finances",
+      "project_name": "Finances"
+    },
+    {
+      "id": "task-007",
+      "text": "Workout — protect the foundation",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "Physical",
       "project_name": "Fitness"
-    },
-    {
-      "id": "task-002",
-      "text": "Family dinner — 6 PM",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "Relationships",
-      "project_name": "Family"
-    },
-    {
-      "id": "task-003",
-      "text": "Plants — 5-15 min",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "Physical",
-      "project_name": "Personal"
-    },
-    {
-      "id": "task-004",
-      "text": "Reading — 9:30 PM. Lights out 10.",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "Mental",
-      "project_name": "Mental"
     }
   ],
-  "needs_you_handled": [],
-  "needs_you_pending": [
-    "Sam: countertop answer was due today — text him tomorrow morning",
-    "10DLC: follow up Ali Monday Apr 7"
-  ],
   "summary": {
-    "daily_score": 10,
+    "daily_score": 0,
     "pomodoros_completed": 0,
     "total_minutes": 0,
     "tasks_completed": 0,
-    "total_tasks": 4,
+    "total_tasks": 7,
     "categories_touched": [],
     "session_streak": 0,
     "day_streak": 0,
