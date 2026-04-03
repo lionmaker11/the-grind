@@ -1,7 +1,7 @@
 {
   "date": "2026-04-03",
   "finances": {
-    "month_income": 8200,
+    "month_income": 10000,
     "month_target": 25000
   },
   "projects": [
@@ -24,31 +24,38 @@
       "name": "708 Pallister",
       "health": "yellow",
       "category": "In Business",
-      "days_silent": 2
+      "days_silent": 0
+    },
+    {
+      "id": "dpe",
+      "name": "Digital Product Empire",
+      "health": "green",
+      "category": "On Business",
+      "days_silent": 0
     },
     {
       "id": "va",
       "name": "VA Appeal",
-      "health": "red",
+      "health": "yellow",
       "category": "Finances",
-      "days_silent": 14
+      "days_silent": 0
     }
   ],
   "tasks": [
     {
       "id": "task-001",
-      "text": "Review MARCUS shadow mode performance",
+      "text": "Provide Hyperliquid API key + MARCUS login to Chief",
       "project_id": "marcus",
       "project_name": "MARCUS",
       "category": "On Business",
-      "type": "pomodoro",
-      "estimated_pomodoros": 2,
+      "type": "quick",
+      "estimated_pomodoros": 1,
       "priority": 1,
       "health": "green"
     },
     {
       "id": "task-002",
-      "text": "Call Sam \u2014 check 708P interior progress",
+      "text": "Call Sam — countertop answer due EOD + framing/drywall status",
       "project_id": "708p",
       "project_name": "708 Pallister",
       "category": "In Business",
@@ -59,51 +66,51 @@
     },
     {
       "id": "task-003",
-      "text": "Review 3 stale MCD leads with Ali",
+      "text": "Follow up 10DLC SMS switch — new Twilio account status",
       "project_id": "mcd",
       "project_name": "Motor City Deals",
       "category": "In Business",
-      "type": "pomodoro",
+      "type": "quick",
       "estimated_pomodoros": 1,
       "priority": 3,
       "health": "green"
     },
     {
       "id": "task-004",
-      "text": "Check VA appeal status online",
-      "project_id": "va",
-      "project_name": "VA Appeal",
-      "category": "Finances",
-      "type": "quick",
-      "estimated_pomodoros": 1,
+      "text": "DPE Sprint 2 — build next product set",
+      "project_id": "dpe",
+      "project_name": "Digital Product Empire",
+      "category": "On Business",
+      "type": "pomodoro",
+      "estimated_pomodoros": 2,
       "priority": 4,
-      "health": "red"
+      "health": "green"
     },
     {
       "id": "task-005",
-      "text": "Update FINANCES.md with April income",
-      "project_id": "taxes",
-      "project_name": "IRS / Taxes",
+      "text": "708P budget spreadsheet — overdue, get it done",
+      "project_id": "708p",
+      "project_name": "708 Pallister",
       "category": "Finances",
-      "type": "quick",
+      "type": "pomodoro",
       "estimated_pomodoros": 1,
       "priority": 5,
       "health": "red"
     },
     {
       "id": "task-006",
-      "text": "GrillaHQ \u2014 review MAO calculator PR",
-      "project_id": "grilla",
-      "project_name": "GrillaHQ",
-      "category": "On Business",
+      "text": "List all unpaid bills (water, trash, cards) — bill audit prep",
+      "project_id": "finances",
+      "project_name": "Finances",
+      "category": "Finances",
       "type": "pomodoro",
-      "estimated_pomodoros": 2,
+      "estimated_pomodoros": 1,
       "priority": 6,
-      "health": "yellow"
+      "health": "red"
     },
     {
       "id": "task-007",
-      "text": "Tonal upper body workout",
+      "text": "Workout — protect the foundation",
       "project_id": "fitness",
       "project_name": "Fitness",
       "category": "Physical",
@@ -114,12 +121,12 @@
     }
   ],
   "needs_you": [
-    "MCD: Deal at 14234 Arcola needs offer approval",
-    "708P: Sam missed yesterday's check-in",
-    "MARCUS: Shadow mode has 72hrs of data \u2014 review for live promotion?"
+    "708P: Sam owes countertop answer by EOD today",
+    "MARCUS: Hyperliquid API key + login still not provided to Chief",
+    "MCD: 10DLC SMS pending — follow up with Ali Mon Apr 7"
   ],
   "falling_through_cracks": [
-    { "name": "VA Appeal", "days_silent": 14 },
-    { "name": "Lionmaker Brand", "days_silent": 9 }
+    { "name": "708P Budget Spreadsheet", "days_silent": 14 },
+    { "name": "Unpaid Bills Audit", "days_silent": 7 }
   ]
 }
