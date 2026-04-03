@@ -1,0 +1,125 @@
+{
+  "date": "2026-04-03",
+  "finances": {
+    "month_income": 8200,
+    "month_target": 25000
+  },
+  "projects": [
+    {
+      "id": "marcus",
+      "name": "MARCUS",
+      "health": "green",
+      "category": "On Business",
+      "days_silent": 0
+    },
+    {
+      "id": "mcd",
+      "name": "Motor City Deals",
+      "health": "green",
+      "category": "In Business",
+      "days_silent": 0
+    },
+    {
+      "id": "708p",
+      "name": "708 Pallister",
+      "health": "yellow",
+      "category": "In Business",
+      "days_silent": 2
+    },
+    {
+      "id": "va",
+      "name": "VA Appeal",
+      "health": "red",
+      "category": "Finances",
+      "days_silent": 14
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-001",
+      "text": "Review MARCUS shadow mode performance",
+      "project_id": "marcus",
+      "project_name": "MARCUS",
+      "category": "On Business",
+      "type": "pomodoro",
+      "estimated_pomodoros": 2,
+      "priority": 1,
+      "health": "green"
+    },
+    {
+      "id": "task-002",
+      "text": "Call Sam \u2014 check 708P interior progress",
+      "project_id": "708p",
+      "project_name": "708 Pallister",
+      "category": "In Business",
+      "type": "quick",
+      "estimated_pomodoros": 1,
+      "priority": 2,
+      "health": "yellow"
+    },
+    {
+      "id": "task-003",
+      "text": "Review 3 stale MCD leads with Ali",
+      "project_id": "mcd",
+      "project_name": "Motor City Deals",
+      "category": "In Business",
+      "type": "pomodoro",
+      "estimated_pomodoros": 1,
+      "priority": 3,
+      "health": "green"
+    },
+    {
+      "id": "task-004",
+      "text": "Check VA appeal status online",
+      "project_id": "va",
+      "project_name": "VA Appeal",
+      "category": "Finances",
+      "type": "quick",
+      "estimated_pomodoros": 1,
+      "priority": 4,
+      "health": "red"
+    },
+    {
+      "id": "task-005",
+      "text": "Update FINANCES.md with April income",
+      "project_id": "taxes",
+      "project_name": "IRS / Taxes",
+      "category": "Finances",
+      "type": "quick",
+      "estimated_pomodoros": 1,
+      "priority": 5,
+      "health": "red"
+    },
+    {
+      "id": "task-006",
+      "text": "GrillaHQ \u2014 review MAO calculator PR",
+      "project_id": "grilla",
+      "project_name": "GrillaHQ",
+      "category": "On Business",
+      "type": "pomodoro",
+      "estimated_pomodoros": 2,
+      "priority": 6,
+      "health": "yellow"
+    },
+    {
+      "id": "task-007",
+      "text": "Tonal upper body workout",
+      "project_id": "fitness",
+      "project_name": "Fitness",
+      "category": "Physical",
+      "type": "pomodoro",
+      "estimated_pomodoros": 1,
+      "priority": 7,
+      "health": "green"
+    }
+  ],
+  "needs_you": [
+    "MCD: Deal at 14234 Arcola needs offer approval",
+    "708P: Sam missed yesterday's check-in",
+    "MARCUS: Shadow mode has 72hrs of data \u2014 review for live promotion?"
+  ],
+  "falling_through_cracks": [
+    { "name": "VA Appeal", "days_silent": 14 },
+    { "name": "Lionmaker Brand", "days_silent": 9 }
+  ]
+}

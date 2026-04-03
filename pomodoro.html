@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POMO::DORO // v2.077</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cyan: #00f0ff;
+    --cyan-dim: rgba(0, 240, 255, 0.3);
+    --cyan-glow: rgba(0, 240, 255, 0.5);
+    --magenta: #ff00de;
+    --magenta-dim: rgba(255, 0, 222, 0.3);
+    --magenta-glow: rgba(255, 0, 222, 0.5);
+    --yellow: #ffe600;
+    --yellow-dim: rgba(255, 230, 0, 0.3);
+    --yellow-glow: rgba(255, 230, 0, 0.5);
+    --red: #ff003c;
+    --green: #39ff14;
+    --green-glow: rgba(57, 255, 20, 0.4);
+    --indigo: #7b5cff;
+    --indigo-dim: rgba(123, 92, 255, 0.3);
+    --indigo-glow: rgba(123, 92, 255, 0.5);
+    --xp-gold: #ffe600;
+    --xp-glow: rgba(255, 230, 0, 0.5);
+    --bg: #0a0a12;
+    --bg-panel: rgba(10, 15, 30, 0.85);
+    --border: rgba(0, 240, 255, 0.12);
+    --border-bright: rgba(0, 240, 255, 0.3);
+    --text: #e0e6f0;
+    --text-dim: rgba(200, 210, 230, 0.45);
+  }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  /* Scanlines overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+  }
+
+  /* CRT vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+  }
+
+  /* Animated BG */
+  .bg-gradient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    transition: background 1.5s ease;
+  }
+  .bg-gradient.work {
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(0,240,255,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(255,0,222,0.06) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0a12 0%, #0d0820 50%, #0a0a12 100%);
+  }
+  .bg-gradient.break {
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(57,255,20,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(0,240,255,0.06) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0a12 0%, #081a0d 50%, #0a0a12 100%);
+  }
+  .bg-gradient.long-break {
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,0,222,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(255,230,0,0.06) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0a12 0%, #1a0820 50%, #0a0a12 100%);
+  }
+  .bg-gradient.meditate {
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(123,92,255,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(0,240,255,0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0a12 0%, #0e0a22 50%, #0a0a12 100%);
+  }
+
+  /* Grid overlay */
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    opacity: 0;
+    animation: floatUp linear forwards;
+  }
+  .particle.square { border-radius: 1px; }
+  .particle.round { border-radius: 50%; }
+  .particle.line { border-radius: 0; height: 1px !important; }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(0) scale(0); }
+    15% { opacity: 0.8; transform: translateY(-30px) scale(1); }
+    85% { opacity: 0.4; }
+    100% { opacity: 0; transform: translateY(-400px) scale(0.2); }
+  }
+
+  .confetti {
+    position: fixed;
+    z-index: 100;
+    pointer-events: none;
+    animation: confettiFall 2.5s ease-out forwards;
+  }
+  .confetti.glitch-piece {
+    width: 3px;
+    height: 12px;
+    border-radius: 0;
+  }
+  @keyframes confettiFall {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.3); }
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    width: 460px;
+    max-width: 95vw;
+    text-align: center;
+    padding: 20px 0 40px;
+  }
+
+  /* Cyber panel styling */
+  .cyber-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    backdrop-filter: blur(12px);
+  }
+  .cyber-panel::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+
+  /* Corner accents */
+  .corner-accent {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--cyan);
+    border-style: solid;
+    opacity: 0.5;
+  }
+  .corner-accent.tl { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+  .corner-accent.tr { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
+  .corner-accent.bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
+  .corner-accent.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+  /* XP Bar */
+  .xp-bar-container {
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+  .xp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(255,230,0,0.1), rgba(255,0,222,0.1));
+    border: 1px solid rgba(255,230,0,0.25);
+    border-radius: 2px;
+    padding: 4px 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--yellow);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .level-badge .level-icon { font-size: 0.85rem; }
+  .xp-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .xp-bar-track {
+    height: 6px;
+    background: rgba(255,230,0,0.06);
+    border: 1px solid rgba(255,230,0,0.15);
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--yellow), var(--magenta));
+    border-radius: 0;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 12px var(--xp-glow);
+    position: relative;
+  }
+  .xp-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 30px; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5));
+    animation: xpShimmer 2s ease-in-out infinite;
+  }
+  @keyframes xpShimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  .xp-popup {
+    position: fixed;
+    z-index: 200;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--yellow);
+    text-shadow: 0 0 15px var(--xp-glow), 0 0 30px var(--xp-glow);
+    pointer-events: none;
+    animation: xpFloat 1.5s ease-out forwards;
+    letter-spacing: 2px;
+  }
+  @keyframes xpFloat {
+    0% { opacity: 1; transform: translateY(0) scale(0.5); }
+    30% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
+  }
+
+  .level-up-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.8);
+    animation: fadeIn 0.3s ease;
+    pointer-events: none;
+  }
+  .level-up-card {
+    background: linear-gradient(135deg, rgba(0,240,255,0.08), rgba(255,0,222,0.08));
+    border: 1px solid var(--cyan);
+    border-radius: 4px;
+    padding: 40px 50px;
+    text-align: center;
+    animation: levelUpPop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(20px);
+    position: relative;
+    box-shadow: 0 0 40px var(--cyan-dim), inset 0 0 40px rgba(0,240,255,0.03);
+  }
+  .level-up-card::before {
+    content: '// SYSTEM UPGRADE';
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--cyan);
+    opacity: 0.5;
+    letter-spacing: 3px;
+  }
+  .level-up-card .emoji { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+  .level-up-card h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--cyan);
+    text-shadow: 0 0 20px var(--cyan-glow);
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .level-up-card .level-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--magenta);
+    letter-spacing: 2px;
+  }
+  @keyframes levelUpPop {
+    0% { transform: scale(0.3) rotate(-5deg); opacity: 0; }
+    60% { transform: scale(1.05) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+  /* Header */
+  .header { margin-bottom: 8px; }
+  .header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    text-shadow: 0 0 10px var(--cyan-dim);
+  }
+  .header .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    margin-top: 2px;
+  }
+  .header .logo-icon {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+    display: block;
+    filter: drop-shadow(0 0 10px var(--cyan-glow));
+    transition: filter 1s ease;
+  }
+
+  /* Glitch effect on title */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    clip-path: inset(0);
+  }
+  .glitch::before {
+    color: var(--magenta);
+    animation: glitch1 3s infinite linear alternate-reverse;
+    opacity: 0.4;
+  }
+  .glitch::after {
+    color: var(--cyan);
+    animation: glitch2 2s infinite linear alternate-reverse;
+    opacity: 0.3;
+  }
+  @keyframes glitch1 {
+    0%, 90% { clip-path: inset(0); transform: translate(0); }
+    92% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 1px); }
+    94% { clip-path: inset(50% 0 20% 0); transform: translate(2px, -1px); }
+    96% { clip-path: inset(0); transform: translate(0); }
+    100% { clip-path: inset(0); transform: translate(0); }
+  }
+  @keyframes glitch2 {
+    0%, 88% { clip-path: inset(0); transform: translate(0); }
+    90% { clip-path: inset(40% 0 30% 0); transform: translate(2px, 1px); }
+    93% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, -1px); }
+    95% { clip-path: inset(0); transform: translate(0); }
+    100% { clip-path: inset(0); transform: translate(0); }
+  }
+
+  /* Mode tabs */
+  .mode-tabs {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    margin-bottom: 24px;
+    background: rgba(0,240,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 3px;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 10px 6px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mode-tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .mode-tab.active { color: #000; font-weight: 900; }
+  .mode-tab.active.work {
+    background: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px var(--cyan-dim), inset 0 0 10px rgba(255,255,255,0.2);
+    text-shadow: none;
+  }
+  .mode-tab.active.break {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 20px var(--green-glow), inset 0 0 10px rgba(255,255,255,0.2);
+  }
+  .mode-tab.active.long-break {
+    background: var(--magenta);
+    border-color: var(--magenta);
+    box-shadow: 0 0 20px var(--magenta-dim), inset 0 0 10px rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  .mode-tab.active.meditate {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    box-shadow: 0 0 20px var(--indigo-dim), inset 0 0 10px rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  /* Timer ring */
+  .timer-container {
+    position: relative;
+    width: 270px;
+    height: 270px;
+    margin: 0 auto 28px;
+  }
+  .timer-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .timer-ring-bg { fill: none; stroke: rgba(0,240,255,0.06); stroke-width: 4; }
+  .timer-ring-progress {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: butt;
+    transition: stroke-dashoffset 0.5s ease, stroke 1s ease;
+  }
+  .timer-ring-progress.work { stroke: url(#workGrad); filter: drop-shadow(0 0 15px var(--cyan-glow)); }
+  .timer-ring-progress.break { stroke: url(#breakGrad); filter: drop-shadow(0 0 15px var(--green-glow)); }
+  .timer-ring-progress.long-break { stroke: url(#longGrad); filter: drop-shadow(0 0 15px var(--magenta-glow)); }
+  .timer-ring-progress.meditate { stroke: url(#medGrad); filter: drop-shadow(0 0 15px var(--indigo-glow)); }
+
+  /* Outer hex ring decoration */
+  .hex-ring {
+    position: absolute;
+    inset: -8px;
+    border: 1px solid rgba(0,240,255,0.08);
+    border-radius: 50%;
+    animation: hexRotate 30s linear infinite;
+  }
+  .hex-ring::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: var(--cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--cyan);
+    transform: translateX(-50%);
+  }
+  @keyframes hexRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  .hex-ring-inner {
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed rgba(255,0,222,0.06);
+    border-radius: 50%;
+    animation: hexRotate 20s linear infinite reverse;
+  }
+
+  .pulse-ring {
+    position: absolute;
+    inset: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,240,255,0.04);
+    animation: pulseRing 3s ease-in-out infinite;
+  }
+  .running .pulse-ring {
+    animation: pulseRing 1.5s ease-in-out infinite;
+    border-color: rgba(0,240,255,0.08);
+  }
+  @keyframes pulseRing {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.03); opacity: 0.7; }
+  }
+
+  .timer-display {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-time {
+    font-family: 'Orbitron', monospace;
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    line-height: 1;
+    transition: color 1s ease, text-shadow 1s ease;
+  }
+  .timer-time.work { color: var(--cyan); text-shadow: 0 0 20px var(--cyan-dim), 0 0 40px rgba(0,240,255,0.15); }
+  .timer-time.break { color: var(--green); text-shadow: 0 0 20px var(--green-glow), 0 0 40px rgba(57,255,20,0.15); }
+  .timer-time.long-break { color: var(--magenta); text-shadow: 0 0 20px var(--magenta-dim), 0 0 40px rgba(255,0,222,0.15); }
+  .timer-time.meditate { color: var(--indigo); text-shadow: 0 0 20px var(--indigo-dim), 0 0 40px rgba(123,92,255,0.15); }
+
+  .timer-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  .multiplier-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,230,0,0.1);
+    border: 1px solid rgba(255,230,0,0.3);
+    color: var(--yellow);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.4s ease;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px var(--yellow-glow);
+  }
+  .multiplier-badge.show { opacity: 1; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .btn {
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .btn:active { transform: scale(0.95) !important; }
+  .btn-main {
+    width: 170px;
+    height: 52px;
+    font-size: 0.8rem;
+    color: #000;
+    border-radius: 2px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-main.work {
+    background: linear-gradient(135deg, var(--cyan), #00c8ff);
+    box-shadow: 0 0 30px var(--cyan-dim), 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .btn-main.break {
+    background: linear-gradient(135deg, var(--green), #20dd10);
+    box-shadow: 0 0 30px var(--green-glow), 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .btn-main.long-break {
+    background: linear-gradient(135deg, var(--magenta), #cc00b3);
+    box-shadow: 0 0 30px var(--magenta-dim), 0 4px 20px rgba(0,0,0,0.3);
+    color: #fff;
+  }
+  .btn-main.meditate {
+    background: linear-gradient(135deg, var(--indigo), #5a3de8);
+    box-shadow: 0 0 30px var(--indigo-dim), 0 4px 20px rgba(0,0,0,0.3);
+    color: #fff;
+  }
+  .btn-main:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+  .btn-secondary {
+    width: 44px;
+    height: 44px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+  }
+  .btn-secondary:hover { background: rgba(0,240,255,0.06); border-color: var(--border-bright); color: var(--cyan); }
+
+  /* Session dots */
+  .sessions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .session-dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(0,240,255,0.08);
+    border: 1px solid rgba(0,240,255,0.15);
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  }
+  .session-dot.completed {
+    border-color: var(--cyan);
+    background: var(--cyan);
+    box-shadow: 0 0 12px var(--cyan-glow);
+    animation: dotPop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .session-dot.current {
+    border-color: var(--cyan);
+    animation: dotPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes dotPop { 0%{transform:scale(0.5)} 60%{transform:scale(1.4)} 100%{transform:scale(1)} }
+  @keyframes dotPulse { 0%,100%{transform:scale(1);opacity:0.5} 50%{transform:scale(1.4);opacity:1} }
+
+  /* Task list */
+  .task-section {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+  .task-header h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .task-header h3 span { color: var(--magenta); }
+  .task-input-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .task-input {
+    flex: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    letter-spacing: 0.5px;
+  }
+  .task-input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan-dim);
+  }
+  .task-input::placeholder { color: var(--text-dim); font-style: italic; }
+  .task-add-btn {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--cyan);
+    border-radius: 2px;
+    background: rgba(0,240,255,0.08);
+    color: var(--cyan);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .task-add-btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan-dim); }
+  .task-add-btn:active { transform: scale(0.95); }
+
+  .task-list { list-style: none; }
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--cyan);
+    border-radius: 2px;
+    margin-bottom: 4px;
+    transition: all 0.4s ease;
+    cursor: pointer;
+  }
+  .task-item:hover { background: rgba(0,240,255,0.04); border-color: var(--border-bright); }
+  .task-item.active-task { border-left-color: var(--magenta); background: rgba(255,0,222,0.04); }
+  .task-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(0,240,255,0.3);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 0.6rem;
+    color: transparent;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    background: rgba(0,240,255,0.05);
+  }
+  .task-item.completed .task-checkbox {
+    border-color: var(--green);
+    background: var(--green);
+    color: #000;
+    animation: checkPop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes checkPop { 0%{transform:scale(0.5)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
+  .task-name {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+  }
+  .task-item.completed .task-name { text-decoration: line-through; color: var(--text-dim); }
+  .task-xp {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--yellow);
+    opacity: 0.6;
+    letter-spacing: 1px;
+  }
+  .task-item.completed .task-xp { opacity: 0.2; }
+  .task-delete {
+    opacity: 0;
+    border: none;
+    background: none;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 2px 4px;
+  }
+  .task-item:hover .task-delete { opacity: 0.5; }
+  .task-delete:hover { opacity: 1 !important; color: var(--red); }
+  .task-item.removing { animation: taskRemove 0.4s ease forwards; }
+  @keyframes taskRemove {
+    0% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(40px); height: 0; padding: 0; margin: 0; overflow: hidden; }
+  }
+
+  /* Achievement toast */
+  .achievement-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    z-index: 400;
+    background: var(--bg-panel);
+    border: 1px solid var(--yellow);
+    border-radius: 2px;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(20px);
+    animation: toastIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    pointer-events: none;
+    max-width: 90vw;
+    box-shadow: 0 0 30px var(--yellow-dim);
+  }
+  .achievement-toast.out { animation: toastOut 0.4s ease forwards; }
+  @keyframes toastIn { 0%{transform:translateX(-50%) translateY(-100px)} 100%{transform:translateX(-50%) translateY(0)} }
+  @keyframes toastOut { 0%{transform:translateX(-50%) translateY(0);opacity:1} 100%{transform:translateX(-50%) translateY(-100px);opacity:0} }
+  .achievement-icon { font-size: 1.6rem; }
+  .achievement-info { text-align: left; }
+  .achievement-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--yellow);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--yellow-glow);
+  }
+  .achievement-desc {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+  }
+  .stat {
+    text-align: center;
+    flex: 1;
+    padding: 14px 8px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    position: relative;
+  }
+  .stat::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.3;
+  }
+  .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 800;
+    transition: color 1s ease, text-shadow 1s ease;
+    letter-spacing: 1px;
+  }
+  .stat-value.work { color: var(--cyan); text-shadow: 0 0 10px var(--cyan-dim); }
+  .stat-value.break { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
+  .stat-value.long-break { color: var(--magenta); text-shadow: 0 0 10px var(--magenta-dim); }
+  .stat-value.meditate { color: var(--indigo); text-shadow: 0 0 10px var(--indigo-dim); }
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  @keyframes tick { 0%{transform:scale(1)} 50%{transform:scale(1.015)} 100%{transform:scale(1)} }
+  .tick-anim { animation: tick 0.12s ease; }
+
+  .flash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    animation: completeFlash 0.8s ease-out forwards;
+  }
+  @keyframes completeFlash {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .flash-overlay.work { background: radial-gradient(circle, var(--cyan-dim), transparent 70%); }
+  .flash-overlay.break { background: radial-gradient(circle, var(--green-glow), transparent 70%); }
+  .flash-overlay.long-break { background: radial-gradient(circle, var(--magenta-dim), transparent 70%); }
+  .flash-overlay.meditate { background: radial-gradient(circle, var(--indigo-dim), transparent 70%); }
+
+  .streak-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(135deg, var(--red), var(--magenta));
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 2px;
+    box-shadow: 0 0 15px rgba(255,0,60,0.5);
+    animation: badgePop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
+    letter-spacing: 1px;
+  }
+  @keyframes badgePop { 0%{transform:scale(0) rotate(-20deg)} 60%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1) rotate(0deg)} }
+
+  .btn-sound {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  .btn-sound:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn-sound.muted { color: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.05); }
+
+  .coin {
+    position: fixed;
+    z-index: 150;
+    font-size: 1rem;
+    pointer-events: none;
+    animation: coinFly 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes coinFly {
+    0% { opacity: 1; transform: scale(0.5); }
+    40% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.5); }
+  }
+
+  /* Blinking cursor effect */
+  .blink { animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  @media (max-width: 480px) {
+    .timer-container { width: 230px; height: 230px; }
+    .timer-time { font-size: 2.6rem; }
+    .stats { flex-wrap: wrap; }
+    .app { padding: 12px 0 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-gradient work" id="bgGradient"></div>
+<div class="grid-overlay"></div>
+<div class="particles" id="particles"></div>
+
+<div class="app">
+  <!-- XP Bar -->
+  <div class="xp-bar-container">
+    <div class="xp-header">
+      <div class="level-badge" id="levelBadge">
+        <span class="level-icon">&#x25C8;</span>
+        <span id="levelText">LVL 01</span>
+      </div>
+      <span class="xp-text" id="xpText">0 / 100 XP</span>
+      <button class="btn-sound" id="soundBtn" onclick="toggleSound()" title="Toggle sound">&#x266B;</button>
+    </div>
+    <div class="xp-bar-track">
+      <div class="xp-bar-fill" id="xpBarFill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div class="header">
+    <span class="logo-icon" id="logoIcon">&#x25C6;</span>
+    <h1 class="glitch" data-text="POMO://DORO">POMO://DORO</h1>
+    <div class="subtitle">NEURAL FOCUS ENGINE v2.077</div>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active work" data-mode="work" onclick="switchMode('work')">FOCUS</button>
+    <button class="mode-tab" data-mode="break" onclick="switchMode('break')">BREAK</button>
+    <button class="mode-tab" data-mode="long-break" onclick="switchMode('long-break')">REBOOT</button>
+    <button class="mode-tab" data-mode="meditate" onclick="switchMode('meditate')">MEDITATE</button>
+  </div>
+
+  <div class="timer-container" id="timerContainer">
+    <div class="hex-ring"></div>
+    <div class="hex-ring-inner"></div>
+    <div class="pulse-ring"></div>
+    <div class="multiplier-badge" id="multiplierBadge">x1</div>
+    <svg class="timer-ring" viewBox="0 0 280 280">
+      <defs>
+        <linearGradient id="workGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00f0ff"/>
+          <stop offset="100%" stop-color="#0080ff"/>
+        </linearGradient>
+        <linearGradient id="breakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#39ff14"/>
+          <stop offset="100%" stop-color="#20aa10"/>
+        </linearGradient>
+        <linearGradient id="longGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff00de"/>
+          <stop offset="100%" stop-color="#8800aa"/>
+        </linearGradient>
+        <linearGradient id="medGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#7b5cff"/>
+          <stop offset="100%" stop-color="#4a2de0"/>
+        </linearGradient>
+      </defs>
+      <circle class="timer-ring-bg" cx="140" cy="140" r="130"/>
+      <circle class="timer-ring-progress work" id="progressRing" cx="140" cy="140" r="130"
+        stroke-dasharray="816.81" stroke-dashoffset="0"/>
+    </svg>
+    <div class="timer-display">
+      <div class="timer-time work" id="timerTime">25:00</div>
+      <div class="timer-label" id="timerLabel">// awaiting input<span class="blink">_</span></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-secondary" onclick="resetTimer()" title="Reset">&#x21BA;</button>
+    <button class="btn btn-main work" id="mainBtn" onclick="toggleTimer()">EXECUTE</button>
+    <button class="btn btn-secondary" onclick="skipTimer()" title="Skip">&#x23ED;</button>
+  </div>
+
+  <div class="sessions" id="sessions">
+    <div class="session-dot current" data-session="1"></div>
+    <div class="session-dot" data-session="2"></div>
+    <div class="session-dot" data-session="3"></div>
+    <div class="session-dot" data-session="4"></div>
+  </div>
+
+  <!-- Task List -->
+  <div class="task-section">
+    <div class="task-header">
+      <h3><span>&gt;</span> MISSION_LOG</h3>
+      <span class="xp-text" id="taskXpHint">// complete for bonus xp</span>
+    </div>
+    <div class="task-input-row">
+      <input class="task-input" id="taskInput" type="text" placeholder="input mission objective..." maxlength="80" onkeydown="if(event.key==='Enter')addTask()">
+      <button class="task-add-btn" onclick="addTask()">+</button>
+    </div>
+    <ul class="task-list" id="taskList"></ul>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value work" id="statPomodoros">0</div>
+      <div class="stat-label">cycles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value work" id="statMinutes">0</div>
+      <div class="stat-label">minutes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value work" id="statStreak">0</div>
+      <div class="stat-label">streak</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value work" id="statXp">0</div>
+      <div class="stat-label">total xp</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // --- State ---
+  let mode = 'work';
+  let running = false;
+  let timeLeft = 25 * 60;
+  let totalTime = 25 * 60;
+  let interval = null;
+  let pomodorosCompleted = 0;
+  let totalMinutes = 0;
+  let streak = 0;
+  let soundEnabled = true;
+  let tasks = [];
+  let taskIdCounter = 0;
+
+  let xp = 0;
+  let totalXp = 0;
+  let level = 1;
+  let xpToNext = 100;
+  let achievements = new Set();
+  let tasksCompleted = 0;
+
+  const DURATIONS = { work: 25 * 60, break: 5 * 60, 'long-break': 15 * 60, meditate: 20 * 60 };
+  const LABELS_RUN = { work: 'neural_focus::active', break: 'cooldown::active', 'long-break': 'deep_reboot::active', meditate: 'zen_protocol::active' };
+  const LABELS_READY = { work: '// awaiting input', break: '// break ready', 'long-break': '// reboot ready', meditate: '// zen ready' };
+  const CIRCUMFERENCE = 2 * Math.PI * 130;
+
+  const LEVEL_TITLES = [
+    '', 'NETRUNNER', 'DATASMITH', 'CODEBREAKER', 'SYNTH_OPS', 'OVERCLOCKED',
+    'MAINFRAME', 'ARCHITECT', 'FLOW_STATE', 'ZERO_COOL', 'LEGENDARY',
+    'TRANSCENDED', 'MYTHIC_OPS', 'SINGULARITY', 'TIME_LORD', 'ASCENDED'
+  ];
+  const LEVEL_ICONS = ['', '\u25C8', '\u25C9', '\u2726', '\u2605', '\u26A1', '\u25C6', '\u2756', '\u29BF', '\u2742', '\u2606', '\u273B', '\u2738', '\u2739', '\u29D7', '\u2736'];
+
+  const XP_REWARDS = { pomodoroComplete: 50, taskComplete: 20, streakBonus: 10, noSkipBonus: 15, firstPomodoro: 25 };
+
+  const ACHIEVEMENTS = {
+    first_pomo: { icon: '\u25C6', title: 'FIRST_BOOT', desc: 'Initialize first focus cycle' },
+    streak_3: { icon: '\u26A1', title: 'OVERCLOCKED', desc: 'Reach a 3-cycle streak' },
+    streak_5: { icon: '\u2622', title: 'UNSTOPPABLE', desc: '5-cycle streak achieved' },
+    streak_10: { icon: '\u2604', title: 'SUPERNOVA', desc: '10-cycle streak achieved' },
+    tasks_5: { icon: '\u2694', title: 'MISSION_MASTER', desc: 'Complete 5 missions' },
+    tasks_10: { icon: '\u2620', title: 'ELITE_OPS', desc: 'Complete 10 missions' },
+    level_5: { icon: '\u25C6', title: 'DIAMOND_NODE', desc: 'Reach Level 5' },
+    level_10: { icon: '\u2756', title: 'APEX_RANK', desc: 'Reach Level 10' },
+    hour_focus: { icon: '\u23F0', title: 'HOUR_POWER', desc: 'Focus for 60+ minutes' },
+    four_cycle: { icon: '\u21BA', title: 'FULL_CYCLE', desc: 'Complete all 4 sessions' },
+  };
+
+  // --- Audio ---
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSubtleTick() {
+    if (!soundEnabled) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 440;
+    osc.type = 'square';
+    gain.gain.setValueAtTime(0.008, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.02);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.02);
+  }
+
+  function playLoudTick() {
+    if (!soundEnabled) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'square';
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playComplete() {
+    if (!soundEnabled) return;
+    [261.63, 329.63, 392, 523.25, 659.25].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sawtooth';
+      const t = audioCtx.currentTime + i * 0.1;
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc.start(t); osc.stop(t + 0.35);
+    });
+  }
+
+  function playXpSound() {
+    if (!soundEnabled) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 1400;
+    osc.type = 'square';
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+  }
+
+  function playLevelUp() {
+    if (!soundEnabled) return;
+    [330, 440, 554, 660, 880, 1108].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sawtooth';
+      const t = audioCtx.currentTime + i * 0.08;
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.start(t); osc.stop(t + 0.4);
+    });
+  }
+
+  function playStart() {
+    if (!soundEnabled) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 660;
+    osc.type = 'sawtooth';
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+  }
+
+  function playTaskComplete() {
+    if (!soundEnabled) return;
+    [880, 1100].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'square';
+      const t = audioCtx.currentTime + i * 0.08;
+      gain.gain.setValueAtTime(0.07, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      osc.start(t); osc.stop(t + 0.15);
+    });
+  }
+
+  // --- Particles (cyberpunk style) ---
+  function spawnParticle() {
+    if (!running) return;
+    const p = document.createElement('div');
+    const shapes = ['square', 'round', 'line'];
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    p.className = 'particle ' + shape;
+    const size = shape === 'line' ? Math.random() * 30 + 10 : Math.random() * 4 + 1;
+    const colors = {
+      work: ['#00f0ff', '#0080ff', '#00ffaa'],
+      break: ['#39ff14', '#00f0ff', '#20dd10'],
+      'long-break': ['#ff00de', '#8800aa', '#ff003c'],
+      'meditate': ['#7b5cff', '#4a2de0', '#00f0ff']
+    };
+    const c = colors[mode];
+    const color = c[Math.floor(Math.random() * c.length)];
+    p.style.width = size + 'px';
+    p.style.height = (shape === 'line' ? 1 : size) + 'px';
+    p.style.background = color;
+    p.style.left = Math.random() * 100 + '%';
+    p.style.bottom = '-10px';
+    p.style.animationDuration = (Math.random() * 4 + 3) + 's';
+    p.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+    document.getElementById('particles').appendChild(p);
+    setTimeout(() => p.remove(), 7000);
+  }
+  setInterval(() => { if (running) spawnParticle(); }, 350);
+
+  function launchConfetti() {
+    const colors = ['#00f0ff','#ff00de','#39ff14','#ffe600','#ff003c','#0080ff','#8800aa'];
+    for (let i = 0; i < 70; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti glitch-piece';
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      c.style.left = Math.random()*100 + 'vw';
+      c.style.top = '-10px';
+      c.style.width = (Math.random() * 4 + 2) + 'px';
+      c.style.height = (Math.random() * 16 + 4) + 'px';
+      c.style.animationDuration = (Math.random()*1.5+1.5) + 's';
+      c.style.animationDelay = Math.random()*0.5 + 's';
+      c.style.boxShadow = `0 0 6px ${c.style.background}`;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4000);
+    }
+  }
+
+  function flashScreen() {
+    const f = document.createElement('div');
+    f.className = 'flash-overlay ' + mode;
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 800);
+  }
+
+  // --- XP System ---
+  function getMultiplier() {
+    if (streak >= 10) return 3;
+    if (streak >= 5) return 2.5;
+    if (streak >= 3) return 2;
+    if (streak >= 1) return 1.5;
+    return 1;
+  }
+
+  function awardXp(base, sourceEl) {
+    const mult = getMultiplier();
+    const amount = Math.floor(base * mult);
+    xp += amount;
+    totalXp += amount;
+    showXpPopup(amount, sourceEl);
+    playXpSound();
+    while (xp >= xpToNext) {
+      xp -= xpToNext;
+      level++;
+      xpToNext = Math.floor(100 * Math.pow(1.4, level - 1));
+      showLevelUp();
+      playLevelUp();
+      launchConfetti();
+      checkAchievements();
+    }
+    updateXpBar();
+    document.getElementById('statXp').textContent = totalXp;
+  }
+
+  function showXpPopup(amount, el) {
+    const popup = document.createElement('div');
+    popup.className = 'xp-popup';
+    popup.textContent = `+${amount} XP`;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      popup.style.left = rect.left + rect.width/2 - 30 + 'px';
+      popup.style.top = rect.top - 10 + 'px';
+    } else {
+      popup.style.left = '50%';
+      popup.style.top = '40%';
+      popup.style.marginLeft = '-30px';
+    }
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 1500);
+  }
+
+  function showLevelUp() {
+    const overlay = document.createElement('div');
+    overlay.className = 'level-up-overlay';
+    const title = LEVEL_TITLES[Math.min(level, LEVEL_TITLES.length - 1)];
+    const icon = LEVEL_ICONS[Math.min(level, LEVEL_ICONS.length - 1)];
+    overlay.innerHTML = `
+      <div class="level-up-card">
+        <span class="emoji">${icon}</span>
+        <h2>LEVEL ${String(level).padStart(2,'0')}</h2>
+        <div class="level-title">// ${title}</div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+      overlay.style.animation = 'fadeIn 0.3s ease reverse forwards';
+      setTimeout(() => overlay.remove(), 400);
+    }, 2200);
+  }
+
+  function updateXpBar() {
+    const pct = (xp / xpToNext) * 100;
+    document.getElementById('xpBarFill').style.width = pct + '%';
+    document.getElementById('xpText').textContent = `${xp} / ${xpToNext} XP`;
+    const icon = LEVEL_ICONS[Math.min(level, LEVEL_ICONS.length - 1)];
+    document.getElementById('levelBadge').innerHTML = `<span class="level-icon">${icon}</span><span id="levelText">LVL ${String(level).padStart(2,'0')}</span>`;
+  }
+
+  function updateMultiplier() {
+    const badge = document.getElementById('multiplierBadge');
+    const mult = getMultiplier();
+    if (mult > 1) {
+      badge.textContent = `x${mult}`;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+
+  function checkAchievements() {
+    const checks = [
+      ['first_pomo', () => pomodorosCompleted >= 1],
+      ['streak_3', () => streak >= 3],
+      ['streak_5', () => streak >= 5],
+      ['streak_10', () => streak >= 10],
+      ['tasks_5', () => tasksCompleted >= 5],
+      ['tasks_10', () => tasksCompleted >= 10],
+      ['level_5', () => level >= 5],
+      ['level_10', () => level >= 10],
+      ['hour_focus', () => totalMinutes >= 60],
+      ['four_cycle', () => pomodorosCompleted >= 4],
+    ];
+    checks.forEach(([key, check]) => {
+      if (!achievements.has(key) && check()) {
+        achievements.add(key);
+        showAchievement(ACHIEVEMENTS[key]);
+      }
+    });
+  }
+
+  function showAchievement(ach) {
+    const toast = document.createElement('div');
+    toast.className = 'achievement-toast';
+    toast.innerHTML = `
+      <div class="achievement-icon">${ach.icon}</div>
+      <div class="achievement-info">
+        <div class="achievement-title">UNLOCKED: ${ach.title}</div>
+        <div class="achievement-desc">${ach.desc}</div>
+      </div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => awardXp(30, null), 500);
+    setTimeout(() => {
+      toast.classList.add('out');
+      setTimeout(() => toast.remove(), 500);
+    }, 3500);
+  }
+
+  // --- Tasks ---
+  function addTask() {
+    const input = document.getElementById('taskInput');
+    const name = input.value.trim();
+    if (!name) return;
+    tasks.push({ id: ++taskIdCounter, name, completed: false });
+    input.value = '';
+    renderTasks();
+  }
+
+  function toggleTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task || task.completed) return;
+    task.completed = true;
+    tasksCompleted++;
+    playTaskComplete();
+    const el = document.querySelector(`[data-task-id="${id}"]`);
+    awardXp(XP_REWARDS.taskComplete, el);
+    checkAchievements();
+    renderTasks();
+  }
+
+  function deleteTask(id) {
+    const el = document.querySelector(`[data-task-id="${id}"]`);
+    if (el) {
+      el.classList.add('removing');
+      setTimeout(() => { tasks = tasks.filter(t => t.id !== id); renderTasks(); }, 400);
+    }
+  }
+
+  function renderTasks() {
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.className = 'task-item' + (task.completed ? ' completed' : '');
+      li.dataset.taskId = task.id;
+      li.innerHTML = `
+        <div class="task-checkbox" onclick="toggleTask(${task.id})">${task.completed ? '\u2713' : ''}</div>
+        <span class="task-name" onclick="toggleTask(${task.id})">${escHtml(task.name)}</span>
+        <span class="task-xp">+${Math.floor(XP_REWARDS.taskComplete * getMultiplier())} XP</span>
+        <button class="task-delete" onclick="event.stopPropagation();deleteTask(${task.id})">x</button>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // --- UI Updates ---
+  function updateDisplay() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    const str = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    document.getElementById('timerTime').textContent = str;
+    const progress = 1 - (timeLeft / totalTime);
+    document.getElementById('progressRing').style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+    document.title = `${str} // ${LABELS_RUN[mode]}`;
+  }
+
+  function updateTheme() {
+    document.getElementById('bgGradient').className = 'bg-gradient ' + mode;
+    document.getElementById('progressRing').className = 'timer-ring-progress ' + mode;
+    document.getElementById('timerTime').className = 'timer-time ' + mode;
+    document.getElementById('mainBtn').className = 'btn btn-main ' + mode;
+    document.querySelectorAll('.mode-tab').forEach(tab => {
+      tab.classList.remove('active','work','break','long-break','meditate');
+      if (tab.dataset.mode === mode) tab.classList.add('active', mode);
+    });
+    document.querySelectorAll('.stat-value').forEach(el => el.className = 'stat-value ' + mode);
+  }
+
+  function updateSessions() {
+    document.querySelectorAll('.session-dot').forEach((dot, i) => {
+      dot.classList.remove('completed','current');
+      if (i < pomodorosCompleted % 4) dot.classList.add('completed');
+      else if (i === pomodorosCompleted % 4 && mode === 'work') dot.classList.add('current');
+    });
+  }
+
+  function updateStats() {
+    document.getElementById('statPomodoros').textContent = pomodorosCompleted;
+    document.getElementById('statMinutes').textContent = totalMinutes;
+    document.getElementById('statStreak').textContent = streak;
+    document.getElementById('statXp').textContent = totalXp;
+    const existing = document.querySelector('.streak-badge');
+    if (existing) existing.remove();
+    if (streak >= 3) {
+      const badge = document.createElement('div');
+      badge.className = 'streak-badge';
+      badge.textContent = '\u26A1 ' + streak;
+      document.getElementById('sessions').appendChild(badge);
+    }
+    updateMultiplier();
+  }
+
+  // --- Timer ---
+  function toggleTimer() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    running ? pauseTimer() : startTimer();
+  }
+
+  function startTimer() {
+    running = true;
+    document.getElementById('mainBtn').textContent = 'PAUSE';
+    document.getElementById('timerLabel').innerHTML = LABELS_RUN[mode] + '<span class="blink">_</span>';
+    document.getElementById('timerContainer').classList.add('running');
+    playStart();
+    interval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 5 && timeLeft > 0) playLoudTick();
+      else playSubtleTick();
+      const el = document.getElementById('timerTime');
+      el.classList.remove('tick-anim');
+      void el.offsetWidth;
+      el.classList.add('tick-anim');
+      updateDisplay();
+      if (timeLeft <= 0) completeSession();
+    }, 1000);
+  }
+
+  function pauseTimer() {
+    running = false;
+    clearInterval(interval);
+    document.getElementById('mainBtn').textContent = 'RESUME';
+    document.getElementById('timerLabel').innerHTML = '// paused<span class="blink">_</span>';
+    document.getElementById('timerContainer').classList.remove('running');
+  }
+
+  function resetTimer() {
+    running = false;
+    clearInterval(interval);
+    timeLeft = DURATIONS[mode];
+    totalTime = DURATIONS[mode];
+    document.getElementById('mainBtn').textContent = 'EXECUTE';
+    document.getElementById('timerLabel').innerHTML = LABELS_READY[mode] + '<span class="blink">_</span>';
+    document.getElementById('timerContainer').classList.remove('running');
+    updateDisplay();
+  }
+
+  function skipTimer() { completeSession(); }
+
+  function completeSession() {
+    running = false;
+    clearInterval(interval);
+    document.getElementById('timerContainer').classList.remove('running');
+    playComplete();
+    flashScreen();
+    launchConfetti();
+    if (mode === 'work') {
+      pomodorosCompleted++;
+      totalMinutes += DURATIONS.work / 60;
+      streak++;
+      const timerEl = document.getElementById('timerContainer');
+      awardXp(XP_REWARDS.pomodoroComplete, timerEl);
+      if (streak > 1) awardXp(XP_REWARDS.streakBonus * streak, timerEl);
+      updateStats();
+      updateSessions();
+      checkAchievements();
+      if (pomodorosCompleted % 4 === 0) switchMode('long-break');
+      else switchMode('break');
+    } else {
+      switchMode('work');
+    }
+    document.getElementById('mainBtn').textContent = 'EXECUTE';
+    document.getElementById('timerLabel').innerHTML = '// cycle complete<span class="blink">_</span>';
+  }
+
+  function switchMode(newMode) {
+    if (running) { clearInterval(interval); running = false; document.getElementById('timerContainer').classList.remove('running'); }
+    mode = newMode;
+    timeLeft = DURATIONS[mode];
+    totalTime = DURATIONS[mode];
+    document.getElementById('mainBtn').textContent = 'EXECUTE';
+    document.getElementById('timerLabel').innerHTML = LABELS_READY[mode] + '<span class="blink">_</span>';
+    updateTheme();
+    updateDisplay();
+    updateSessions();
+    renderTasks();
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('soundBtn');
+    btn.textContent = soundEnabled ? '\u266B' : '\u2215';
+    btn.classList.toggle('muted', !soundEnabled);
+    btn.title = soundEnabled ? 'Sound ON' : 'Sound OFF';
+  }
+
+  // Init
+  updateDisplay();
+  updateTheme();
+  updateSessions();
+  updateStats();
+  updateXpBar();
+  renderTasks();
+</script>
+</body>
+</html>
