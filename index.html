@@ -18,27 +18,36 @@
        STYLE: Screens & Navigation ........... ~line 240
        STYLE: Cyber Panel .................... ~line 310
        STYLE: Queue Screen ................... ~line 350
+       STYLE: Swipe-to-Complete .............. ~line 465
        STYLE: Timer Screen (POMO://DORO) ..... ~line 570
        STYLE: Scoreboard Screen .............. ~line 770
        STYLE: Overlays & Toasts .............. ~line 920
-       HTML: Top Bar ......................... ~line 1030
-       HTML: Queue Screen .................... ~line 1060
-       HTML: Timer Screen .................... ~line 1130
-       HTML: Scoreboard Screen ............... ~line 1210
-       HTML: Bottom Nav ...................... ~line 1310
-       JS: State & Constants ................. ~line 1340
-       JS: Persistence ....................... ~line 1420
-       JS: Data Loading ...................... ~line 1500
-       JS: Finance Bar ....................... ~line 1540
-       JS: Queue Rendering ................... ~line 1590
-       JS: Task Launching & Navigation ....... ~line 1700
-       JS: Audio ............................. ~line 1780
-       JS: Particles & Effects ............... ~line 1870
-       JS: XP System ........................ ~line 1930
-       JS: Timer Engine ...................... ~line 2060
-       JS: Scoreboard ........................ ~line 2230
-       JS: Celebration ....................... ~line 2370
-       JS: Init .............................. ~line 2410
+       STYLE: Undo Toast ..................... ~line 1035
+       STYLE: Chief Chat UI .................. ~line 1060
+       HTML: Top Bar ......................... ~line 1250
+       HTML: Queue Screen .................... ~line 1280
+       HTML: Timer Screen .................... ~line 1350
+       HTML: Scoreboard Screen ............... ~line 1430
+       HTML: Bottom Nav ...................... ~line 1530
+       HTML: Chief Chat ...................... ~line 1560
+       JS: State & Constants ................. ~line 1600
+       JS: Persistence ....................... ~line 1700
+       JS: Data Loading ...................... ~line 1780
+       JS: Finance Bar ....................... ~line 1820
+       JS: Queue Rendering ................... ~line 1870
+       JS: Swipe-to-Complete ................. ~line 1970
+       JS: Task Launching & Navigation ....... ~line 2080
+       JS: Audio ............................. ~line 2160
+       JS: Particles & Effects ............... ~line 2250
+       JS: XP System ........................ ~line 2310
+       JS: Timer Engine ...................... ~line 2450
+       JS: Daily Score Calc .................. ~line 2600
+       JS: Scoreboard ........................ ~line 2630
+       JS: Celebration ....................... ~line 2780
+       JS: Results Sync ...................... ~line 2830
+       JS: Today Polling ..................... ~line 2930
+       JS: Chief Chat ........................ ~line 2980
+       JS: Init .............................. ~line 3300
      ============================================================ -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap');
@@ -299,7 +308,7 @@
     flex-shrink: 0;
   }
   .btn-sound:hover { border-color: var(--cyan); color: var(--cyan); }
-  .btn-sound.muted { color: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.05); }
+  .btn-sound.muted { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.15); }
 
   /* ========== SCREENS & NAVIGATION ========== */
   .screen-container {
@@ -442,7 +451,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 14px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-left: 3px solid var(--cyan);
@@ -451,6 +459,7 @@
     transition: all 0.4s ease;
     cursor: pointer;
     position: relative;
+    overflow: hidden;
   }
   .queue-task:hover { background: rgba(0,240,255,0.04); border-color: var(--border-bright); }
   .queue-task.health-red { border-left-color: var(--health-red); animation: redGlow 2s ease-in-out infinite; }
@@ -639,6 +648,124 @@
     transition: all 0.3s;
   }
   .manual-add-btn:hover { background: var(--cyan); color: #000; }
+
+  /* ========== SWIPE-TO-COMPLETE ========== */
+  .swipe-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(57,255,20,0.25) 0%, rgba(57,255,20,0.15) 60%, transparent 100%);
+    display: flex;
+    align-items: center;
+    padding-left: 18px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .swipe-bg .swipe-done-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--green);
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px var(--green-glow);
+  }
+  .swipe-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    position: relative;
+    z-index: 1;
+    background: var(--bg-panel);
+    transition: transform 0.15s ease-out;
+    width: 100%;
+  }
+  .queue-task.quick-completing {
+    max-height: 80px;
+    animation: collapseTask 0.4s 0.2s ease forwards;
+    pointer-events: none;
+  }
+  @keyframes collapseTask {
+    0% { max-height: 80px; opacity: 1; margin-bottom: 6px; }
+    100% { max-height: 0; opacity: 0; margin-bottom: 0; padding: 0; border-width: 0; overflow: hidden; }
+  }
+
+  .swipe-hint {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--green);
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: swipeHintAnim 3s ease 1s forwards;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes swipeHintAnim {
+    0% { opacity: 0; transform: translateY(-50%) translateX(0); }
+    15% { opacity: 0.8; }
+    50% { opacity: 0.8; transform: translateY(-50%) translateX(-20px); }
+    70% { opacity: 0.8; transform: translateY(-50%) translateX(0); }
+    100% { opacity: 0; }
+  }
+
+  /* ========== UNDO TOAST ========== */
+  .undo-toast {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 16px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    background: rgba(10,15,30,0.95);
+    border: 1px solid var(--green);
+    border-radius: 4px;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 20px var(--green-glow);
+    animation: toastIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    max-width: 90vw;
+  }
+  .undo-toast .undo-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .undo-toast .undo-btn {
+    background: rgba(57,255,20,0.15);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 5px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .undo-toast .undo-btn:hover { background: var(--green); color: #000; }
+  .undo-toast .undo-timer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--green);
+    border-radius: 0 0 4px 4px;
+    animation: undoShrink 5s linear forwards;
+  }
+  @keyframes undoShrink {
+    0% { width: 100%; }
+    100% { width: 0%; }
+  }
 
   /* ========== TIMER SCREEN (POMO://DORO) ========== */
   .timer-header-info {
@@ -874,28 +1001,22 @@
   }
   .cat-dot { text-align: center; }
   .cat-dot-circle {
-    width: 32px;
-    height: 32px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     margin: 0 auto 4px;
     border: 1px solid rgba(0,240,255,0.15);
     background: rgba(0,240,255,0.04);
     transition: all 0.5s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    filter: grayscale(1) opacity(0.4);
   }
   .cat-dot.lit .cat-dot-circle {
-    background: rgba(0,240,255,0.1);
+    background: var(--cyan);
     border-color: var(--cyan);
     box-shadow: 0 0 12px var(--cyan-glow);
-    filter: none;
   }
   .cat-dot-label {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.45rem;
+    font-size: 0.55rem;
     color: rgba(200, 210, 230, 0.7);
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -1039,180 +1160,262 @@
   .blink { animation: blink 1s step-end infinite; }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-  /* ========== SWIPE TO COMPLETE ========== */
-  .queue-task { overflow: hidden; }
-  .swipe-bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, rgba(57,255,20,0.15), rgba(57,255,20,0.06));
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-left: 16px;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .swipe-bg.visible { opacity: 1; }
-  .swipe-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.7rem;
-    font-weight: 900;
-    color: var(--green);
-    letter-spacing: 3px;
-    text-shadow: 0 0 10px var(--green-glow);
-  }
-  .swipe-xp {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
-    font-weight: 700;
-    color: var(--yellow);
-    opacity: 0.7;
-  }
-  .swipe-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--bg-panel);
-    position: relative;
-    z-index: 1;
-    padding: 12px 14px;
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .queue-task.has-swipe { padding: 0; }
-  .queue-task.quick-completing .swipe-content { transform: translateX(100%); }
-  .queue-task.quick-completing { max-height: 80px; animation: rowCollapse 0.4s 0.25s ease forwards; }
-  @keyframes rowCollapse {
-    0% { max-height: 80px; opacity: 1; margin-bottom: 6px; }
-    100% { max-height: 0; opacity: 0; margin-bottom: 0; padding: 0; border-width: 0; }
-  }
-  .swipe-hint .swipe-content { animation: hintNudge 1.5s ease-in-out 1s 1; }
-  @keyframes hintNudge {
-    0% { transform: translateX(0); }
-    30% { transform: translateX(30px); }
-    60% { transform: translateX(10px); }
-    100% { transform: translateX(0); }
-  }
-
-  /* Undo toast */
-  .undo-toast {
-    position: fixed;
-    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 12px);
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    z-index: 400;
-    background: var(--bg-panel);
-    border: 1px solid var(--green);
-    border-radius: 2px;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    backdrop-filter: blur(20px);
-    animation: undoIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    max-width: 90vw;
-    box-shadow: 0 0 20px var(--green-glow);
-  }
-  .undo-toast.out { animation: undoOut 0.3s ease forwards; }
-  @keyframes undoIn { 0%{transform:translateX(-50%) translateY(100px)} 100%{transform:translateX(-50%) translateY(0)} }
-  @keyframes undoOut { 0%{transform:translateX(-50%) translateY(0);opacity:1} 100%{transform:translateX(-50%) translateY(100px);opacity:0} }
-  .undo-task-name { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--green); letter-spacing:1px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .undo-btn { font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:800; color:#000; background:var(--green); border:none; padding:6px 14px; border-radius:2px; letter-spacing:2px; cursor:pointer; flex-shrink:0; }
-  .undo-btn:active { transform: scale(0.95); }
-  .undo-timer-bar { position:absolute; bottom:0; left:0; height:2px; background:var(--green); box-shadow:0 0 6px var(--green-glow); animation:undoCountdown 5s linear forwards; }
-  @keyframes undoCountdown { 0%{width:100%} 100%{width:0%} }
-
-  /* ========== CHIEF CHAT ========== */
-  .chief-fab {
-    position: fixed;
-    right: 16px;
-    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 16px);
-    z-index: 60;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 1px solid var(--magenta);
-    background: linear-gradient(135deg, rgba(255,0,222,0.15), rgba(255,0,222,0.05));
-    backdrop-filter: blur(8px);
-    color: var(--magenta);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px var(--magenta-dim), 0 4px 12px rgba(0,0,0,0.4);
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    animation: chiefPulse 3s ease-in-out infinite;
-  }
-  .chief-fab:active { transform: scale(0.92); }
-  .chief-fab svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; }
-  .chief-fab.open { background: var(--magenta); color: #000; border-color: var(--magenta); animation: none; }
-  @keyframes chiefPulse {
-    0%, 100% { box-shadow: 0 0 20px var(--magenta-dim), 0 4px 12px rgba(0,0,0,0.4); }
-    50% { box-shadow: 0 0 30px var(--magenta-glow), 0 4px 16px rgba(0,0,0,0.4); }
-  }
-  .chief-fab.timer-active:not(.open) { opacity: 0.35; width: 40px; height: 40px; box-shadow: none; animation: none; }
-  .chief-fab.timer-active:not(.open):active { opacity: 0.8; width: 48px; height: 48px; }
-  .chief-fab-badge { position:absolute; top:-2px; right:-2px; width:12px; height:12px; border-radius:50%; background:var(--red); border:2px solid var(--bg); display:none; }
-  .chief-fab-badge.visible { display: block; animation: fabBadgePulse 2s ease-in-out infinite; }
-  @keyframes fabBadgePulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,0,60,0.4)} 50%{box-shadow:0 0 0 6px rgba(255,0,60,0)} }
-
-  .chief-backdrop { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.5); opacity:0; visibility:hidden; transition:opacity 0.3s ease, visibility 0s linear 0.3s; }
-  .chief-backdrop.open { opacity:1; visibility:visible; transition:opacity 0.3s ease, visibility 0s linear 0s; }
-
-  .chief-panel {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    z-index: 501;
-    height: 55vh;
-    max-height: 480px;
-    min-height: 320px;
-    background: rgba(10,10,18,0.97);
-    backdrop-filter: blur(16px);
-    border-top: 1px solid var(--magenta-dim);
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    flex-direction: column;
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .chief-panel.open { transform: translateY(0); }
-
-  .chief-header { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
-  .chief-header-dot { width:8px; height:8px; border-radius:50%; background:var(--magenta); box-shadow:0 0 8px var(--magenta-glow); animation:chiefDotPulse 2s ease-in-out infinite; }
-  @keyframes chiefDotPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
-  .chief-header-title { font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:800; color:var(--magenta); letter-spacing:3px; }
-  .chief-header-status { font-family:'Share Tech Mono',monospace; font-size:0.55rem; color:var(--text-dim); letter-spacing:1px; margin-left:auto; }
-
-  .chief-messages { flex:1; overflow-y:auto; overscroll-behavior:contain; padding:12px 16px; display:flex; flex-direction:column; gap:10px; }
-  .chief-msg { max-width:85%; padding:8px 12px; border-radius:8px; font-size:0.85rem; line-height:1.4; word-wrap:break-word; animation: msgFadeIn 0.3s ease; }
-  @keyframes msgFadeIn { 0%{opacity:0;transform:translateY(6px)} 100%{opacity:1;transform:translateY(0)} }
-  .chief-msg.user { align-self:flex-end; background:rgba(0,240,255,0.1); border:1px solid rgba(0,240,255,0.2); color:var(--text); border-radius:8px 8px 2px 8px; font-family:'Rajdhani',sans-serif; font-weight:500; }
-  .chief-msg.chief { align-self:flex-start; background:rgba(255,0,222,0.06); border:1px solid rgba(255,0,222,0.12); color:var(--text); border-radius:8px 8px 8px 2px; font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.5px; }
-  .chief-msg.action { align-self:center; max-width:90%; background:rgba(255,230,0,0.05); border:1px dashed rgba(255,230,0,0.2); border-radius:4px; padding:6px 14px; text-align:center; font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--yellow); }
-  .chief-msg.system { align-self:center; max-width:90%; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--text-dim); text-align:center; padding:4px; }
-  .chief-cursor { display:inline-block; width:2px; height:1em; background:var(--magenta); margin-left:2px; vertical-align:text-bottom; animation:blink 0.8s step-end infinite; }
-  .chief-typing { align-self:flex-start; display:flex; gap:4px; padding:10px 14px; }
-  .chief-typing-dot { width:6px; height:6px; border-radius:50%; background:var(--magenta-dim); animation:typingBounce 1.4s ease-in-out infinite; }
-  .chief-typing-dot:nth-child(2) { animation-delay:0.2s; }
-  .chief-typing-dot:nth-child(3) { animation-delay:0.4s; }
-  @keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-6px);opacity:1} }
-
-  .chief-input-row { display:flex; align-items:center; gap:8px; padding:10px 12px; padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px)); border-top:1px solid var(--border); flex-shrink:0; background:rgba(10,10,18,0.98); }
-  .chief-input { flex:1; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px; padding:8px 16px; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:500; outline:none; transition:border-color 0.3s, box-shadow 0.3s; }
-  .chief-input:focus { border-color:var(--magenta-dim); box-shadow:0 0 10px rgba(255,0,222,0.15); }
-  .chief-input::placeholder { color:var(--text-muted); }
-  .chief-send-btn, .chief-mic-btn { width:36px; height:36px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all 0.2s; }
-  .chief-send-btn { background:var(--magenta); color:#000; }
-  .chief-send-btn:disabled { opacity:0.3; cursor:default; }
-  .chief-send-btn:not(:disabled):active { transform:scale(0.9); }
-  .chief-send-btn svg { width:16px; height:16px; }
-  .chief-mic-btn { background:none; border:1px solid var(--border); color:var(--text-dim); opacity:0.4; cursor:default; }
-  .chief-mic-btn svg { width:16px; height:16px; }
-
   @media (max-width: 480px) {
     .timer-container { width: 220px; height: 220px; }
     .timer-time { font-size: 2.4rem; }
     .timer-stats { flex-wrap: wrap; }
   }
+
+  /* ========== CHIEF CHAT UI ========== */
+  .chief-fab {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 14px);
+    right: 16px;
+    z-index: 60;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--magenta), #aa00cc);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px var(--magenta-dim), 0 4px 12px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+    animation: chiefPulse 3s ease-in-out infinite;
+  }
+  .chief-fab svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+  .chief-fab:hover { transform: scale(1.08); filter: brightness(1.2); }
+  .chief-fab:active { transform: scale(0.95); }
+  .chief-fab.chief-open {
+    z-index: 90;
+  }
+  .chief-fab.timer-active {
+    width: 40px;
+    height: 40px;
+    opacity: 0.5;
+    animation: none;
+  }
+  .chief-fab.timer-active svg { width: 18px; height: 18px; }
+  @keyframes chiefPulse {
+    0%, 100% { box-shadow: 0 0 20px var(--magenta-dim), 0 4px 12px rgba(0,0,0,0.4); }
+    50% { box-shadow: 0 0 30px var(--magenta-glow), 0 4px 12px rgba(0,0,0,0.4); }
+  }
+
+  .chief-fab-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255,0,60,0.6);
+    display: none;
+  }
+  .chief-fab-badge.show { display: block; }
+
+  .chief-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .chief-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .chief-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 80;
+    height: 55vh;
+    background: rgba(10,10,18,0.98);
+    border-top: 2px solid var(--magenta);
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .chief-panel.open {
+    transform: translateY(0);
+  }
+
+  .chief-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .chief-header-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--magenta);
+    box-shadow: 0 0 8px var(--magenta-glow);
+  }
+  .chief-header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--magenta);
+    letter-spacing: 4px;
+    flex: 1;
+  }
+  .chief-header-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .chief-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overscroll-behavior: contain;
+  }
+
+  .chief-msg {
+    max-width: 85%;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }
+  .chief-msg.user {
+    align-self: flex-end;
+    background: rgba(0,240,255,0.1);
+    border: 1px solid rgba(0,240,255,0.25);
+    color: var(--cyan);
+  }
+  .chief-msg.chief {
+    align-self: flex-start;
+    background: rgba(255,0,222,0.08);
+    border: 1px solid rgba(255,0,222,0.2);
+    color: var(--text);
+  }
+  .chief-msg.action {
+    align-self: center;
+    background: rgba(255,230,0,0.08);
+    border: 1px solid rgba(255,230,0,0.2);
+    color: var(--yellow);
+    font-size: 0.65rem;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .chief-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 0.75rem;
+    background: var(--magenta);
+    animation: blink 0.8s step-end infinite;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+  }
+
+  .chief-typing {
+    align-self: flex-start;
+    padding: 10px 16px;
+    display: flex;
+    gap: 4px;
+  }
+  .chief-typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--magenta);
+    opacity: 0.5;
+    animation: typingBounce 1.2s ease-in-out infinite;
+  }
+  .chief-typing span:nth-child(2) { animation-delay: 0.15s; }
+  .chief-typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .chief-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .chief-input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px; /* prevent iOS zoom */
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .chief-input:focus { border-color: var(--magenta); }
+  .chief-input::placeholder { color: var(--text-muted); }
+
+  .chief-send-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--magenta);
+    border-radius: 4px;
+    background: rgba(255,0,222,0.1);
+    color: var(--magenta);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .chief-send-btn:disabled { opacity: 0.3; cursor: default; }
+  .chief-send-btn:not(:disabled):hover { background: var(--magenta); color: #fff; }
+  .chief-send-btn svg { width: 18px; height: 18px; }
+
+  .chief-mic-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0.3;
+  }
+  .chief-mic-btn svg { width: 18px; height: 18px; }
 </style>
 </head>
 <body>
@@ -1506,9 +1709,12 @@ const CIRCUMFERENCE = 2 * Math.PI * 130;
 const LEVEL_TITLES = ['', 'NETRUNNER', 'DATASMITH', 'CODEBREAKER', 'SYNTH_OPS', 'OVERCLOCKED', 'MAINFRAME', 'ARCHITECT', 'FLOW_STATE', 'ZERO_COOL', 'LEGENDARY', 'TRANSCENDED', 'MYTHIC_OPS', 'SINGULARITY', 'TIME_LORD', 'ASCENDED'];
 const LEVEL_ICONS = ['', '\u25C8', '\u25C9', '\u2726', '\u2605', '\u26A1', '\u25C6', '\u2756', '\u29BF', '\u2742', '\u2606', '\u273B', '\u2738', '\u2739', '\u29D7', '\u2736'];
 
-const XP_REWARDS = { pomodoroComplete: 50, quickComplete: 25, taskComplete: 20, streakBonus: 10, quickTaskComplete: 50 };
+const XP_REWARDS = { pomodoroComplete: 50, quickComplete: 25, quickTaskComplete: 50, taskComplete: 20, streakBonus: 10 };
 const ALL_CATEGORIES = ['Physical', 'Mental', 'Spiritual', 'On Business', 'In Business', 'Finances', 'Relationships'];
-const CAT_EMOJI = { 'Physical': '\uD83D\uDCAA', 'Mental': '\uD83E\uDDE0', 'Spiritual': '\uD83E\uDDD8', 'On Business': '\uD83C\uDFD7\uFE0F', 'In Business': '\uD83D\uDCBC', 'Finances': '\uD83D\uDCB0', 'Relationships': '\u2764\uFE0F' };
+const CAT_EMOJI = {
+  'Physical': '\uD83D\uDCAA', 'Mental': '\uD83E\uDDE0', 'Spiritual': '\uD83E\uDDD8',
+  'On Business': '\uD83C\uDFD7\uFE0F', 'In Business': '\uD83D\uDCBC', 'Finances': '\uD83D\uDCB0', 'Relationships': '\u2764\uFE0F'
+};
 
 const ACHIEVEMENTS = {
   first_pomo: { icon: '\u25C6', title: 'FIRST_BOOT', desc: 'Initialize first focus cycle' },
@@ -1531,6 +1737,29 @@ const ACHIEVEMENTS = {
 const screenOrder = ['queue', 'timer', 'score'];
 let currentScreen = 'queue';
 
+// Swipe-to-complete state
+let swipeHintShown = false;
+let undoToastEl = null;
+let undoTimer = null;
+let undoData = null;
+
+// Sync state
+let lastTodaySha = null;
+let syncInFlight = false;
+const SYNC_DEBOUNCE = 5000;
+let syncTimer = null;
+
+// Polling state
+let pollInterval = null;
+
+// Chief Chat state
+let chiefOpen = false;
+let chiefConversation = [];
+let chiefStreaming = false;
+let chiefAwaitingToken = false;
+const CHIEF_STORAGE = 'the-grind-chief-chat';
+const CHIEF_TOKEN_KEY = 'the-grind-chief-token';
+
 // ==================== PERSISTENCE ====================
 function saveState() {
   const state = {
@@ -1544,7 +1773,8 @@ function saveState() {
     categoriesTouched: [...categoriesTouched],
     cracksWorked: [...cracksWorked],
     manualTasks,
-    soundEnabled
+    soundEnabled,
+    swipeHintShown
   };
   localStorage.setItem('the-grind-state', JSON.stringify(state));
 }
@@ -1563,6 +1793,7 @@ function loadState() {
     xpToNext = state.xpToNext || 100;
     achievements = new Set(state.achievements || []);
     soundEnabled = state.soundEnabled !== undefined ? state.soundEnabled : true;
+    swipeHintShown = state.swipeHintShown || false;
 
     const saved = state.date;
     if (!saved) return;
@@ -1669,6 +1900,8 @@ function renderQueue() {
 
   if (allTasks.length === 0 && !todayData) return;
 
+  let isFirstIncomplete = true;
+
   allTasks.forEach(task => {
     const isCompleted = completedTaskIds.has(task.id);
     const isManual = !!task.manual;
@@ -1682,40 +1915,50 @@ function renderQueue() {
     div.className = 'queue-task' + (isCompleted ? ' completed' : '') +
       (isRed && !isCompleted ? ' health-red' : '') +
       (health === 'yellow' && !isCompleted ? ' health-yellow' : '') +
-      (health === 'green' && !isCompleted ? ' health-green' : '') +
-      (!isCompleted ? ' has-swipe' : '');
-    div.dataset.taskId = task.id;
-
-    const catEmoji = task.category ? (CAT_EMOJI[task.category] || '') : '';
-    const taskContent = `
-      <div class="task-info">
-        <div class="task-text">${escHtml(task.text || task.name || '')}</div>
-        <div class="task-meta">
-          ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
-          ${catEmoji ? `<span class="task-type-pomo">${catEmoji}</span>` : ''}
-          <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
-        </div>
-      </div>
-      ${isRed && !isCompleted ? '<span class="task-2x">2X</span>' : ''}
-    `;
+      (health === 'green' && !isCompleted ? ' health-green' : '');
 
     if (!isCompleted) {
+      // Use swipe-content wrapper for incomplete tasks
       div.innerHTML = `
-        <div class="swipe-bg"><span class="swipe-label">DONE</span><span class="swipe-xp">+${Math.floor(XP_REWARDS.quickTaskComplete * getMultiplier() * (isRed ? 2 : 1))} XP</span></div>
-        <div class="swipe-content">${taskContent}</div>
+        <div class="swipe-bg"><span class="swipe-done-label">DONE</span></div>
+        <div class="swipe-content">
+          <div class="task-info">
+            <div class="task-text">${escHtml(task.text || task.name || '')}</div>
+            <div class="task-meta">
+              ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
+              <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
+            </div>
+          </div>
+          ${isRed ? '<span class="task-2x">2X</span>' : ''}
+        </div>
       `;
+      // Show swipe hint on first incomplete task, first time only
+      if (isFirstIncomplete && !swipeHintShown) {
+        const hint = document.createElement('div');
+        hint.className = 'swipe-hint';
+        hint.textContent = 'SWIPE \u2192';
+        div.appendChild(hint);
+        swipeHintShown = true;
+        saveState();
+      }
+      if (isFirstIncomplete) isFirstIncomplete = false;
       setupSwipeToComplete(div, task);
     } else {
-      div.innerHTML = taskContent;
+      div.innerHTML = `
+        <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;width:100%;">
+          <div class="task-info">
+            <div class="task-text">${escHtml(task.text || task.name || '')}</div>
+            <div class="task-meta">
+              ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
+              <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
+            </div>
+          </div>
+          ${isRed ? '<span class="task-2x">2X</span>' : ''}
+        </div>
+      `;
     }
     container.appendChild(div);
   });
-
-  // First-time swipe hint
-  if (!localStorage.getItem('the-grind-swipe-hint')) {
-    const firstRow = container.querySelector('.queue-task:not(.completed)');
-    if (firstRow) { firstRow.classList.add('swipe-hint'); localStorage.setItem('the-grind-swipe-hint', '1'); }
-  }
 
   const nextTask = getNextIncompleteTask();
   const btn = document.getElementById('startBtn');
@@ -1761,6 +2004,191 @@ function getTaskXp(task) {
   const mult = getMultiplier();
   const healthMult = task.health === 'red' ? 2 : 1;
   return Math.floor(base * mult * healthMult);
+}
+
+// ==================== SWIPE-TO-COMPLETE ====================
+function setupSwipeToComplete(el, task) {
+  let startX = 0;
+  let startY = 0;
+  let deltaX = 0;
+  let swiping = false;
+  let locked = false;
+
+  const swipeContent = el.querySelector('.swipe-content');
+  const swipeBg = el.querySelector('.swipe-bg');
+
+  el.addEventListener('touchstart', (e) => {
+    if (completedTaskIds.has(task.id)) return;
+    const touch = e.touches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+    deltaX = 0;
+    swiping = false;
+    locked = false;
+    if (swipeContent) swipeContent.style.transition = 'none';
+  }, { passive: true });
+
+  el.addEventListener('touchmove', (e) => {
+    if (completedTaskIds.has(task.id)) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+
+    // Dead zone: 10px before we decide direction
+    if (!locked && Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+
+    if (!locked) {
+      locked = true;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        swiping = false;
+        return;
+      }
+      swiping = true;
+    }
+
+    if (!swiping) return;
+
+    e.preventDefault();
+    deltaX = Math.max(0, dx);
+
+    if (swipeContent) swipeContent.style.transform = `translateX(${deltaX}px)`;
+    if (swipeBg) swipeBg.style.opacity = Math.min(1, deltaX / 80);
+  }, { passive: false });
+
+  el.addEventListener('touchend', () => {
+    if (completedTaskIds.has(task.id)) return;
+    if (swipeContent) swipeContent.style.transition = 'transform 0.25s ease';
+
+    if (swiping && deltaX >= 80) {
+      if (swipeContent) swipeContent.style.transform = `translateX(${el.offsetWidth}px)`;
+      setTimeout(() => quickCompleteTask(el, task), 200);
+    } else if (swiping) {
+      if (swipeContent) swipeContent.style.transform = 'translateX(0)';
+      if (swipeBg) swipeBg.style.opacity = '0';
+    } else if (!locked || deltaX < 5) {
+      launchTask(task);
+    }
+    swiping = false;
+    locked = false;
+  }, { passive: true });
+}
+
+function quickCompleteTask(el, task) {
+  const healthMult = task.health === 'red' ? 2 : 1;
+
+  if (task.category) categoriesTouched.add(task.category);
+
+  if (todayData && todayData.falling_through_cracks) {
+    const crackNames = todayData.falling_through_cracks.map(c => c.name.toLowerCase());
+    if (task.project_name && crackNames.some(cn => task.project_name.toLowerCase().includes(cn.split(' ')[0].toLowerCase()))) {
+      cracksWorked.add(task.project_id);
+    }
+  }
+
+  completedTaskIds.add(task.id);
+  tasksCompleted++;
+
+  const needed = task.estimated_pomodoros || 1;
+  taskPomosDone[task.id] = needed;
+
+  const base = XP_REWARDS.quickTaskComplete;
+  awardXp(base, el, healthMult);
+
+  playTaskComplete();
+
+  el.classList.add('quick-completing');
+
+  lastCompletedTask = task;
+  checkAchievements();
+  saveState();
+  debouncedSync();
+
+  setTimeout(() => {
+    renderQueue();
+    renderScoreboard();
+
+    const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+    const allDone = allTasks.length > 0 && allTasks.every(t => completedTaskIds.has(t.id));
+    if (allDone) {
+      showCelebration();
+    }
+  }, 600);
+
+  showUndoToast(task);
+}
+
+function showUndoToast(task) {
+  if (undoToastEl) {
+    undoToastEl.remove();
+    undoToastEl = null;
+  }
+  if (undoTimer) {
+    clearTimeout(undoTimer);
+    undoTimer = null;
+  }
+
+  undoData = {
+    taskId: task.id,
+    category: task.category,
+    projectId: task.project_id,
+    healthMult: task.health === 'red' ? 2 : 1,
+    xpAwarded: lastXpAwarded
+  };
+
+  const toast = document.createElement('div');
+  toast.className = 'undo-toast';
+  toast.innerHTML = `
+    <span class="undo-text">COMPLETED</span>
+    <button class="undo-btn" onclick="undoQuickComplete()">UNDO</button>
+    <div class="undo-timer-bar"></div>
+  `;
+  document.body.appendChild(toast);
+  undoToastEl = toast;
+
+  undoTimer = setTimeout(() => {
+    if (undoToastEl) {
+      undoToastEl.remove();
+      undoToastEl = null;
+    }
+    undoData = null;
+  }, 5000);
+}
+
+function undoQuickComplete() {
+  if (!undoData) return;
+
+  const { taskId, category, projectId, xpAwarded } = undoData;
+
+  completedTaskIds.delete(taskId);
+  tasksCompleted = Math.max(0, tasksCompleted - 1);
+  delete taskPomosDone[taskId];
+
+  if (category) {
+    const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+    const otherWithCat = allTasks.some(t => t.id !== taskId && completedTaskIds.has(t.id) && t.category === category);
+    if (!otherWithCat) categoriesTouched.delete(category);
+  }
+
+  if (projectId) cracksWorked.delete(projectId);
+
+  const xpToRemove = xpAwarded;
+  totalXp = Math.max(0, totalXp - xpToRemove);
+  xp = Math.max(0, xp - xpToRemove);
+  updateXpBar();
+
+  if (undoToastEl) {
+    undoToastEl.remove();
+    undoToastEl = null;
+  }
+  if (undoTimer) {
+    clearTimeout(undoTimer);
+    undoTimer = null;
+  }
+  undoData = null;
+
+  saveState();
+  renderQueue();
+  renderScoreboard();
 }
 
 // ==================== MANUAL TASKS ====================
@@ -1833,10 +2261,16 @@ function showScreen(name) {
 }
 
 // ==================== AUDIO (from POMO://DORO) ====================
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx;
+try {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+} catch(e) {
+  soundEnabled = false;
+  audioCtx = null;
+}
 
 function playSubtleTick() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.frequency.value = 440; osc.type = 'square';
@@ -1846,7 +2280,7 @@ function playSubtleTick() {
 }
 
 function playLoudTick() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.frequency.value = 880; osc.type = 'square';
@@ -1856,7 +2290,7 @@ function playLoudTick() {
 }
 
 function playComplete() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   [261.63, 329.63, 392, 523.25, 659.25].forEach((freq, i) => {
     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
@@ -1869,7 +2303,7 @@ function playComplete() {
 }
 
 function playXpSound() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.frequency.value = 1400; osc.type = 'square';
@@ -1879,7 +2313,7 @@ function playXpSound() {
 }
 
 function playLevelUp() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   [330, 440, 554, 660, 880, 1108].forEach((freq, i) => {
     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
@@ -1892,7 +2326,7 @@ function playLevelUp() {
 }
 
 function playStart() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.frequency.value = 660; osc.type = 'sawtooth';
@@ -1902,7 +2336,7 @@ function playStart() {
 }
 
 function playTaskComplete() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !audioCtx) return;
   [880, 1100].forEach((freq, i) => {
     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
@@ -1969,7 +2403,6 @@ function flashScreen() {
 
 // ==================== XP SYSTEM ====================
 function getMultiplier() {
-  // Uses sessionStreak (intra-day consecutive pomos)
   if (sessionStreak >= 10) return 3;
   if (sessionStreak >= 5) return 2.5;
   if (sessionStreak >= 3) return 2;
@@ -2083,16 +2516,16 @@ function showAchievement(ach) {
 
 // ==================== TIMER ENGINE ====================
 function toggleTimer() {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
   running ? pauseTimer() : startTimer();
 }
 
 function startTimer() {
   running = true;
-  updateChiefFabState();
   document.getElementById('mainBtn').textContent = 'PAUSE';
   document.getElementById('timerLabel').innerHTML = LABELS_RUN[mode] + '<span class="blink">_</span>';
   document.getElementById('timerContainer').classList.add('running');
+  document.getElementById('chiefFab').classList.add('timer-active');
   playStart();
   interval = setInterval(() => {
     timeLeft--;
@@ -2109,22 +2542,22 @@ function startTimer() {
 
 function pauseTimer() {
   running = false;
-  updateChiefFabState();
   clearInterval(interval);
   document.getElementById('mainBtn').textContent = 'RESUME';
   document.getElementById('timerLabel').innerHTML = '// paused<span class="blink">_</span>';
   document.getElementById('timerContainer').classList.remove('running');
+  document.getElementById('chiefFab').classList.remove('timer-active');
 }
 
 function resetTimer() {
   running = false;
-  updateChiefFabState();
   clearInterval(interval);
   timeLeft = DURATIONS[mode];
   totalTime = DURATIONS[mode];
   document.getElementById('mainBtn').textContent = 'EXECUTE';
   document.getElementById('timerLabel').innerHTML = LABELS_READY[mode] + '<span class="blink">_</span>';
   document.getElementById('timerContainer').classList.remove('running');
+  document.getElementById('chiefFab').classList.remove('timer-active');
   updateTimerDisplay();
 }
 
@@ -2132,9 +2565,9 @@ function skipTimer() { completeSession(); }
 
 function completeSession() {
   running = false;
-  updateChiefFabState();
   clearInterval(interval);
   document.getElementById('timerContainer').classList.remove('running');
+  document.getElementById('chiefFab').classList.remove('timer-active');
   playComplete();
   flashScreen();
   launchConfetti();
@@ -2222,7 +2655,7 @@ function getCurrentTask() {
 }
 
 function switchMode(newMode) {
-  if (running) { clearInterval(interval); running = false; document.getElementById('timerContainer').classList.remove('running'); }
+  if (running) { clearInterval(interval); running = false; document.getElementById('timerContainer').classList.remove('running'); document.getElementById('chiefFab').classList.remove('timer-active'); }
   mode = newMode;
   timeLeft = DURATIONS[mode];
   totalTime = DURATIONS[mode];
@@ -2287,6 +2720,21 @@ function toggleSound() {
   saveState();
 }
 
+// ==================== DAILY SCORE CALC ====================
+function calcDailyScore() {
+  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+  const totalPomosPlanned = allTasks.reduce((s, t) => s + (t.estimated_pomodoros || 1), 0);
+  const pomoScore = totalPomosPlanned > 0 ? Math.min(40, Math.round((pomodorosCompleted / totalPomosPlanned) * 40)) : 0;
+  const topPriority = allTasks.filter(t => t.priority && t.priority <= 3);
+  const topDone = topPriority.filter(t => completedTaskIds.has(t.id)).length;
+  const priorityScore = topPriority.length > 0 ? Math.round((topDone / topPriority.length) * 20) : 0;
+  const catScore = categoriesTouched.size >= 3 ? 20 : Math.round((categoriesTouched.size / 3) * 20);
+  const financeScore = categoriesTouched.has('Finances') ? 10 : 0;
+  const hasCracks = todayData && todayData.falling_through_cracks && todayData.falling_through_cracks.length > 0;
+  const cracksScore = (!hasCracks || cracksWorked.size > 0) ? 10 : 0;
+  return pomoScore + priorityScore + catScore + financeScore + cracksScore;
+}
+
 // ==================== SCOREBOARD ====================
 function renderScoreboard() {
   // Just completed — auto-dismiss after 5s
@@ -2305,11 +2753,9 @@ function renderScoreboard() {
   const doneCount = allTasks.filter(t => completedTaskIds.has(t.id)).length;
   const totalPomosPlanned = allTasks.reduce((s, t) => s + (t.estimated_pomodoros || 1), 0);
 
-  // Tasks done (merged into breakdown)
   document.getElementById('scoreTasksDone').textContent = `${doneCount}/${totalTaskCount}`;
   document.getElementById('scoreTasksDone').className = 'score-row-value ' + (doneCount > 0 ? 'earned' : 'pending');
 
-  // Daily score calc
   const pomoScore = totalPomosPlanned > 0 ? Math.min(40, Math.round((pomodorosCompleted / totalPomosPlanned) * 40)) : 0;
   const topPriority = allTasks.filter(t => t.priority && t.priority <= 3);
   const topDone = topPriority.filter(t => completedTaskIds.has(t.id)).length;
@@ -2332,11 +2778,11 @@ function renderScoreboard() {
   setScore('scoreFinancePts', financeScore, 10);
   setScore('scoreCracksPts', cracksScore, 10);
 
-  // Category dots — emoji labels
+  // Category dots with emoji labels
   document.getElementById('categoryDots').innerHTML = ALL_CATEGORIES.map(cat => {
     const lit = categoriesTouched.has(cat);
-    const emoji = CAT_EMOJI[cat] || '';
-    return `<div class="cat-dot ${lit ? 'lit' : ''}"><div class="cat-dot-circle">${emoji}</div><div class="cat-dot-label">${cat.split(' ').pop()}</div></div>`;
+    const emoji = CAT_EMOJI[cat] || cat;
+    return `<div class="cat-dot ${lit ? 'lit' : ''}"><div class="cat-dot-circle"></div><div class="cat-dot-label">${emoji}</div></div>`;
   }).join('');
 
   // Project health grid
@@ -2385,161 +2831,32 @@ function showCelebration() {
   showScreen('score');
 }
 
-// ==================== UTILS ====================
-function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
-// ==================== SWIPE TO COMPLETE ====================
-const SWIPE_THRESHOLD = 80;
-const SWIPE_DEAD_ZONE = 10;
-let undoTimeout = null;
-let undoData = null;
-
-function setupSwipeToComplete(el, task) {
-  const content = el.querySelector('.swipe-content');
-  const bg = el.querySelector('.swipe-bg');
-  if (!content || !bg) return;
-  let startX = 0, startY = 0, currentX = 0, swiping = false, scrolling = false;
-
-  content.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    currentX = 0; swiping = false; scrolling = false;
-    content.style.transition = 'none';
-  }, { passive: true });
-
-  content.addEventListener('touchmove', e => {
-    if (scrolling) return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
-    if (!swiping && Math.abs(dy) > SWIPE_DEAD_ZONE) { scrolling = true; return; }
-    if (!swiping && Math.abs(dx) > SWIPE_DEAD_ZONE) swiping = true;
-    if (!swiping) return;
-    e.preventDefault();
-    currentX = Math.max(0, dx);
-    content.style.transform = `translateX(${currentX}px)`;
-    bg.classList.toggle('visible', currentX > 20);
-  }, { passive: false });
-
-  content.addEventListener('touchend', () => {
-    content.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
-    if (swiping && currentX >= SWIPE_THRESHOLD) {
-      quickCompleteTask(el, task);
-    } else if (swiping) {
-      content.style.transform = 'translateX(0)';
-      bg.classList.remove('visible');
-    } else if (!scrolling) {
-      launchTask(task);
-    }
-    swiping = false;
-  });
-}
-
-function quickCompleteTask(el, task) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  playTaskComplete();
-  el.classList.add('quick-completing');
-  el.querySelector('.swipe-bg')?.classList.add('visible');
-
-  const healthMult = task.health === 'red' ? 2 : 1;
-  awardXp(XP_REWARDS.quickTaskComplete, el, healthMult);
-
-  completedTaskIds.add(task.id);
-  taskPomosDone[task.id] = task.estimated_pomodoros || 1;
-  tasksCompleted++;
-  if (task.category) categoriesTouched.add(task.category);
-
-  if (todayData && todayData.falling_through_cracks) {
-    const crackNames = todayData.falling_through_cracks.map(c => c.name.toLowerCase());
-    if (task.project_name && crackNames.some(cn => task.project_name.toLowerCase().includes(cn.split(' ')[0].toLowerCase()))) {
-      cracksWorked.add(task.project_id);
-    }
-  }
-
-  checkAchievements();
-  saveState();
-  undoData = { taskId: task.id, task, xpAwarded: lastXpAwarded, prevTasksCompleted: tasksCompleted - 1, prevPomosDone: (taskPomosDone[task.id] || 1) };
-  showUndoToast(task);
-  debouncedSync();
-
-  setTimeout(() => {
-    renderQueue();
-    const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
-    if (allTasks.length > 0 && allTasks.every(t => completedTaskIds.has(t.id))) showCelebration();
-  }, 650);
-}
-
-function showUndoToast(task) {
-  document.querySelectorAll('.undo-toast').forEach(t => t.remove());
-  if (undoTimeout) clearTimeout(undoTimeout);
-  const toast = document.createElement('div');
-  toast.className = 'undo-toast';
-  toast.innerHTML = `<span class="undo-task-name">// ${escHtml(task.text || '')} done</span><button class="undo-btn" onclick="undoQuickComplete()">UNDO</button><div class="undo-timer-bar"></div>`;
-  document.body.appendChild(toast);
-  undoTimeout = setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 400); undoData = null; }, 5000);
-}
-
-function undoQuickComplete() {
-  if (!undoData) return;
-  completedTaskIds.delete(undoData.taskId);
-  delete taskPomosDone[undoData.taskId];
-  tasksCompleted = undoData.prevTasksCompleted;
-  xp -= undoData.xpAwarded; totalXp -= undoData.xpAwarded;
-  if (xp < 0) xp = 0;
-  updateXpBar();
-  document.getElementById('statXp').textContent = totalXp;
-  if (undoData.task.category) {
-    const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
-    if (!allTasks.some(t => t.id !== undoData.taskId && completedTaskIds.has(t.id) && t.category === undoData.task.category)) {
-      categoriesTouched.delete(undoData.task.category);
-    }
-  }
-  saveState();
-  renderQueue();
-  updateStats();
-  document.querySelectorAll('.undo-toast').forEach(t => { t.classList.add('out'); setTimeout(() => t.remove(), 400); });
-  if (undoTimeout) clearTimeout(undoTimeout);
-  undoData = null;
-}
-
 // ==================== RESULTS SYNC ====================
-let lastTodaySha = null;
-let syncInFlight = false;
-let syncTimer = null;
-
-function calcDailyScore() {
-  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
-  const totalPomosPlanned = allTasks.reduce((s, t) => s + (t.estimated_pomodoros || 1), 0);
-  const pomoScore = totalPomosPlanned > 0 ? Math.min(40, Math.round((pomodorosCompleted / totalPomosPlanned) * 40)) : 0;
-  const topPriority = allTasks.filter(t => t.priority && t.priority <= 3);
-  const topDone = topPriority.filter(t => completedTaskIds.has(t.id)).length;
-  const priorityScore = topPriority.length > 0 ? Math.round((topDone / topPriority.length) * 20) : 0;
-  const catScore = categoriesTouched.size >= 3 ? 20 : Math.round((categoriesTouched.size / 3) * 20);
-  const financeScore = categoriesTouched.has('Finances') ? 10 : 0;
-  const hasCracks = todayData && todayData.falling_through_cracks && todayData.falling_through_cracks.length > 0;
-  const cracksScore = (!hasCracks || cracksWorked.size > 0) ? 10 : 0;
-  return pomoScore + priorityScore + catScore + financeScore + cracksScore;
-}
-
 function buildResultsPayload() {
   const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
   return {
     date: getTodayDate(),
     last_synced: new Date().toISOString(),
-    today_json_date: todayData?.date || null,
     tasks: allTasks.map(t => ({
-      id: t.id, text: t.text, project_id: t.project_id || null, category: t.category || null,
-      status: completedTaskIds.has(t.id) ? 'completed' : (taskPomosDone[t.id] > 0 ? 'in_progress' : 'pending'),
+      id: t.id,
+      text: t.text || t.name || '',
+      status: completedTaskIds.has(t.id) ? 'done' : 'pending',
       completion_type: completedTaskIds.has(t.id) ? (taskPomosDone[t.id] >= (t.estimated_pomodoros || 1) ? 'timed' : 'quick') : null,
-      pomos_done: taskPomosDone[t.id] || 0, pomos_estimated: t.estimated_pomodoros || 1,
-      completed_at: completedTaskIds.has(t.id) ? new Date().toISOString() : null
+      pomos: taskPomosDone[t.id] || 0,
+      category: t.category || null,
+      project_name: t.project_name || null
     })),
-    manual_tasks: manualTasks.filter(t => completedTaskIds.has(t.id)).map(t => ({ id: t.id, text: t.text, status: 'completed' })),
     summary: {
-      pomodoros_completed: pomodorosCompleted, total_minutes: totalMinutes,
-      tasks_completed: tasksCompleted, tasks_total: allTasks.length,
       daily_score: calcDailyScore(),
-      categories_touched: [...categoriesTouched], cracks_worked: [...cracksWorked],
-      xp_earned_today: totalXp, level, day_streak: dayStreak, session_streak: sessionStreak
+      pomodoros_completed: pomodorosCompleted,
+      total_minutes: totalMinutes,
+      tasks_completed: tasksCompleted,
+      total_tasks: allTasks.length,
+      categories_touched: [...categoriesTouched],
+      session_streak: sessionStreak,
+      day_streak: dayStreak,
+      xp: totalXp,
+      level: level
     }
   };
 }
@@ -2547,48 +2864,59 @@ function buildResultsPayload() {
 async function syncResults() {
   if (syncInFlight) return;
   syncInFlight = true;
-  const token = localStorage.getItem('the-grind-chief-token') || '';
   try {
+    const payload = buildResultsPayload();
+    const chiefToken = localStorage.getItem(CHIEF_TOKEN_KEY);
+    const headers = { 'Content-Type': 'application/json' };
+    if (chiefToken) headers['X-Chief-Token'] = chiefToken;
     const res = await fetch('/api/sync', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
-      body: JSON.stringify({ type: 'results', payload: buildResultsPayload() })
+      headers,
+      body: JSON.stringify({ type: 'results', payload, sha: lastTodaySha })
     });
-    if (res.ok) { localStorage.removeItem('the-grind-sync-queue'); }
-    else { queueOfflineSync(); }
-  } catch { queueOfflineSync(); }
-  finally { syncInFlight = false; }
+    if (!res.ok) throw new Error('sync failed');
+    const data = await res.json();
+    if (data.sha) lastTodaySha = data.sha;
+    localStorage.removeItem('the-grind-sync-queue');
+  } catch (e) {
+    queueOfflineSync(buildResultsPayload());
+  } finally {
+    syncInFlight = false;
+  }
 }
 
-function queueOfflineSync() {
-  localStorage.setItem('the-grind-sync-queue', JSON.stringify({ payload: buildResultsPayload(), queued_at: new Date().toISOString() }));
+function queueOfflineSync(payload) {
+  localStorage.setItem('the-grind-sync-queue', JSON.stringify({
+    payload, queued_at: new Date().toISOString()
+  }));
 }
 
 async function drainOfflineQueue() {
   const raw = localStorage.getItem('the-grind-sync-queue');
-  if (!raw || !navigator.onLine) return;
-  const { payload } = JSON.parse(raw);
-  syncInFlight = true;
-  const token = localStorage.getItem('the-grind-chief-token') || '';
+  if (!raw) return;
   try {
+    const { payload } = JSON.parse(raw);
     const res = await fetch('/api/sync', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
-      body: JSON.stringify({ type: 'results', payload })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'results', payload, sha: lastTodaySha })
     });
-    if (res.ok) localStorage.removeItem('the-grind-sync-queue');
-  } catch {}
-  finally { syncInFlight = false; }
+    if (res.ok) {
+      localStorage.removeItem('the-grind-sync-queue');
+      const data = await res.json();
+      if (data.sha) lastTodaySha = data.sha;
+    }
+  } catch (e) { /* retry later */ }
 }
 
 function debouncedSync() {
   if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(syncResults, 5000);
+  syncTimer = setTimeout(syncResults, SYNC_DEBOUNCE);
 }
 
-// Polling for today.json updates
+// ==================== TODAY POLLING ====================
 function startPolling() {
-  setInterval(async () => {
+  pollInterval = setInterval(async () => {
     try {
       const res = await fetch('/api/check-update');
       if (!res.ok) return;
@@ -2599,276 +2927,357 @@ function startPolling() {
       } else if (!lastTodaySha) {
         lastTodaySha = sha;
       }
-    } catch {}
+    } catch(e) {}
   }, 120000);
 }
 
 // ==================== CHIEF CHAT ====================
-let chiefOpen = false;
-let chiefConversation = [];
-let chiefStreaming = false;
-const CHIEF_CHAT_KEY = 'the-grind-chief-chat';
-const CHIEF_TOKEN_KEY = 'the-grind-chief-token';
-
 function toggleChief() {
   chiefOpen = !chiefOpen;
-  document.getElementById('chiefFab').classList.toggle('open', chiefOpen);
   document.getElementById('chiefPanel').classList.toggle('open', chiefOpen);
   document.getElementById('chiefBackdrop').classList.toggle('open', chiefOpen);
-  document.getElementById('chiefBadge').classList.remove('visible');
-  if (chiefOpen) setTimeout(() => document.getElementById('chiefInput').focus(), 350);
+  document.getElementById('chiefFab').classList.toggle('chief-open', chiefOpen);
+
+  if (chiefOpen) {
+    try {
+      const saved = localStorage.getItem(CHIEF_STORAGE);
+      if (saved && chiefConversation.length === 0) {
+        chiefConversation = JSON.parse(saved);
+        renderChiefMessages();
+      }
+    } catch(e) {}
+
+    if (chiefConversation.length === 0) {
+      addChiefSystemMessage('// CHIEF online. What do you need?');
+    }
+
+    document.getElementById('chiefInput').focus();
+    document.getElementById('chiefBadge').classList.remove('show');
+  }
 }
 
-function loadChiefHistory() {
-  try {
-    const raw = localStorage.getItem(CHIEF_CHAT_KEY);
-    if (!raw) return [];
-    const data = JSON.parse(raw);
-    if (data.date !== getTodayDate()) { localStorage.removeItem(CHIEF_CHAT_KEY); return []; }
-    return data.messages || [];
-  } catch { return []; }
+function addChiefSystemMessage(text) {
+  const messagesEl = document.getElementById('chiefMessages');
+  const msgEl = document.createElement('div');
+  msgEl.className = 'chief-msg chief';
+  msgEl.textContent = text;
+  messagesEl.appendChild(msgEl);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function saveChiefHistory() {
-  localStorage.setItem(CHIEF_CHAT_KEY, JSON.stringify({ date: getTodayDate(), messages: chiefConversation.slice(-30) }));
-}
-
-function addChiefMsg(role, text) {
-  const container = document.getElementById('chiefMessages');
-  const div = document.createElement('div');
-  div.className = 'chief-msg ' + role;
-  div.textContent = text;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-
-function renderChiefHistory() {
-  const container = document.getElementById('chiefMessages');
-  container.innerHTML = '';
-  chiefConversation.forEach(m => addChiefMsg(m.role, m.content));
-}
-
-function buildAppState() {
-  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
-  return {
-    date: getTodayDate(),
-    tasks: allTasks,
-    completedTaskIds: [...completedTaskIds],
-    taskPomosDone,
-    currentTaskId,
-    timerRunning: running,
-    timeRemaining: running ? `${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,'0')}` : null,
-    pomodorosCompleted, tasksCompleted, sessionStreak, dayStreak,
-    dailyScore: calcDailyScore(),
-    categoriesTouched: [...categoriesTouched],
-    finances: todayData?.finances || null,
-    needsYou: todayData?.needs_you || [],
-    fallingThroughCracks: todayData?.falling_through_cracks || []
-  };
+function renderChiefMessages() {
+  const messagesEl = document.getElementById('chiefMessages');
+  messagesEl.innerHTML = '';
+  chiefConversation.forEach(msg => {
+    const msgEl = document.createElement('div');
+    if (msg.role === 'action') {
+      msgEl.className = 'chief-msg action';
+    } else {
+      msgEl.className = 'chief-msg ' + (msg.role === 'user' ? 'user' : 'chief');
+    }
+    msgEl.textContent = msg.content;
+    messagesEl.appendChild(msgEl);
+  });
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
 async function sendChiefMessage() {
   const input = document.getElementById('chiefInput');
   const text = input.value.trim();
   if (!text || chiefStreaming) return;
-  input.value = '';
-  document.getElementById('chiefSendBtn').disabled = true;
 
+  // Check for token
   const token = localStorage.getItem(CHIEF_TOKEN_KEY);
   if (!token) {
-    addChiefMsg('system', '// Set your Chief auth token first. Enter it below and send.');
-    chiefConversation.push({ role: 'user', content: text });
-    localStorage.setItem(CHIEF_TOKEN_KEY, text);
-    addChiefMsg('system', '// Token saved. You can now talk to Chief.');
-    saveChiefHistory();
+    if (chiefAwaitingToken) {
+      localStorage.setItem(CHIEF_TOKEN_KEY, text);
+      input.value = '';
+      chiefAwaitingToken = false;
+      addChiefSystemMessage('// Connected. Talk to Chief.');
+      return;
+    }
+    input.value = '';
+    chiefAwaitingToken = true;
+    addChiefSystemMessage('// Enter your Chief token to connect');
     return;
   }
 
-  chiefConversation.push({ role: 'user', content: text });
-  addChiefMsg('user', text);
-  saveChiefHistory();
+  input.value = '';
 
-  // Show typing
-  const container = document.getElementById('chiefMessages');
-  const typing = document.createElement('div');
-  typing.className = 'chief-typing';
-  typing.id = 'chiefTyping';
-  typing.innerHTML = '<div class="chief-typing-dot"></div><div class="chief-typing-dot"></div><div class="chief-typing-dot"></div>';
-  container.appendChild(typing);
-  container.scrollTop = container.scrollHeight;
+  chiefConversation.push({ role: 'user', content: text });
+  const messagesEl = document.getElementById('chiefMessages');
+  const userMsgEl = document.createElement('div');
+  userMsgEl.className = 'chief-msg user';
+  userMsgEl.textContent = text;
+  messagesEl.appendChild(userMsgEl);
+
+  if (!navigator.onLine) {
+    addChiefSystemMessage('// Chief is offline. Your message will be sent when you reconnect.');
+    return;
+  }
 
   chiefStreaming = true;
+  document.getElementById('chiefSendBtn').disabled = true;
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chief-typing';
+  typingEl.innerHTML = '<span></span><span></span><span></span>';
+  messagesEl.appendChild(typingEl);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
   try {
+    const appState = buildAppState();
     const res = await fetch('/api/chief', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Chief-Token': token
+      },
       body: JSON.stringify({
         message: text,
-        conversation: chiefConversation.filter(m => m.role === 'user' || m.role === 'assistant').slice(-20),
-        appState: buildAppState()
+        conversation: chiefConversation.filter(m => m.role === 'user' || m.role === 'assistant').slice(0, -1),
+        appState
       })
     });
 
-    document.getElementById('chiefTyping')?.remove();
+    typingEl.remove();
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: 'Connection failed' }));
-      addChiefMsg('system', `// ${err.error || 'Chief unavailable'}`);
+      const errText = await res.text().catch(() => 'Unknown error');
+      addChiefSystemMessage(`// Error: ${res.status} - ${errText}`);
       chiefStreaming = false;
+      document.getElementById('chiefSendBtn').disabled = false;
       return;
     }
-
-    // Stream response
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'chief-msg chief';
-    msgDiv.id = 'chiefStreamMsg';
-    container.appendChild(msgDiv);
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let fullText = '';
-    const cursor = document.createElement('span');
-    cursor.className = 'chief-cursor';
+    let sseBuffer = '';
+    let chiefMsgEl = document.createElement('div');
+    chiefMsgEl.className = 'chief-msg chief';
+    chiefMsgEl.innerHTML = '<span class="chief-cursor"></span>';
+    messagesEl.appendChild(chiefMsgEl);
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      for (const line of chunk.split('\n')) {
+      sseBuffer += decoder.decode(value, { stream: true });
+
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop() || '';
+      for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         try {
           const data = JSON.parse(line.slice(6));
-          if (data.t === 'token') {
+          if (data.t === 'token' && data.c) {
             fullText += data.c;
-            const displayText = fullText.split('---ACTIONS---')[0];
-            msgDiv.textContent = displayText;
-            msgDiv.appendChild(cursor);
-            container.scrollTop = container.scrollHeight;
-          } else if (data.t === 'error') {
-            addChiefMsg('system', `// ${data.c}`);
+          } else if (data.t === 'error' && data.c) {
+            addChiefSystemMessage('// Error: ' + data.c);
           }
-        } catch {}
+        } catch(e) { /* ignore parse errors */ }
+      }
+
+      const actionsIdx = fullText.indexOf('---ACTIONS---');
+      if (actionsIdx >= 0) {
+        const visibleText = fullText.substring(0, actionsIdx).trim();
+        chiefMsgEl.textContent = visibleText;
+      } else {
+        chiefMsgEl.innerHTML = escHtml(fullText) + '<span class="chief-cursor"></span>';
+      }
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    const actionsIdx = fullText.indexOf('---ACTIONS---');
+    if (actionsIdx >= 0) {
+      const actionsRaw = fullText.substring(actionsIdx + 13).trim();
+      if (actionsRaw) {
+        try {
+          const actions = JSON.parse(actionsRaw);
+          executeChiefActions(actions);
+        } catch(e) { /* ignore parse errors */ }
       }
     }
+    const displayText = actionsIdx >= 0 ? fullText.substring(0, actionsIdx).trim() : fullText.trim();
+    chiefMsgEl.textContent = displayText;
+    chiefConversation.push({ role: 'assistant', content: displayText });
 
-    cursor.remove();
-    msgDiv.removeAttribute('id');
-
-    // Parse actions
-    const actionDelim = '---ACTIONS---';
-    let responseText = fullText;
-    if (fullText.includes(actionDelim)) {
-      responseText = fullText.split(actionDelim)[0].trim();
-      msgDiv.textContent = responseText;
-      const actionJson = fullText.split(actionDelim)[1].trim();
-      try {
-        const actions = JSON.parse(actionJson);
-        executeChiefActions(actions);
-      } catch(e) { console.warn('Action parse error:', e); }
+    localStorage.setItem(CHIEF_STORAGE, JSON.stringify(chiefConversation));
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } catch(e) {
+    typingEl.remove();
+    if (!navigator.onLine) {
+      addChiefSystemMessage('// Chief is offline. Your message will be sent when you reconnect.');
+    } else {
+      addChiefSystemMessage('// Connection error. Try again.');
     }
-
-    chiefConversation.push({ role: 'assistant', content: responseText });
-    saveChiefHistory();
-
-  } catch (err) {
-    document.getElementById('chiefTyping')?.remove();
-    addChiefMsg('system', '// Connection lost. Try again.');
   }
+
   chiefStreaming = false;
   document.getElementById('chiefSendBtn').disabled = false;
 }
 
 function executeChiefActions(actions) {
   if (!Array.isArray(actions)) return;
-  for (const action of actions) {
-    switch (action.type) {
+  const messagesEl = document.getElementById('chiefMessages');
+
+  actions.forEach(action => {
+    switch(action.type) {
       case 'add_task': {
-        const p = action.payload;
-        const task = {
-          id: 'chief-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
-          text: p.text, project_id: p.project_id || null, project_name: p.project_name || null,
-          category: p.category || null, type: p.type || 'pomodoro',
-          estimated_pomodoros: p.estimated_pomodoros || 1, health: p.health || 'gray', priority: 999
+        const newTask = {
+          id: action.id || 'chief-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+          text: action.text,
+          type: action.task_type || 'pomodoro',
+          estimated_pomodoros: action.estimated_pomodoros || 1,
+          priority: action.priority || queueTasks.length + 1,
+          health: action.health || 'gray',
+          category: action.category || null,
+          project_name: action.project_name || null
         };
-        const pos = p.insert_at === 'end' || !p.insert_at ? queueTasks.length : Math.min(p.insert_at - 1, queueTasks.length);
-        queueTasks.splice(pos, 0, task);
-        queueTasks.forEach((t, i) => t.priority = i + 1);
-        addChiefMsg('action', `+ Added: ${p.text}`);
+        queueTasks.push(newTask);
+        queueTasks.sort((a,b) => a.priority - b.priority);
+        const actionMsg = document.createElement('div');
+        actionMsg.className = 'chief-msg action';
+        actionMsg.textContent = `+ Added: ${newTask.text}`;
+        messagesEl.appendChild(actionMsg);
+        chiefConversation.push({ role: 'action', content: `+ Added: ${newTask.text}` });
         break;
       }
       case 'remove_task': {
-        const removed = queueTasks.find(t => t.id === action.payload.task_id);
-        queueTasks = queueTasks.filter(t => t.id !== action.payload.task_id);
-        queueTasks.forEach((t, i) => t.priority = i + 1);
-        addChiefMsg('action', `- Removed: ${removed?.text || action.payload.task_id}`);
-        break;
-      }
-      case 'reorder_tasks': {
-        const idx = queueTasks.findIndex(t => t.id === action.payload.task_id);
-        if (idx !== -1) {
-          const [task] = queueTasks.splice(idx, 1);
-          const np = Math.min(action.payload.new_position - 1, queueTasks.length);
-          queueTasks.splice(np, 0, task);
-          queueTasks.forEach((t, i) => t.priority = i + 1);
-          addChiefMsg('action', `~ Moved "${task.text}" to #${action.payload.new_position}`);
+        const idx = queueTasks.findIndex(t => t.id === action.id);
+        if (idx >= 0) {
+          const removed = queueTasks.splice(idx, 1)[0];
+          const actionMsg = document.createElement('div');
+          actionMsg.className = 'chief-msg action';
+          actionMsg.textContent = `- Removed: ${removed.text || removed.name}`;
+          messagesEl.appendChild(actionMsg);
+          chiefConversation.push({ role: 'action', content: `- Removed: ${removed.text || removed.name}` });
         }
         break;
       }
-      case 'skip_task':
+      case 'reorder_tasks': {
+        if (Array.isArray(action.order)) {
+          const taskMap = {};
+          queueTasks.forEach(t => taskMap[t.id] = t);
+          const reordered = [];
+          action.order.forEach((id, i) => {
+            if (taskMap[id]) {
+              taskMap[id].priority = i + 1;
+              reordered.push(taskMap[id]);
+            }
+          });
+          queueTasks.forEach(t => { if (!action.order.includes(t.id)) reordered.push(t); });
+          queueTasks.length = 0;
+          queueTasks.push(...reordered);
+          const actionMsg = document.createElement('div');
+          actionMsg.className = 'chief-msg action';
+          actionMsg.textContent = '~ Reordered queue';
+          messagesEl.appendChild(actionMsg);
+          chiefConversation.push({ role: 'action', content: '~ Reordered queue' });
+        }
+        break;
+      }
+      case 'skip_task': {
+        const task = queueTasks.find(t => t.id === action.id);
+        if (task) {
+          completedTaskIds.add(task.id);
+          const actionMsg = document.createElement('div');
+          actionMsg.className = 'chief-msg action';
+          actionMsg.textContent = `~ Skipped: ${task.text || task.name}`;
+          messagesEl.appendChild(actionMsg);
+          chiefConversation.push({ role: 'action', content: `~ Skipped: ${task.text || task.name}` });
+        }
+        break;
+      }
       case 'complete_task': {
-        completedTaskIds.add(action.payload.task_id);
-        const t = queueTasks.find(t => t.id === action.payload.task_id);
-        tasksCompleted++;
-        if (t?.category) categoriesTouched.add(t.category);
-        addChiefMsg('action', `> ${action.type === 'skip_task' ? 'Skipped' : 'Completed'}: ${t?.text || action.payload.task_id}`);
+        const task = queueTasks.find(t => t.id === action.id);
+        if (task && !completedTaskIds.has(task.id)) {
+          completedTaskIds.add(task.id);
+          tasksCompleted++;
+          taskPomosDone[task.id] = task.estimated_pomodoros || 1;
+          if (task.category) categoriesTouched.add(task.category);
+          const actionMsg = document.createElement('div');
+          actionMsg.className = 'chief-msg action';
+          actionMsg.textContent = `\u2713 Completed: ${task.text || task.name}`;
+          messagesEl.appendChild(actionMsg);
+          chiefConversation.push({ role: 'action', content: `\u2713 Completed: ${task.text || task.name}` });
+        }
         break;
       }
       case 'update_finance': {
-        if (todayData && todayData.finances && action.payload.month_income != null) {
-          todayData.finances.month_income = action.payload.month_income;
+        if (todayData && todayData.finances && action.month_income !== undefined) {
+          todayData.finances.month_income = action.month_income;
           renderFinanceBar();
-          addChiefMsg('action', `$ Income updated to $${action.payload.month_income.toLocaleString()}`);
+          const actionMsg = document.createElement('div');
+          actionMsg.className = 'chief-msg action';
+          actionMsg.textContent = `$ Updated finances`;
+          messagesEl.appendChild(actionMsg);
+          chiefConversation.push({ role: 'action', content: '$ Updated finances' });
         }
         break;
       }
       case 'launch_task': {
-        const task = queueTasks.find(t => t.id === action.payload.task_id);
-        if (task) { launchTask(task); addChiefMsg('action', `> Launching: ${task.text}`); }
+        const task = queueTasks.find(t => t.id === action.id);
+        if (task) {
+          launchTask(task);
+          if (chiefOpen) toggleChief();
+        }
         break;
       }
     }
-  }
+  });
+
   renderQueue();
   renderScoreboard();
   saveState();
-  // Sync modified queue back to today.json
-  syncTodayJson();
+  debouncedSync();
 }
 
-async function syncTodayJson() {
-  if (!todayData) return;
-  const token = localStorage.getItem(CHIEF_TOKEN_KEY) || '';
-  const updated = { ...todayData, tasks: queueTasks };
-  try {
-    await fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
-      body: JSON.stringify({ type: 'update_today', payload: updated })
-    });
-  } catch {}
+function buildAppState() {
+  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+  return {
+    tasks: allTasks.map(t => ({
+      id: t.id,
+      text: t.text || t.name || '',
+      type: t.type,
+      priority: t.priority,
+      estimated_pomodoros: t.estimated_pomodoros,
+      health: t.health,
+      category: t.category,
+      project_name: t.project_name,
+      completed: completedTaskIds.has(t.id),
+      pomos_done: taskPomosDone[t.id] || 0
+    })),
+    completedTaskIds: [...completedTaskIds],
+    taskPomosDone,
+    currentTaskId,
+    timerState: { mode, running, timeLeft, totalTime },
+    pomodorosCompleted,
+    tasksCompleted,
+    sessionStreak,
+    dayStreak,
+    dailyScore: calcDailyScore(),
+    categoriesTouched: [...categoriesTouched],
+    finances: todayData ? todayData.finances : null,
+    needsYou: todayData ? todayData.needs_you : null,
+    fallingThroughCracks: todayData ? todayData.falling_through_cracks : null,
+    xp: totalXp,
+    level
+  };
 }
 
-function initChiefInput() {
-  const input = document.getElementById('chiefInput');
-  const sendBtn = document.getElementById('chiefSendBtn');
-  if (!input || !sendBtn) return;
-  input.addEventListener('input', () => { sendBtn.disabled = !input.value.trim(); });
-  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChiefMessage(); } });
-}
+// Chief input handlers
+document.getElementById('chiefInput').addEventListener('input', function() {
+  document.getElementById('chiefSendBtn').disabled = !this.value.trim() || chiefStreaming;
+});
+document.getElementById('chiefInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChiefMessage();
+  }
+});
 
-function updateChiefFabState() {
-  document.getElementById('chiefFab')?.classList.toggle('timer-active', running);
-}
+// ==================== UTILS ====================
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
 // ==================== INIT ====================
 loadState();
@@ -2878,16 +3287,14 @@ updateTimerTheme();
 updateSessions();
 updateStats();
 loadTodayData();
-
-// Chief chat init
-chiefConversation = loadChiefHistory();
-renderChiefHistory();
-initChiefInput();
-
-// Sync init
 drainOfflineQueue();
 startPolling();
-window.addEventListener('online', drainOfflineQueue);
+
+// Load Chief conversation
+try {
+  const savedChat = localStorage.getItem(CHIEF_STORAGE);
+  if (savedChat) chiefConversation = JSON.parse(savedChat);
+} catch(e) {}
 
 if (!soundEnabled) {
   const btn = document.getElementById('soundBtn');
@@ -2904,17 +3311,11 @@ requestAnimationFrame(() => {
 // Day rollover detection — reset daily state if date changes while app is open
 let _lastDate = getTodayDate();
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') {
-    syncResults();
-  }
   if (document.visibilityState === 'visible') {
-    drainOfflineQueue();
     const now = getTodayDate();
     if (now !== _lastDate) {
       _lastDate = now;
-      // Save current state so loadState can detect the day change
       saveState();
-      // Reset daily variables
       sessionStreak = 0;
       pomodorosCompleted = 0;
       totalMinutes = 0;
@@ -2925,9 +3326,9 @@ document.addEventListener('visibilitychange', () => {
       cracksWorked = new Set();
       manualTasks = [];
       lastCompletedTask = null;
+      // Clear Chief conversation on day rollover
       chiefConversation = [];
-      localStorage.removeItem(CHIEF_CHAT_KEY);
-      // Check if dayStreak should increment
+      localStorage.removeItem(CHIEF_STORAGE);
       const raw = localStorage.getItem('the-grind-state');
       if (raw) {
         const prev = JSON.parse(raw);
@@ -2939,8 +3340,16 @@ document.addEventListener('visibilitychange', () => {
       updateSessions();
       loadTodayData();
     }
+    // Drain offline queue when becoming visible
+    drainOfflineQueue();
+  } else {
+    // Sync when going hidden
+    debouncedSync();
   }
 });
+
+// Drain offline queue when coming online
+window.addEventListener('online', drainOfflineQueue);
 
 // Register service worker
 if ('serviceWorker' in navigator) {
