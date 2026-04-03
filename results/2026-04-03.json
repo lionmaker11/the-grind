@@ -1,6 +1,6 @@
 {
   "date": "2026-04-03",
-  "last_synced": "2026-04-03T20:03:33.733Z",
+  "last_synced": "2026-04-03T20:09:53.496Z",
   "tasks": [
     {
       "id": "task-001",
@@ -39,10 +39,9 @@
       "project_name": "Mental"
     }
   ],
-  "needs_you_handled": [
-    "Sam: countertop answer was due today — text him tomorrow morning"
-  ],
+  "needs_you_handled": [],
   "needs_you_pending": [
+    "Sam: countertop answer was due today — text him tomorrow morning",
     "10DLC: follow up Ali Monday Apr 7"
   ],
   "summary": {
