@@ -2014,9 +2014,12 @@ function renderNeedsYou() {
 }
 
 function completeNeedsItem(idx) {
-  if (completedNeeds.has(idx)) return;
-  completedNeeds.add(idx);
-  if (audioCtx) { try { playTaskComplete(); } catch {} }
+  if (completedNeeds.has(idx)) {
+    completedNeeds.delete(idx);
+  } else {
+    completedNeeds.add(idx);
+    if (audioCtx) { try { playTaskComplete(); } catch {} }
+  }
   renderNeedsYou();
   saveState();
   debouncedSync();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'the-grind-v9';
+const CACHE_NAME = 'the-grind-v10';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
