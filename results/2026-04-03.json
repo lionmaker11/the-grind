@@ -1,0 +1,17 @@
+{
+  "date": "2026-04-03",
+  "last_synced": "2026-04-03T20:00:00Z",
+  "tasks": [
+    {
+      "id": "task-001",
+      "text": "Test sync",
+      "status": "completed",
+      "pomos_done": 1,
+      "pomos_estimated": 1
+    }
+  ],
+  "summary": {
+    "pomodoros_completed": 1,
+    "daily_score": 20
+  }
+}
