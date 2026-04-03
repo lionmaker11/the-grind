@@ -1,10 +1,7 @@
 {
-  "rewrites": [
-    { "source": "/today.json", "destination": "/public/today.json" }
-  ],
   "headers": [
     {
-      "source": "/public/today.json",
+      "source": "/today.json",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
       ]

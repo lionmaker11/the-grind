@@ -28,7 +28,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
   // Network-first for today.json (strip query params for cache key)
-  if (url.pathname === '/public/today.json' || url.pathname === '/today.json') {
+  if (url.pathname === '/today.json') {
     e.respondWith(
       fetch(e.request).then(res => {
         const clone = res.clone();
