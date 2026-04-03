@@ -1405,15 +1405,26 @@
     width: 40px;
     height: 40px;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 50%;
     background: transparent;
-    color: var(--text-muted);
-    cursor: not-allowed;
+    color: var(--text-dim);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    opacity: 0.3;
+    transition: all 0.2s;
+  }
+  .chief-mic-btn:active { background: rgba(255,0,60,0.15); border-color: var(--red); color: var(--red); }
+  .chief-mic-btn.recording {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+    animation: micPulse 1s ease-in-out infinite;
+  }
+  @keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,60,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255,0,60,0); }
   }
   .chief-mic-btn svg { width: 18px; height: 18px; }
 </style>
@@ -1659,7 +1670,7 @@
     <button class="chief-send-btn" id="chiefSendBtn" onclick="sendChiefMessage()" disabled>
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="currentColor"/></svg>
     </button>
-    <button class="chief-mic-btn" disabled title="Voice (coming soon)">
+    <button class="chief-mic-btn" id="chiefMicBtn" title="Hold to talk">
       <svg viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </button>
   </div>
@@ -3293,6 +3304,165 @@ document.getElementById('chiefInput').addEventListener('keydown', function(e) {
   }
 });
 
+// ==================== VOICE INPUT ====================
+let isRecording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let speechRecognition = null;
+
+function initVoiceInput() {
+  const micBtn = document.getElementById('chiefMicBtn');
+  if (!micBtn) return;
+
+  // Tap to start/stop recording
+  micBtn.addEventListener('click', e => {
+    e.preventDefault();
+    if (chiefStreaming) return;
+    isRecording ? stopVoice() : startVoice();
+  });
+
+  // Touch: hold to record
+  let holdTimer = null;
+  micBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (chiefStreaming) return;
+    holdTimer = setTimeout(() => { holdTimer = null; startVoice(); }, 0);
+  }, { passive: false });
+  micBtn.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    if (isRecording) stopVoice();
+  });
+  micBtn.addEventListener('touchcancel', e => {
+    e.preventDefault();
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    if (isRecording) stopVoice();
+  });
+}
+
+function startVoice() {
+  if (isRecording) return;
+
+  // Try Web Speech API first (free, works in Safari browser)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    try {
+      speechRecognition = new SpeechRecognition();
+      speechRecognition.continuous = false;
+      speechRecognition.interimResults = false;
+      speechRecognition.lang = 'en-US';
+
+      speechRecognition.onresult = e => {
+        const text = e.results[0][0].transcript;
+        if (text && text.trim()) {
+          document.getElementById('chiefInput').value = text.trim();
+          sendChiefMessage();
+        }
+        isRecording = false;
+        document.getElementById('chiefMicBtn').classList.remove('recording');
+      };
+
+      speechRecognition.onerror = e => {
+        isRecording = false;
+        document.getElementById('chiefMicBtn').classList.remove('recording');
+        // If Web Speech fails (common on iOS standalone), fall back to MediaRecorder + Whisper
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'network') {
+          startMediaRecording();
+        } else if (e.error === 'no-speech') {
+          addChiefSystemMessage('// No speech detected. Try again.');
+        } else {
+          startMediaRecording();
+        }
+      };
+
+      speechRecognition.onend = () => {
+        isRecording = false;
+        document.getElementById('chiefMicBtn').classList.remove('recording');
+      };
+
+      speechRecognition.start();
+      isRecording = true;
+      document.getElementById('chiefMicBtn').classList.add('recording');
+      return;
+    } catch { /* fall through to MediaRecorder */ }
+  }
+
+  // Fallback: MediaRecorder + Whisper API
+  startMediaRecording();
+}
+
+async function startMediaRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/mp4';
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      if (audioChunks.length > 0) transcribeAudio(new Blob(audioChunks, { type: mimeType }), mimeType);
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    document.getElementById('chiefMicBtn').classList.add('recording');
+  } catch {
+    addChiefSystemMessage('// Mic access denied. Check permissions.');
+  }
+}
+
+function stopVoice() {
+  if (speechRecognition) {
+    try { speechRecognition.stop(); } catch {}
+    speechRecognition = null;
+  }
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+  }
+  isRecording = false;
+  document.getElementById('chiefMicBtn').classList.remove('recording');
+}
+
+async function transcribeAudio(blob, mimeType) {
+  addChiefSystemMessage('// Transcribing...');
+  const messagesEl = document.getElementById('chiefMessages');
+
+  try {
+    const buffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
+
+    const res = await fetch('/api/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify({ audio: base64, mimeType })
+    });
+
+    // Remove "Transcribing..." message
+    const lastMsg = messagesEl.lastChild;
+    if (lastMsg && lastMsg.textContent === '// Transcribing...') lastMsg.remove();
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      addChiefSystemMessage('// Voice not available. Set GROQ_API_KEY in Vercel for Whisper.');
+      return;
+    }
+
+    const data = await res.json();
+    if (data.text && data.text.trim()) {
+      document.getElementById('chiefInput').value = data.text.trim();
+      sendChiefMessage();
+    } else {
+      addChiefSystemMessage('// No speech detected. Try again.');
+    }
+  } catch {
+    addChiefSystemMessage('// Transcription error. Try typing.');
+  }
+}
+
 // ==================== UTILS ====================
 function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
@@ -3306,6 +3476,7 @@ updateStats();
 loadTodayData();
 drainOfflineQueue();
 startPolling();
+initVoiceInput();
 
 // Load Chief conversation
 try {
