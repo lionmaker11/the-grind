@@ -84,7 +84,7 @@
     --health-yellow: #ffe600;
     --health-red: #ff003c;
     --health-gray: #6b7280;
-    --top-bar-h: 88px;
+    --top-bar-h: 100px;
     --bottom-nav-h: 56px;
   }
 
@@ -554,11 +554,20 @@
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.72rem;
     color: var(--text);
-    padding: 7px 0;
+    padding: 10px 12px;
     border-bottom: 1px solid rgba(255,0,60,0.12);
     letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    border-radius: 2px;
   }
-  .needs-item::before { content: '> '; color: var(--red); }
+  .needs-item:active { background: rgba(57,255,20,0.08); }
+  .needs-item::before { content: '> '; color: var(--red); flex-shrink: 0; }
+  .needs-item.done { opacity: 0.4; text-decoration: line-through; color: var(--text-dim); }
+  .needs-item.done::before { content: '\2713 '; color: var(--green); }
 
   .cracks-section { margin-bottom: 14px; }
   .crack-item {
@@ -1689,6 +1698,7 @@ let lastCompletedTask = null;
 let lastXpAwarded = 0;
 let manualTasks = [];
 let manualIdCounter = 0;
+let completedNeeds = new Set();
 
 // Timer state (from POMO://DORO)
 let mode = 'work';
@@ -1783,6 +1793,7 @@ function saveState() {
     taskPomosDone,
     categoriesTouched: [...categoriesTouched],
     cracksWorked: [...cracksWorked],
+    completedNeeds: [...completedNeeds],
     manualTasks,
     soundEnabled,
     swipeHintShown
@@ -1824,6 +1835,7 @@ function loadState() {
       taskPomosDone = state.taskPomosDone || {};
       categoriesTouched = new Set(state.categoriesTouched || []);
       cracksWorked = new Set(state.cracksWorked || []);
+      completedNeeds = new Set(state.completedNeeds || []);
       manualTasks = state.manualTasks || [];
     } else if (diffDays === 1) {
       // New day — increment dayStreak if yesterday qualified (4+ pomos)
@@ -1987,10 +1999,27 @@ function renderNeedsYou() {
     document.getElementById('needsYouSection').style.display = 'none';
     return;
   }
+  const remaining = todayData.needs_you.filter((_, i) => !completedNeeds.has(i));
+  if (remaining.length === 0) {
+    document.getElementById('needsYouSection').style.display = 'none';
+    return;
+  }
   document.getElementById('needsYouSection').style.display = 'block';
-  document.getElementById('needsCount').textContent = todayData.needs_you.length;
+  document.getElementById('needsCount').textContent = remaining.length;
   const list = document.getElementById('needsList');
-  list.innerHTML = todayData.needs_you.map(n => `<div class="needs-item">${escHtml(n)}</div>`).join('');
+  list.innerHTML = todayData.needs_you.map((n, i) => {
+    const done = completedNeeds.has(i);
+    return `<div class="needs-item ${done ? 'done' : ''}" onclick="completeNeedsItem(${i})">${escHtml(n)}</div>`;
+  }).join('');
+}
+
+function completeNeedsItem(idx) {
+  if (completedNeeds.has(idx)) return;
+  completedNeeds.add(idx);
+  if (audioCtx) { try { playTaskComplete(); } catch {} }
+  renderNeedsYou();
+  saveState();
+  debouncedSync();
 }
 
 function renderCracks() {
@@ -2019,49 +2048,42 @@ function getTaskXp(task) {
 
 // ==================== SWIPE-TO-COMPLETE ====================
 function setupSwipeToComplete(el, task) {
-  let startX = 0;
-  let startY = 0;
-  let deltaX = 0;
-  let swiping = false;
-  let locked = false;
+  let startX = 0, startY = 0, deltaX = 0;
+  let direction = null; // null = undecided, 'h' = horizontal swipe, 'v' = vertical scroll, 'tap' = no movement
 
   const swipeContent = el.querySelector('.swipe-content');
   const swipeBg = el.querySelector('.swipe-bg');
 
   el.addEventListener('touchstart', (e) => {
     if (completedTaskIds.has(task.id)) return;
-    const touch = e.touches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
     deltaX = 0;
-    swiping = false;
-    locked = false;
+    direction = null;
     if (swipeContent) swipeContent.style.transition = 'none';
   }, { passive: true });
 
   el.addEventListener('touchmove', (e) => {
     if (completedTaskIds.has(task.id)) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
 
-    // Dead zone: 10px before we decide direction
-    if (!locked && Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-
-    if (!locked) {
-      locked = true;
-      if (Math.abs(dy) > Math.abs(dx)) {
-        swiping = false;
-        return;
+    // Wait for 15px of movement before deciding direction
+    if (!direction) {
+      if (Math.abs(dx) < 15 && Math.abs(dy) < 15) return;
+      // Require 2:1 horizontal ratio to trigger swipe — strongly favor vertical scroll
+      if (Math.abs(dx) > Math.abs(dy) * 2 && dx > 0) {
+        direction = 'h';
+      } else {
+        direction = 'v';
+        return; // Let the browser handle vertical scroll naturally
       }
-      swiping = true;
     }
 
-    if (!swiping) return;
+    if (direction !== 'h') return;
 
     e.preventDefault();
     deltaX = Math.max(0, dx);
-
     if (swipeContent) swipeContent.style.transform = `translateX(${deltaX}px)`;
     if (swipeBg) swipeBg.style.opacity = Math.min(1, deltaX / 80);
   }, { passive: false });
@@ -2070,13 +2092,14 @@ function setupSwipeToComplete(el, task) {
     if (completedTaskIds.has(task.id)) return;
     if (swipeContent) swipeContent.style.transition = 'transform 0.25s ease';
 
-    if (swiping && deltaX >= 80) {
+    if (direction === 'h' && deltaX >= 80) {
       if (swipeContent) swipeContent.style.transform = `translateX(${el.offsetWidth}px)`;
       setTimeout(() => quickCompleteTask(el, task), 200);
-    } else if (swiping) {
+    } else if (direction === 'h') {
       if (swipeContent) swipeContent.style.transform = 'translateX(0)';
       if (swipeBg) swipeBg.style.opacity = '0';
-    } else if (!locked || deltaX < 5) {
+    } else if (!direction) {
+      // No significant movement — this was a tap
       launchTask(task);
     }
     swiping = false;
@@ -2857,6 +2880,8 @@ function buildResultsPayload() {
       category: t.category || null,
       project_name: t.project_name || null
     })),
+    needs_you_handled: todayData?.needs_you ? todayData.needs_you.filter((_, i) => completedNeeds.has(i)) : [],
+    needs_you_pending: todayData?.needs_you ? todayData.needs_you.filter((_, i) => !completedNeeds.has(i)) : [],
     summary: {
       daily_score: calcDailyScore(),
       pomodoros_completed: pomodorosCompleted,
@@ -3491,10 +3516,17 @@ if (!soundEnabled) {
 }
 
 // Measure top bar and set CSS variable for screen positioning
-requestAnimationFrame(() => {
+function measureTopBar() {
   const h = document.getElementById('topBar').offsetHeight;
-  document.documentElement.style.setProperty('--top-bar-h', h + 'px');
-});
+  if (h > 0) document.documentElement.style.setProperty('--top-bar-h', h + 'px');
+}
+requestAnimationFrame(measureTopBar);
+// Re-measure after fonts load (can change element height)
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(measureTopBar);
+}
+// Re-measure on resize (orientation change)
+window.addEventListener('resize', measureTopBar);
 
 // Day rollover detection — reset daily state if date changes while app is open
 let _lastDate = getTodayDate();
@@ -3512,6 +3544,7 @@ document.addEventListener('visibilitychange', () => {
       taskPomosDone = {};
       categoriesTouched = new Set();
       cracksWorked = new Set();
+      completedNeeds = new Set();
       manualTasks = [];
       lastCompletedTask = null;
       // Clear Chief conversation on day rollover
