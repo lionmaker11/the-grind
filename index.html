@@ -2950,15 +2950,20 @@ function updateChiefStatus() {
 }
 
 async function verifyChiefConnection() {
-  const token = CHIEF_TOKEN;
-  if (!token || !navigator.onLine) { chiefVerified = false; updateChiefStatus(); return; }
+  if (!navigator.onLine) { chiefVerified = false; updateChiefStatus(); return; }
   try {
     const res = await fetch('/api/chief', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
-      body: JSON.stringify({ message: 'ping', conversation: [], appState: {} })
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify({ message: 'status check', conversation: [], appState: {} })
     });
-    chiefVerified = res.ok;
+    if (res.ok) {
+      chiefVerified = true;
+      // Don't show the ping response — just verify connection
+      await res.json();
+    } else {
+      chiefVerified = false;
+    }
   } catch { chiefVerified = false; }
   updateChiefStatus();
 }
@@ -3061,9 +3066,8 @@ async function sendChiefMessage() {
       })
     });
 
-    typingEl.remove();
-
     if (!res.ok) {
+      typingEl.remove();
       chiefVerified = false;
       updateChiefStatus();
       addChiefSystemMessage(`// Error: ${res.status}. Check Vercel env vars.`);
@@ -3072,23 +3076,9 @@ async function sendChiefMessage() {
       return;
     }
 
-    let chiefMsgEl = document.createElement('div');
-    chiefMsgEl.className = 'chief-msg chief';
-    chiefMsgEl.textContent = '...';
-    messagesEl.appendChild(chiefMsgEl);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-
-    // Read full response as text (avoids iOS Safari ReadableStream issues)
-    const rawText = await res.text();
-    let fullText = '';
-    for (const line of rawText.split('\n')) {
-      if (!line.startsWith('data: ')) continue;
-      try {
-        const data = JSON.parse(line.slice(6));
-        if (data.t === 'token' && data.c) fullText += data.c;
-        else if (data.t === 'error' && data.c) addChiefSystemMessage('// ' + data.c);
-      } catch {}
-    }
+    const data = await res.json();
+    typingEl.remove();
+    const fullText = data.text || '';
 
     // Parse actions
     const actionsIdx = fullText.indexOf('---ACTIONS---');
@@ -3099,7 +3089,12 @@ async function sendChiefMessage() {
       }
     }
     const displayText = (actionsIdx >= 0 ? fullText.substring(0, actionsIdx) : fullText).trim();
+
+    const chiefMsgEl = document.createElement('div');
+    chiefMsgEl.className = 'chief-msg chief';
     chiefMsgEl.textContent = displayText || '// No response from Chief.';
+    messagesEl.appendChild(chiefMsgEl);
+
     chiefConversation.push({ role: 'assistant', content: displayText });
     chiefVerified = true;
     updateChiefStatus();

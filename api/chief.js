@@ -126,30 +126,21 @@ export default async function handler(req, res) {
   }
   messages.push({ role: 'user', content: message });
 
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache, no-store');
-  res.setHeader('Connection', 'keep-alive');
-
   const client = new Anthropic();
 
   try {
-    const stream = await client.messages.stream({
+    const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       system: system,
       messages: messages,
     });
 
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta?.text) {
-        res.write(`data: ${JSON.stringify({ t: 'token', c: event.delta.text })}\n\n`);
-      }
-    }
-    res.write(`data: ${JSON.stringify({ t: 'done' })}\n\n`);
-    res.end();
+    const text = response.content?.[0]?.text || '';
+    res.setHeader('Cache-Control', 'no-cache, no-store');
+    return res.status(200).json({ text });
   } catch (err) {
-    res.write(`data: ${JSON.stringify({ t: 'error', c: err.message || 'Chief connection failed' })}\n\n`);
-    res.end();
+    return res.status(500).json({ error: err.message || 'Chief connection failed' });
   }
 }
 
