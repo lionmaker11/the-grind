@@ -1,77 +1,50 @@
 {
   "date": "2026-04-03",
-  "last_synced": "2026-04-03T19:57:06.324Z",
+  "last_synced": "2026-04-03T19:57:08.430Z",
   "tasks": [
     {
       "id": "task-001",
-      "text": "Review MARCUS shadow mode performance",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "On Business",
-      "project_name": "MARCUS"
-    },
-    {
-      "id": "task-002",
-      "text": "Call Sam — check 708P interior progress",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "In Business",
-      "project_name": "708 Pallister"
-    },
-    {
-      "id": "task-003",
-      "text": "Review 3 stale MCD leads with Ali",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "In Business",
-      "project_name": "Motor City Deals"
-    },
-    {
-      "id": "task-004",
-      "text": "Check VA appeal status online",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "Finances",
-      "project_name": "VA Appeal"
-    },
-    {
-      "id": "task-005",
-      "text": "Update FINANCES.md with April income",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "Finances",
-      "project_name": "IRS / Taxes"
-    },
-    {
-      "id": "task-006",
-      "text": "GrillaHQ — review MAO calculator PR",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "On Business",
-      "project_name": "GrillaHQ"
-    },
-    {
-      "id": "task-007",
-      "text": "Tonal upper body workout",
+      "text": "Workout — missed this morning. Do it before dinner.",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "Physical",
       "project_name": "Fitness"
+    },
+    {
+      "id": "task-002",
+      "text": "Family dinner — 6 PM",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Relationships",
+      "project_name": "Family"
+    },
+    {
+      "id": "task-003",
+      "text": "Plants — 5-15 min",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Physical",
+      "project_name": "Personal"
+    },
+    {
+      "id": "task-004",
+      "text": "Reading — 9:30 PM. Lights out 10.",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Mental",
+      "project_name": "Mental"
     }
   ],
   "summary": {
-    "daily_score": 0,
+    "daily_score": 10,
     "pomodoros_completed": 0,
     "total_minutes": 0,
     "tasks_completed": 0,
-    "total_tasks": 7,
+    "total_tasks": 4,
     "categories_touched": [],
     "session_streak": 0,
     "day_streak": 0,
