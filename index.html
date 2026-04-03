@@ -3124,7 +3124,7 @@ async function sendChiefMessage() {
     if (actionsIdx >= 0) {
       const actionsRaw = fullText.substring(actionsIdx + 13).trim();
       if (actionsRaw) {
-        try { executeChiefActions(JSON.parse(actionsRaw)); } catch {}
+        try { executeChiefActions(JSON.parse(actionsRaw)); } catch(e) { console.error('Chief action error:', e, actionsRaw); }
       }
     }
     const displayText = (actionsIdx >= 0 ? fullText.substring(0, actionsIdx) : fullText).trim();
@@ -3159,26 +3159,33 @@ function executeChiefActions(actions) {
   const messagesEl = document.getElementById('chiefMessages');
 
   actions.forEach(rawAction => {
-    // Normalize: merge payload into action if present, handle various model formats
-    let action;
+    // Normalize: extract action type and payload fields
+    const actionType = rawAction.type;
+    let fields = {};
+
     if (rawAction.payload && typeof rawAction.payload === 'object') {
-      action = { type: rawAction.type, ...rawAction.payload };
+      fields = { ...rawAction.payload };
     } else {
       // Handle {complete_task: {task_id}} format
       const keys = Object.keys(rawAction);
       const actionKey = keys.find(k => ['add_task','remove_task','reorder_tasks','skip_task','complete_task','update_finance','launch_task'].includes(k));
       if (actionKey && typeof rawAction[actionKey] === 'object') {
-        action = { type: actionKey, ...rawAction[actionKey] };
+        fields = { ...rawAction[actionKey] };
+        if (!actionType) rawAction.type = actionKey;
       } else {
-        action = { ...rawAction };
+        fields = { ...rawAction };
       }
     }
+    // Build normalized action — preserve actionType, rename payload's "type" to "task_type"
+    const action = { ...fields };
+    action.type = actionType || rawAction.type;
+    if (fields.type && fields.type !== actionType) action.task_type = fields.type;
     // Normalize task_id → id
     if (action.task_id && !action.id) action.id = action.task_id;
 
     switch(action.type) {
       case 'add_task': {
-        const taskType = (action.task_type || action.pomodoro_type || 'pomodoro');
+        const taskType = action.task_type || 'pomodoro';
         const newTask = {
           id: 'chief-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
           text: action.text,
@@ -3285,6 +3292,8 @@ function executeChiefActions(actions) {
   renderQueue();
   renderScoreboard();
   saveState();
+  debouncedSync();
+  syncTodayJson();
   debouncedSync();
 }
 
