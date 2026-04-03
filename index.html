@@ -69,7 +69,8 @@
     --border: rgba(0, 240, 255, 0.12);
     --border-bright: rgba(0, 240, 255, 0.3);
     --text: #e0e6f0;
-    --text-dim: rgba(200, 210, 230, 0.45);
+    --text-dim: rgba(200, 210, 230, 0.65);
+    --text-muted: rgba(200, 210, 230, 0.5);
     --health-green: #39ff14;
     --health-yellow: #ffe600;
     --health-red: #ff003c;
@@ -192,9 +193,11 @@
   }
   .finance-label {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 600;
     letter-spacing: 1px;
     white-space: nowrap;
+    color: var(--text);
   }
   .finance-bar-track {
     flex: 1;
@@ -222,7 +225,7 @@
   }
   .finance-pace {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     color: var(--text-dim);
     letter-spacing: 1px;
     white-space: nowrap;
@@ -275,7 +278,7 @@
   @keyframes xpShimmer { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
   .xp-text {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     color: var(--text-dim);
     letter-spacing: 1px;
     white-space: nowrap;
@@ -364,7 +367,7 @@
     border: none;
     color: var(--text-dim);
     font-family: 'Orbitron', monospace;
-    font-size: 0.5rem;
+    font-size: 0.55rem;
     font-weight: 700;
     letter-spacing: 1.5px;
     cursor: pointer;
@@ -373,6 +376,7 @@
   }
   .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; }
   .nav-btn.active { color: var(--cyan); }
+  .nav-btn:not(.active) { color: rgba(200, 210, 230, 0.6); }
   .nav-btn.active svg { filter: drop-shadow(0 0 6px var(--cyan-glow)); }
   .nav-btn.active::before {
     content: '';
@@ -411,11 +415,11 @@
   .corner-accent.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
   .section-title {
     font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: rgba(200, 210, 230, 0.75);
     margin-bottom: 10px;
   }
   .section-title span { color: var(--magenta); }
@@ -423,10 +427,10 @@
   /* ========== QUEUE SCREEN ========== */
   .stale-banner {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     color: var(--yellow);
-    background: rgba(255,230,0,0.06);
-    border: 1px solid rgba(255,230,0,0.15);
+    background: rgba(255,230,0,0.08);
+    border: 1px solid rgba(255,230,0,0.25);
     border-radius: 2px;
     padding: 8px 12px;
     margin-bottom: 12px;
@@ -461,8 +465,9 @@
 
   .task-info { flex: 1; min-width: 0; }
   .task-text {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
     letter-spacing: 0.3px;
     margin-bottom: 3px;
     transition: all 0.3s;
@@ -475,19 +480,19 @@
   }
   .task-project {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     color: var(--cyan);
     letter-spacing: 1px;
   }
   .task-type-pomo {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--text-dim);
+    font-size: 0.65rem;
+    color: rgba(200, 210, 230, 0.7);
     letter-spacing: 1px;
   }
   .task-2x {
     font-family: 'Orbitron', monospace;
-    font-size: 0.5rem;
+    font-size: 0.55rem;
     font-weight: 800;
     color: var(--red);
     letter-spacing: 1px;
@@ -529,7 +534,7 @@
   }
   .needs-label {
     font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     font-weight: 700;
     color: var(--red);
     letter-spacing: 2px;
@@ -538,10 +543,10 @@
   .needs-list.open { display: block; }
   .needs-item {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--text);
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,0,60,0.08);
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,0,60,0.12);
     letter-spacing: 0.5px;
   }
   .needs-item::before { content: '> '; color: var(--red); }
@@ -559,16 +564,17 @@
   }
   .crack-name {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--red);
     letter-spacing: 1px;
   }
   .crack-days {
     font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     font-weight: 800;
     color: var(--red);
     letter-spacing: 1px;
+    text-shadow: 0 0 6px rgba(255,0,60,0.4);
   }
 
   .start-btn {
@@ -595,7 +601,7 @@
   .manual-fallback { text-align: center; padding: 20px 0; }
   .manual-note {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--text-dim);
     margin-bottom: 14px;
     letter-spacing: 0.5px;
@@ -641,11 +647,11 @@
   }
   .timer-task-name {
     font-family: 'Orbitron', monospace;
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     font-weight: 700;
     color: var(--cyan);
     letter-spacing: 2px;
-    opacity: 0.8;
+    opacity: 0.9;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -654,14 +660,14 @@
   }
   .timer-project-name {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     color: var(--text-dim);
     letter-spacing: 1px;
     margin-top: 2px;
   }
   .timer-pomo-progress {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     color: var(--magenta);
     letter-spacing: 1px;
     margin-top: 2px;
@@ -684,7 +690,7 @@
   }
   .pomo-header .subtitle {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.5rem;
+    font-size: 0.52rem;
     color: var(--text-dim);
     letter-spacing: 4px;
     margin-top: 1px;
@@ -731,7 +737,7 @@
     background: transparent;
     color: var(--text-dim);
     font-family: 'Orbitron', monospace;
-    font-size: 0.5rem;
+    font-size: 0.55rem;
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -774,7 +780,7 @@
   .timer-time.break { color: var(--green); text-shadow: 0 0 20px var(--green-glow); }
   .timer-time.long-break { color: var(--magenta); text-shadow: 0 0 20px var(--magenta-dim); }
   .timer-time.meditate { color: var(--indigo); text-shadow: 0 0 20px var(--indigo-dim); }
-  .timer-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase; color: var(--text-dim); margin-top: 6px; }
+  .timer-label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(200, 210, 230, 0.7); margin-top: 6px; }
   .multiplier-badge { position: absolute; top: 18px; right: 18px; background: rgba(255,230,0,0.1); border: 1px solid rgba(255,230,0,0.3); color: var(--yellow); font-family: 'Orbitron', monospace; font-size: 0.55rem; font-weight: 800; padding: 2px 7px; border-radius: 2px; opacity: 0; transition: all 0.4s; letter-spacing: 2px; text-shadow: 0 0 8px var(--yellow-glow); }
   .multiplier-badge.show { opacity: 1; }
 
@@ -808,7 +814,7 @@
   .stat-value.break { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
   .stat-value.long-break { color: var(--magenta); text-shadow: 0 0 10px var(--magenta-dim); }
   .stat-value.meditate { color: var(--indigo); text-shadow: 0 0 10px var(--indigo-dim); }
-  .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 0.45rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-top: 3px; }
+  .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(200, 210, 230, 0.7); margin-top: 3px; }
 
   @keyframes tick { 0%{transform:scale(1)} 50%{transform:scale(1.015)} 100%{transform:scale(1)} }
   .tick-anim { animation: tick 0.12s ease; }
@@ -831,8 +837,8 @@
   }
   .score-label {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--text-dim);
+    font-size: 0.65rem;
+    color: rgba(200, 210, 230, 0.7);
     letter-spacing: 3px;
     margin-top: 2px;
   }
@@ -847,8 +853,8 @@
   }
   .score-row-label {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text-dim);
+    font-size: 0.68rem;
+    color: rgba(200, 210, 230, 0.75);
     letter-spacing: 1px;
   }
   .score-row-value {
@@ -858,7 +864,7 @@
     letter-spacing: 1px;
   }
   .score-row-value.earned { color: var(--green); }
-  .score-row-value.pending { color: var(--text-dim); }
+  .score-row-value.pending { color: rgba(200, 210, 230, 0.55); }
 
   .category-dots {
     display: grid;
@@ -883,8 +889,8 @@
   }
   .cat-dot-label {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.4rem;
-    color: var(--text-dim);
+    font-size: 0.45rem;
+    color: rgba(200, 210, 230, 0.7);
     letter-spacing: 1px;
     text-transform: uppercase;
     line-height: 1.3;
@@ -914,8 +920,8 @@
   }
   .project-health-name {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.5rem;
-    color: var(--text-dim);
+    font-size: 0.55rem;
+    color: rgba(200, 210, 230, 0.75);
     letter-spacing: 1px;
   }
 
@@ -928,9 +934,9 @@
   }
   .next-task-label {
     font-family: 'Orbitron', monospace;
-    font-size: 0.5rem;
+    font-size: 0.55rem;
     font-weight: 700;
-    color: var(--text-dim);
+    color: rgba(200, 210, 230, 0.75);
     letter-spacing: 3px;
     margin-bottom: 6px;
   }
@@ -981,8 +987,8 @@
   }
   .celebration-detail {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text-dim);
+    font-size: 0.7rem;
+    color: rgba(200, 210, 230, 0.75);
     letter-spacing: 1px;
     margin: 4px 0;
   }
@@ -1019,7 +1025,7 @@
   .achievement-icon { font-size: 1.4rem; }
   .achievement-info { text-align: left; }
   .achievement-title { font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 800; color: var(--yellow); letter-spacing: 2px; text-shadow: 0 0 10px var(--yellow-glow); }
-  .achievement-desc { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
+  .achievement-desc { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: rgba(200, 210, 230, 0.75); margin-top: 2px; letter-spacing: 1px; }
 
   .coin { position: fixed; z-index: 150; font-size: 1rem; pointer-events: none; animation: coinFly 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
   @keyframes coinFly { 0%{opacity:1;transform:scale(0.5)} 40%{opacity:1;transform:scale(1.2)} 100%{opacity:0;transform:translateY(-60px) scale(0.5)} }
