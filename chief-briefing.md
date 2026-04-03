@@ -23,18 +23,18 @@
 - **Status:** Needs to FINISH. Break even and move on.
 - **Contractor:** Sam Haidar. Partner: Rick.
 - **Now:** Basement framing + drywall due Sat EOD. Site visit Saturday.
-- **Countertops:** Sam owed answer by EOD today — still waiting.
+- **Countertops:** Sam owed answer today — follow up if not received.
 - **Budget spreadsheet:** Overdue.
 
 ### Digital Product Empire (DPE)
 - **Status:** Sprint 1 DONE. 6 products live on Gumroad. Sprint 2 started today.
-- **Revenue:** $0 so far — products live, no sales yet.
+- **Revenue:** $0 so far.
 
 ### BiggerSpreads
 - **Status:** ON HOLD until June 2026.
 
 ### VA Appeal
-- **Status:** Docket. Expedite request in. Decision 60-120 days out. Check early May.
+- **Status:** Docket. Decision 60-120 days out. Check early May.
 
 ---
 
@@ -43,7 +43,7 @@
 - **Target:** $25,000/month
 - **90-day goal:** $50K/month by June 15, 2026
 - **Mortgage:** $3,400/month — current
-- **Unpaid:** Water bill, trash bill
+- **Unpaid:** Trash bill
 - **Credit cards:** Maxed. Andrea may need bankruptcy evaluation.
 - **Bill audit due:** April 17
 
@@ -54,7 +54,6 @@
 - Starts strong, fades at 60-90 days — watch project age
 - New ideas mid-day: "Backlog. No exceptions."
 - Sleep and workouts are the foundation — protect before business
-- Workout missed this morning — needs to happen today
 
 ---
 
@@ -90,45 +89,24 @@
       "days_silent": 1
     },
     {
-      "id": "mcd",
-      "name": "Motor City Deals",
+      "id": "family",
+      "name": "Family",
       "health": "green",
-      "category": "In Business",
+      "category": "Relationships",
       "days_silent": 0
     },
     {
-      "id": "708p",
-      "name": "708 Pallister",
-      "health": "yellow",
-      "category": "In Business",
-      "days_silent": 2
-    },
-    {
-      "id": "va",
-      "name": "VA Appeal",
-      "health": "red",
-      "category": "Finances",
-      "days_silent": 14
-    },
-    {
-      "id": "marcus",
-      "name": "MARCUS",
+      "id": "mental",
+      "name": "Mental",
       "health": "green",
-      "category": "On Business",
-      "days_silent": 0
-    },
-    {
-      "id": "dpe",
-      "name": "Digital Product Empire",
-      "health": "green",
-      "category": "On Business",
+      "category": "Mental",
       "days_silent": 0
     }
   ],
   "tasks": [
     {
       "id": "task-001",
-      "text": "Workout — Tonal or cold plunge. You missed this morning. Do it now.",
+      "text": "Workout — missed this morning. Last window before dinner.",
       "project_id": "fitness",
       "project_name": "Fitness",
       "category": "Physical",
@@ -139,57 +117,42 @@
     },
     {
       "id": "task-002",
-      "text": "MCD: Send first email outreach batch to real estate agents",
-      "project_id": "mcd",
-      "project_name": "Motor City Deals",
-      "category": "In Business",
-      "type": "pomodoro",
-      "estimated_pomodoros": 2,
+      "text": "Family dinner — 6 PM",
+      "project_id": "family",
+      "project_name": "Family",
+      "category": "Relationships",
+      "type": "quick",
+      "estimated_pomodoros": 1,
       "priority": 2,
       "health": "green"
     },
     {
       "id": "task-003",
-      "text": "Text Sam — did countertop answer come? It was due today.",
-      "project_id": "708p",
-      "project_name": "708 Pallister",
-      "category": "In Business",
-      "type": "quick",
-      "estimated_pomodoros": 1,
-      "priority": 3,
-      "health": "yellow"
-    },
-    {
-      "id": "task-004",
-      "text": "Water bill: find the account, get the amount, log it",
-      "project_id": "va",
-      "project_name": "Finances",
-      "category": "Finances",
-      "type": "quick",
-      "estimated_pomodoros": 1,
-      "priority": 4,
-      "health": "red"
-    },
-    {
-      "id": "task-005",
       "text": "Plants — 5-15 min",
       "project_id": "fitness",
       "project_name": "Personal",
       "category": "Physical",
       "type": "quick",
       "estimated_pomodoros": 1,
-      "priority": 5,
+      "priority": 3,
+      "health": "green"
+    },
+    {
+      "id": "task-004",
+      "text": "Reading — 9:30 PM. Lights out 10 PM.",
+      "project_id": "mental",
+      "project_name": "Mental",
+      "category": "Mental",
+      "type": "quick",
+      "estimated_pomodoros": 1,
+      "priority": 4,
       "health": "green"
     }
   ],
   "needs_you": [
-    "Sam: countertop timeline was due today — no answer received yet",
-    "10DLC: new Twilio registration pending — follow up Ali Monday Apr 7",
-    "Water bill: still unpaid, amount unknown"
+    "Sam: countertop timeline was due today — confirm receipt or follow up",
+    "10DLC: new Twilio registration pending — follow up Ali Monday Apr 7"
   ],
-  "falling_through_cracks": [
-    { "name": "VA Appeal", "days_silent": 14 },
-    { "name": "Pallister Budget Spreadsheet", "days_silent": 14 }
-  ]
+  "falling_through_cracks": []
 }
 ---END QUEUE---
