@@ -6,3 +6,4 @@ POMODORO.app/
 THE_GRIND_CLAUDE_CODE_PROMPT.md
 .vercel/
 .vercel
+.env*

@@ -874,18 +874,24 @@
   }
   .cat-dot { text-align: center; }
   .cat-dot-circle {
-    width: 18px;
-    height: 18px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     margin: 0 auto 4px;
     border: 1px solid rgba(0,240,255,0.15);
     background: rgba(0,240,255,0.04);
     transition: all 0.5s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    filter: grayscale(1) opacity(0.4);
   }
   .cat-dot.lit .cat-dot-circle {
-    background: var(--cyan);
+    background: rgba(0,240,255,0.1);
     border-color: var(--cyan);
     box-shadow: 0 0 12px var(--cyan-glow);
+    filter: none;
   }
   .cat-dot-label {
     font-family: 'Share Tech Mono', monospace;
@@ -1032,6 +1038,175 @@
 
   .blink { animation: blink 1s step-end infinite; }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* ========== SWIPE TO COMPLETE ========== */
+  .queue-task { overflow: hidden; }
+  .swipe-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(57,255,20,0.15), rgba(57,255,20,0.06));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 16px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .swipe-bg.visible { opacity: 1; }
+  .swipe-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--green);
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px var(--green-glow);
+  }
+  .swipe-xp {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--yellow);
+    opacity: 0.7;
+  }
+  .swipe-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-panel);
+    position: relative;
+    z-index: 1;
+    padding: 12px 14px;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .queue-task.has-swipe { padding: 0; }
+  .queue-task.quick-completing .swipe-content { transform: translateX(100%); }
+  .queue-task.quick-completing { max-height: 80px; animation: rowCollapse 0.4s 0.25s ease forwards; }
+  @keyframes rowCollapse {
+    0% { max-height: 80px; opacity: 1; margin-bottom: 6px; }
+    100% { max-height: 0; opacity: 0; margin-bottom: 0; padding: 0; border-width: 0; }
+  }
+  .swipe-hint .swipe-content { animation: hintNudge 1.5s ease-in-out 1s 1; }
+  @keyframes hintNudge {
+    0% { transform: translateX(0); }
+    30% { transform: translateX(30px); }
+    60% { transform: translateX(10px); }
+    100% { transform: translateX(0); }
+  }
+
+  /* Undo toast */
+  .undo-toast {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    z-index: 400;
+    background: var(--bg-panel);
+    border: 1px solid var(--green);
+    border-radius: 2px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(20px);
+    animation: undoIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    max-width: 90vw;
+    box-shadow: 0 0 20px var(--green-glow);
+  }
+  .undo-toast.out { animation: undoOut 0.3s ease forwards; }
+  @keyframes undoIn { 0%{transform:translateX(-50%) translateY(100px)} 100%{transform:translateX(-50%) translateY(0)} }
+  @keyframes undoOut { 0%{transform:translateX(-50%) translateY(0);opacity:1} 100%{transform:translateX(-50%) translateY(100px);opacity:0} }
+  .undo-task-name { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--green); letter-spacing:1px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .undo-btn { font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:800; color:#000; background:var(--green); border:none; padding:6px 14px; border-radius:2px; letter-spacing:2px; cursor:pointer; flex-shrink:0; }
+  .undo-btn:active { transform: scale(0.95); }
+  .undo-timer-bar { position:absolute; bottom:0; left:0; height:2px; background:var(--green); box-shadow:0 0 6px var(--green-glow); animation:undoCountdown 5s linear forwards; }
+  @keyframes undoCountdown { 0%{width:100%} 100%{width:0%} }
+
+  /* ========== CHIEF CHAT ========== */
+  .chief-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 16px);
+    z-index: 60;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--magenta);
+    background: linear-gradient(135deg, rgba(255,0,222,0.15), rgba(255,0,222,0.05));
+    backdrop-filter: blur(8px);
+    color: var(--magenta);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px var(--magenta-dim), 0 4px 12px rgba(0,0,0,0.4);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: chiefPulse 3s ease-in-out infinite;
+  }
+  .chief-fab:active { transform: scale(0.92); }
+  .chief-fab svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+  .chief-fab.open { background: var(--magenta); color: #000; border-color: var(--magenta); animation: none; }
+  @keyframes chiefPulse {
+    0%, 100% { box-shadow: 0 0 20px var(--magenta-dim), 0 4px 12px rgba(0,0,0,0.4); }
+    50% { box-shadow: 0 0 30px var(--magenta-glow), 0 4px 16px rgba(0,0,0,0.4); }
+  }
+  .chief-fab.timer-active:not(.open) { opacity: 0.35; width: 40px; height: 40px; box-shadow: none; animation: none; }
+  .chief-fab.timer-active:not(.open):active { opacity: 0.8; width: 48px; height: 48px; }
+  .chief-fab-badge { position:absolute; top:-2px; right:-2px; width:12px; height:12px; border-radius:50%; background:var(--red); border:2px solid var(--bg); display:none; }
+  .chief-fab-badge.visible { display: block; animation: fabBadgePulse 2s ease-in-out infinite; }
+  @keyframes fabBadgePulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,0,60,0.4)} 50%{box-shadow:0 0 0 6px rgba(255,0,60,0)} }
+
+  .chief-backdrop { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.5); opacity:0; visibility:hidden; transition:opacity 0.3s ease, visibility 0s linear 0.3s; }
+  .chief-backdrop.open { opacity:1; visibility:visible; transition:opacity 0.3s ease, visibility 0s linear 0s; }
+
+  .chief-panel {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 501;
+    height: 55vh;
+    max-height: 480px;
+    min-height: 320px;
+    background: rgba(10,10,18,0.97);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--magenta-dim);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .chief-panel.open { transform: translateY(0); }
+
+  .chief-header { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .chief-header-dot { width:8px; height:8px; border-radius:50%; background:var(--magenta); box-shadow:0 0 8px var(--magenta-glow); animation:chiefDotPulse 2s ease-in-out infinite; }
+  @keyframes chiefDotPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+  .chief-header-title { font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:800; color:var(--magenta); letter-spacing:3px; }
+  .chief-header-status { font-family:'Share Tech Mono',monospace; font-size:0.55rem; color:var(--text-dim); letter-spacing:1px; margin-left:auto; }
+
+  .chief-messages { flex:1; overflow-y:auto; overscroll-behavior:contain; padding:12px 16px; display:flex; flex-direction:column; gap:10px; }
+  .chief-msg { max-width:85%; padding:8px 12px; border-radius:8px; font-size:0.85rem; line-height:1.4; word-wrap:break-word; animation: msgFadeIn 0.3s ease; }
+  @keyframes msgFadeIn { 0%{opacity:0;transform:translateY(6px)} 100%{opacity:1;transform:translateY(0)} }
+  .chief-msg.user { align-self:flex-end; background:rgba(0,240,255,0.1); border:1px solid rgba(0,240,255,0.2); color:var(--text); border-radius:8px 8px 2px 8px; font-family:'Rajdhani',sans-serif; font-weight:500; }
+  .chief-msg.chief { align-self:flex-start; background:rgba(255,0,222,0.06); border:1px solid rgba(255,0,222,0.12); color:var(--text); border-radius:8px 8px 8px 2px; font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.5px; }
+  .chief-msg.action { align-self:center; max-width:90%; background:rgba(255,230,0,0.05); border:1px dashed rgba(255,230,0,0.2); border-radius:4px; padding:6px 14px; text-align:center; font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--yellow); }
+  .chief-msg.system { align-self:center; max-width:90%; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--text-dim); text-align:center; padding:4px; }
+  .chief-cursor { display:inline-block; width:2px; height:1em; background:var(--magenta); margin-left:2px; vertical-align:text-bottom; animation:blink 0.8s step-end infinite; }
+  .chief-typing { align-self:flex-start; display:flex; gap:4px; padding:10px 14px; }
+  .chief-typing-dot { width:6px; height:6px; border-radius:50%; background:var(--magenta-dim); animation:typingBounce 1.4s ease-in-out infinite; }
+  .chief-typing-dot:nth-child(2) { animation-delay:0.2s; }
+  .chief-typing-dot:nth-child(3) { animation-delay:0.4s; }
+  @keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-6px);opacity:1} }
+
+  .chief-input-row { display:flex; align-items:center; gap:8px; padding:10px 12px; padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px)); border-top:1px solid var(--border); flex-shrink:0; background:rgba(10,10,18,0.98); }
+  .chief-input { flex:1; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px; padding:8px 16px; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:500; outline:none; transition:border-color 0.3s, box-shadow 0.3s; }
+  .chief-input:focus { border-color:var(--magenta-dim); box-shadow:0 0 10px rgba(255,0,222,0.15); }
+  .chief-input::placeholder { color:var(--text-muted); }
+  .chief-send-btn, .chief-mic-btn { width:36px; height:36px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all 0.2s; }
+  .chief-send-btn { background:var(--magenta); color:#000; }
+  .chief-send-btn:disabled { opacity:0.3; cursor:default; }
+  .chief-send-btn:not(:disabled):active { transform:scale(0.9); }
+  .chief-send-btn svg { width:16px; height:16px; }
+  .chief-mic-btn { background:none; border:1px solid var(--border); color:var(--text-dim); opacity:0.4; cursor:default; }
+  .chief-mic-btn svg { width:16px; height:16px; }
 
   @media (max-width: 480px) {
     .timer-container { width: 220px; height: 220px; }
@@ -1263,6 +1438,30 @@
   </button>
 </div>
 
+<!-- ========== CHIEF CHAT ========== -->
+<button class="chief-fab" id="chiefFab" onclick="toggleChief()" aria-label="Chat with Chief">
+  <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="chief-fab-badge" id="chiefBadge"></div>
+</button>
+<div class="chief-backdrop" id="chiefBackdrop" onclick="toggleChief()"></div>
+<div class="chief-panel" id="chiefPanel">
+  <div class="chief-header">
+    <div class="chief-header-dot"></div>
+    <div class="chief-header-title">CHIEF</div>
+    <div class="chief-header-status" id="chiefStatus">// online</div>
+  </div>
+  <div class="chief-messages" id="chiefMessages"></div>
+  <div class="chief-input-row">
+    <input class="chief-input" id="chiefInput" type="text" placeholder="Talk to Chief..." maxlength="500" autocomplete="off" enterkeyhint="send">
+    <button class="chief-send-btn" id="chiefSendBtn" onclick="sendChiefMessage()" disabled>
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="currentColor"/></svg>
+    </button>
+    <button class="chief-mic-btn" disabled title="Voice (coming soon)">
+      <svg viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
 <script>
 // ==================== STATE & CONSTANTS ====================
 let todayData = null;
@@ -1307,8 +1506,9 @@ const CIRCUMFERENCE = 2 * Math.PI * 130;
 const LEVEL_TITLES = ['', 'NETRUNNER', 'DATASMITH', 'CODEBREAKER', 'SYNTH_OPS', 'OVERCLOCKED', 'MAINFRAME', 'ARCHITECT', 'FLOW_STATE', 'ZERO_COOL', 'LEGENDARY', 'TRANSCENDED', 'MYTHIC_OPS', 'SINGULARITY', 'TIME_LORD', 'ASCENDED'];
 const LEVEL_ICONS = ['', '\u25C8', '\u25C9', '\u2726', '\u2605', '\u26A1', '\u25C6', '\u2756', '\u29BF', '\u2742', '\u2606', '\u273B', '\u2738', '\u2739', '\u29D7', '\u2736'];
 
-const XP_REWARDS = { pomodoroComplete: 50, quickComplete: 25, taskComplete: 20, streakBonus: 10 };
+const XP_REWARDS = { pomodoroComplete: 50, quickComplete: 25, taskComplete: 20, streakBonus: 10, quickTaskComplete: 50 };
 const ALL_CATEGORIES = ['Physical', 'Mental', 'Spiritual', 'On Business', 'In Business', 'Finances', 'Relationships'];
+const CAT_EMOJI = { 'Physical': '\uD83D\uDCAA', 'Mental': '\uD83E\uDDE0', 'Spiritual': '\uD83E\uDDD8', 'On Business': '\uD83C\uDFD7\uFE0F', 'In Business': '\uD83D\uDCBC', 'Finances': '\uD83D\uDCB0', 'Relationships': '\u2764\uFE0F' };
 
 const ACHIEVEMENTS = {
   first_pomo: { icon: '\u25C6', title: 'FIRST_BOOT', desc: 'Initialize first focus cycle' },
@@ -1482,23 +1682,40 @@ function renderQueue() {
     div.className = 'queue-task' + (isCompleted ? ' completed' : '') +
       (isRed && !isCompleted ? ' health-red' : '') +
       (health === 'yellow' && !isCompleted ? ' health-yellow' : '') +
-      (health === 'green' && !isCompleted ? ' health-green' : '');
+      (health === 'green' && !isCompleted ? ' health-green' : '') +
+      (!isCompleted ? ' has-swipe' : '');
+    div.dataset.taskId = task.id;
 
-    div.innerHTML = `
+    const catEmoji = task.category ? (CAT_EMOJI[task.category] || '') : '';
+    const taskContent = `
       <div class="task-info">
         <div class="task-text">${escHtml(task.text || task.name || '')}</div>
         <div class="task-meta">
           ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
+          ${catEmoji ? `<span class="task-type-pomo">${catEmoji}</span>` : ''}
           <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
         </div>
       </div>
       ${isRed && !isCompleted ? '<span class="task-2x">2X</span>' : ''}
     `;
+
     if (!isCompleted) {
-      div.onclick = () => launchTask(task);
+      div.innerHTML = `
+        <div class="swipe-bg"><span class="swipe-label">DONE</span><span class="swipe-xp">+${Math.floor(XP_REWARDS.quickTaskComplete * getMultiplier() * (isRed ? 2 : 1))} XP</span></div>
+        <div class="swipe-content">${taskContent}</div>
+      `;
+      setupSwipeToComplete(div, task);
+    } else {
+      div.innerHTML = taskContent;
     }
     container.appendChild(div);
   });
+
+  // First-time swipe hint
+  if (!localStorage.getItem('the-grind-swipe-hint')) {
+    const firstRow = container.querySelector('.queue-task:not(.completed)');
+    if (firstRow) { firstRow.classList.add('swipe-hint'); localStorage.setItem('the-grind-swipe-hint', '1'); }
+  }
 
   const nextTask = getNextIncompleteTask();
   const btn = document.getElementById('startBtn');
@@ -1872,6 +2089,7 @@ function toggleTimer() {
 
 function startTimer() {
   running = true;
+  updateChiefFabState();
   document.getElementById('mainBtn').textContent = 'PAUSE';
   document.getElementById('timerLabel').innerHTML = LABELS_RUN[mode] + '<span class="blink">_</span>';
   document.getElementById('timerContainer').classList.add('running');
@@ -1891,6 +2109,7 @@ function startTimer() {
 
 function pauseTimer() {
   running = false;
+  updateChiefFabState();
   clearInterval(interval);
   document.getElementById('mainBtn').textContent = 'RESUME';
   document.getElementById('timerLabel').innerHTML = '// paused<span class="blink">_</span>';
@@ -1899,6 +2118,7 @@ function pauseTimer() {
 
 function resetTimer() {
   running = false;
+  updateChiefFabState();
   clearInterval(interval);
   timeLeft = DURATIONS[mode];
   totalTime = DURATIONS[mode];
@@ -1912,6 +2132,7 @@ function skipTimer() { completeSession(); }
 
 function completeSession() {
   running = false;
+  updateChiefFabState();
   clearInterval(interval);
   document.getElementById('timerContainer').classList.remove('running');
   playComplete();
@@ -1959,6 +2180,7 @@ function completeSession() {
     checkAchievements();
     renderQueue();
     saveState();
+    debouncedSync();
 
     // Check if all tasks done
     const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
@@ -2110,11 +2332,11 @@ function renderScoreboard() {
   setScore('scoreFinancePts', financeScore, 10);
   setScore('scoreCracksPts', cracksScore, 10);
 
-  // Category dots — 4-column grid
-  const CAT_LABELS = { 'Physical': 'PHY', 'Mental': 'MNT', 'Spiritual': 'SPR', 'On Business': 'ON<br>BIZ', 'In Business': 'IN<br>BIZ', 'Finances': 'FIN', 'Relationships': 'REL' };
+  // Category dots — emoji labels
   document.getElementById('categoryDots').innerHTML = ALL_CATEGORIES.map(cat => {
     const lit = categoriesTouched.has(cat);
-    return `<div class="cat-dot ${lit ? 'lit' : ''}"><div class="cat-dot-circle"></div><div class="cat-dot-label">${CAT_LABELS[cat] || cat}</div></div>`;
+    const emoji = CAT_EMOJI[cat] || '';
+    return `<div class="cat-dot ${lit ? 'lit' : ''}"><div class="cat-dot-circle">${emoji}</div><div class="cat-dot-label">${cat.split(' ').pop()}</div></div>`;
   }).join('');
 
   // Project health grid
@@ -2166,6 +2388,488 @@ function showCelebration() {
 // ==================== UTILS ====================
 function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+// ==================== SWIPE TO COMPLETE ====================
+const SWIPE_THRESHOLD = 80;
+const SWIPE_DEAD_ZONE = 10;
+let undoTimeout = null;
+let undoData = null;
+
+function setupSwipeToComplete(el, task) {
+  const content = el.querySelector('.swipe-content');
+  const bg = el.querySelector('.swipe-bg');
+  if (!content || !bg) return;
+  let startX = 0, startY = 0, currentX = 0, swiping = false, scrolling = false;
+
+  content.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    currentX = 0; swiping = false; scrolling = false;
+    content.style.transition = 'none';
+  }, { passive: true });
+
+  content.addEventListener('touchmove', e => {
+    if (scrolling) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if (!swiping && Math.abs(dy) > SWIPE_DEAD_ZONE) { scrolling = true; return; }
+    if (!swiping && Math.abs(dx) > SWIPE_DEAD_ZONE) swiping = true;
+    if (!swiping) return;
+    e.preventDefault();
+    currentX = Math.max(0, dx);
+    content.style.transform = `translateX(${currentX}px)`;
+    bg.classList.toggle('visible', currentX > 20);
+  }, { passive: false });
+
+  content.addEventListener('touchend', () => {
+    content.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
+    if (swiping && currentX >= SWIPE_THRESHOLD) {
+      quickCompleteTask(el, task);
+    } else if (swiping) {
+      content.style.transform = 'translateX(0)';
+      bg.classList.remove('visible');
+    } else if (!scrolling) {
+      launchTask(task);
+    }
+    swiping = false;
+  });
+}
+
+function quickCompleteTask(el, task) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  playTaskComplete();
+  el.classList.add('quick-completing');
+  el.querySelector('.swipe-bg')?.classList.add('visible');
+
+  const healthMult = task.health === 'red' ? 2 : 1;
+  awardXp(XP_REWARDS.quickTaskComplete, el, healthMult);
+
+  completedTaskIds.add(task.id);
+  taskPomosDone[task.id] = task.estimated_pomodoros || 1;
+  tasksCompleted++;
+  if (task.category) categoriesTouched.add(task.category);
+
+  if (todayData && todayData.falling_through_cracks) {
+    const crackNames = todayData.falling_through_cracks.map(c => c.name.toLowerCase());
+    if (task.project_name && crackNames.some(cn => task.project_name.toLowerCase().includes(cn.split(' ')[0].toLowerCase()))) {
+      cracksWorked.add(task.project_id);
+    }
+  }
+
+  checkAchievements();
+  saveState();
+  undoData = { taskId: task.id, task, xpAwarded: lastXpAwarded, prevTasksCompleted: tasksCompleted - 1, prevPomosDone: (taskPomosDone[task.id] || 1) };
+  showUndoToast(task);
+  debouncedSync();
+
+  setTimeout(() => {
+    renderQueue();
+    const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+    if (allTasks.length > 0 && allTasks.every(t => completedTaskIds.has(t.id))) showCelebration();
+  }, 650);
+}
+
+function showUndoToast(task) {
+  document.querySelectorAll('.undo-toast').forEach(t => t.remove());
+  if (undoTimeout) clearTimeout(undoTimeout);
+  const toast = document.createElement('div');
+  toast.className = 'undo-toast';
+  toast.innerHTML = `<span class="undo-task-name">// ${escHtml(task.text || '')} done</span><button class="undo-btn" onclick="undoQuickComplete()">UNDO</button><div class="undo-timer-bar"></div>`;
+  document.body.appendChild(toast);
+  undoTimeout = setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 400); undoData = null; }, 5000);
+}
+
+function undoQuickComplete() {
+  if (!undoData) return;
+  completedTaskIds.delete(undoData.taskId);
+  delete taskPomosDone[undoData.taskId];
+  tasksCompleted = undoData.prevTasksCompleted;
+  xp -= undoData.xpAwarded; totalXp -= undoData.xpAwarded;
+  if (xp < 0) xp = 0;
+  updateXpBar();
+  document.getElementById('statXp').textContent = totalXp;
+  if (undoData.task.category) {
+    const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+    if (!allTasks.some(t => t.id !== undoData.taskId && completedTaskIds.has(t.id) && t.category === undoData.task.category)) {
+      categoriesTouched.delete(undoData.task.category);
+    }
+  }
+  saveState();
+  renderQueue();
+  updateStats();
+  document.querySelectorAll('.undo-toast').forEach(t => { t.classList.add('out'); setTimeout(() => t.remove(), 400); });
+  if (undoTimeout) clearTimeout(undoTimeout);
+  undoData = null;
+}
+
+// ==================== RESULTS SYNC ====================
+let lastTodaySha = null;
+let syncInFlight = false;
+let syncTimer = null;
+
+function calcDailyScore() {
+  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+  const totalPomosPlanned = allTasks.reduce((s, t) => s + (t.estimated_pomodoros || 1), 0);
+  const pomoScore = totalPomosPlanned > 0 ? Math.min(40, Math.round((pomodorosCompleted / totalPomosPlanned) * 40)) : 0;
+  const topPriority = allTasks.filter(t => t.priority && t.priority <= 3);
+  const topDone = topPriority.filter(t => completedTaskIds.has(t.id)).length;
+  const priorityScore = topPriority.length > 0 ? Math.round((topDone / topPriority.length) * 20) : 0;
+  const catScore = categoriesTouched.size >= 3 ? 20 : Math.round((categoriesTouched.size / 3) * 20);
+  const financeScore = categoriesTouched.has('Finances') ? 10 : 0;
+  const hasCracks = todayData && todayData.falling_through_cracks && todayData.falling_through_cracks.length > 0;
+  const cracksScore = (!hasCracks || cracksWorked.size > 0) ? 10 : 0;
+  return pomoScore + priorityScore + catScore + financeScore + cracksScore;
+}
+
+function buildResultsPayload() {
+  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+  return {
+    date: getTodayDate(),
+    last_synced: new Date().toISOString(),
+    today_json_date: todayData?.date || null,
+    tasks: allTasks.map(t => ({
+      id: t.id, text: t.text, project_id: t.project_id || null, category: t.category || null,
+      status: completedTaskIds.has(t.id) ? 'completed' : (taskPomosDone[t.id] > 0 ? 'in_progress' : 'pending'),
+      completion_type: completedTaskIds.has(t.id) ? (taskPomosDone[t.id] >= (t.estimated_pomodoros || 1) ? 'timed' : 'quick') : null,
+      pomos_done: taskPomosDone[t.id] || 0, pomos_estimated: t.estimated_pomodoros || 1,
+      completed_at: completedTaskIds.has(t.id) ? new Date().toISOString() : null
+    })),
+    manual_tasks: manualTasks.filter(t => completedTaskIds.has(t.id)).map(t => ({ id: t.id, text: t.text, status: 'completed' })),
+    summary: {
+      pomodoros_completed: pomodorosCompleted, total_minutes: totalMinutes,
+      tasks_completed: tasksCompleted, tasks_total: allTasks.length,
+      daily_score: calcDailyScore(),
+      categories_touched: [...categoriesTouched], cracks_worked: [...cracksWorked],
+      xp_earned_today: totalXp, level, day_streak: dayStreak, session_streak: sessionStreak
+    }
+  };
+}
+
+async function syncResults() {
+  if (syncInFlight) return;
+  syncInFlight = true;
+  const token = localStorage.getItem('the-grind-chief-token') || '';
+  try {
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
+      body: JSON.stringify({ type: 'results', payload: buildResultsPayload() })
+    });
+    if (res.ok) { localStorage.removeItem('the-grind-sync-queue'); }
+    else { queueOfflineSync(); }
+  } catch { queueOfflineSync(); }
+  finally { syncInFlight = false; }
+}
+
+function queueOfflineSync() {
+  localStorage.setItem('the-grind-sync-queue', JSON.stringify({ payload: buildResultsPayload(), queued_at: new Date().toISOString() }));
+}
+
+async function drainOfflineQueue() {
+  const raw = localStorage.getItem('the-grind-sync-queue');
+  if (!raw || !navigator.onLine) return;
+  const { payload } = JSON.parse(raw);
+  syncInFlight = true;
+  const token = localStorage.getItem('the-grind-chief-token') || '';
+  try {
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
+      body: JSON.stringify({ type: 'results', payload })
+    });
+    if (res.ok) localStorage.removeItem('the-grind-sync-queue');
+  } catch {}
+  finally { syncInFlight = false; }
+}
+
+function debouncedSync() {
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncResults, 5000);
+}
+
+// Polling for today.json updates
+function startPolling() {
+  setInterval(async () => {
+    try {
+      const res = await fetch('/api/check-update');
+      if (!res.ok) return;
+      const { sha } = await res.json();
+      if (lastTodaySha && sha !== lastTodaySha) {
+        lastTodaySha = sha;
+        await loadTodayData();
+      } else if (!lastTodaySha) {
+        lastTodaySha = sha;
+      }
+    } catch {}
+  }, 120000);
+}
+
+// ==================== CHIEF CHAT ====================
+let chiefOpen = false;
+let chiefConversation = [];
+let chiefStreaming = false;
+const CHIEF_CHAT_KEY = 'the-grind-chief-chat';
+const CHIEF_TOKEN_KEY = 'the-grind-chief-token';
+
+function toggleChief() {
+  chiefOpen = !chiefOpen;
+  document.getElementById('chiefFab').classList.toggle('open', chiefOpen);
+  document.getElementById('chiefPanel').classList.toggle('open', chiefOpen);
+  document.getElementById('chiefBackdrop').classList.toggle('open', chiefOpen);
+  document.getElementById('chiefBadge').classList.remove('visible');
+  if (chiefOpen) setTimeout(() => document.getElementById('chiefInput').focus(), 350);
+}
+
+function loadChiefHistory() {
+  try {
+    const raw = localStorage.getItem(CHIEF_CHAT_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    if (data.date !== getTodayDate()) { localStorage.removeItem(CHIEF_CHAT_KEY); return []; }
+    return data.messages || [];
+  } catch { return []; }
+}
+
+function saveChiefHistory() {
+  localStorage.setItem(CHIEF_CHAT_KEY, JSON.stringify({ date: getTodayDate(), messages: chiefConversation.slice(-30) }));
+}
+
+function addChiefMsg(role, text) {
+  const container = document.getElementById('chiefMessages');
+  const div = document.createElement('div');
+  div.className = 'chief-msg ' + role;
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function renderChiefHistory() {
+  const container = document.getElementById('chiefMessages');
+  container.innerHTML = '';
+  chiefConversation.forEach(m => addChiefMsg(m.role, m.content));
+}
+
+function buildAppState() {
+  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+  return {
+    date: getTodayDate(),
+    tasks: allTasks,
+    completedTaskIds: [...completedTaskIds],
+    taskPomosDone,
+    currentTaskId,
+    timerRunning: running,
+    timeRemaining: running ? `${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,'0')}` : null,
+    pomodorosCompleted, tasksCompleted, sessionStreak, dayStreak,
+    dailyScore: calcDailyScore(),
+    categoriesTouched: [...categoriesTouched],
+    finances: todayData?.finances || null,
+    needsYou: todayData?.needs_you || [],
+    fallingThroughCracks: todayData?.falling_through_cracks || []
+  };
+}
+
+async function sendChiefMessage() {
+  const input = document.getElementById('chiefInput');
+  const text = input.value.trim();
+  if (!text || chiefStreaming) return;
+  input.value = '';
+  document.getElementById('chiefSendBtn').disabled = true;
+
+  const token = localStorage.getItem(CHIEF_TOKEN_KEY);
+  if (!token) {
+    addChiefMsg('system', '// Set your Chief auth token first. Enter it below and send.');
+    chiefConversation.push({ role: 'user', content: text });
+    localStorage.setItem(CHIEF_TOKEN_KEY, text);
+    addChiefMsg('system', '// Token saved. You can now talk to Chief.');
+    saveChiefHistory();
+    return;
+  }
+
+  chiefConversation.push({ role: 'user', content: text });
+  addChiefMsg('user', text);
+  saveChiefHistory();
+
+  // Show typing
+  const container = document.getElementById('chiefMessages');
+  const typing = document.createElement('div');
+  typing.className = 'chief-typing';
+  typing.id = 'chiefTyping';
+  typing.innerHTML = '<div class="chief-typing-dot"></div><div class="chief-typing-dot"></div><div class="chief-typing-dot"></div>';
+  container.appendChild(typing);
+  container.scrollTop = container.scrollHeight;
+
+  chiefStreaming = true;
+  try {
+    const res = await fetch('/api/chief', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
+      body: JSON.stringify({
+        message: text,
+        conversation: chiefConversation.filter(m => m.role === 'user' || m.role === 'assistant').slice(-20),
+        appState: buildAppState()
+      })
+    });
+
+    document.getElementById('chiefTyping')?.remove();
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Connection failed' }));
+      addChiefMsg('system', `// ${err.error || 'Chief unavailable'}`);
+      chiefStreaming = false;
+      return;
+    }
+
+    // Stream response
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chief-msg chief';
+    msgDiv.id = 'chiefStreamMsg';
+    container.appendChild(msgDiv);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'chief-cursor';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.t === 'token') {
+            fullText += data.c;
+            const displayText = fullText.split('---ACTIONS---')[0];
+            msgDiv.textContent = displayText;
+            msgDiv.appendChild(cursor);
+            container.scrollTop = container.scrollHeight;
+          } else if (data.t === 'error') {
+            addChiefMsg('system', `// ${data.c}`);
+          }
+        } catch {}
+      }
+    }
+
+    cursor.remove();
+    msgDiv.removeAttribute('id');
+
+    // Parse actions
+    const actionDelim = '---ACTIONS---';
+    let responseText = fullText;
+    if (fullText.includes(actionDelim)) {
+      responseText = fullText.split(actionDelim)[0].trim();
+      msgDiv.textContent = responseText;
+      const actionJson = fullText.split(actionDelim)[1].trim();
+      try {
+        const actions = JSON.parse(actionJson);
+        executeChiefActions(actions);
+      } catch(e) { console.warn('Action parse error:', e); }
+    }
+
+    chiefConversation.push({ role: 'assistant', content: responseText });
+    saveChiefHistory();
+
+  } catch (err) {
+    document.getElementById('chiefTyping')?.remove();
+    addChiefMsg('system', '// Connection lost. Try again.');
+  }
+  chiefStreaming = false;
+  document.getElementById('chiefSendBtn').disabled = false;
+}
+
+function executeChiefActions(actions) {
+  if (!Array.isArray(actions)) return;
+  for (const action of actions) {
+    switch (action.type) {
+      case 'add_task': {
+        const p = action.payload;
+        const task = {
+          id: 'chief-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+          text: p.text, project_id: p.project_id || null, project_name: p.project_name || null,
+          category: p.category || null, type: p.type || 'pomodoro',
+          estimated_pomodoros: p.estimated_pomodoros || 1, health: p.health || 'gray', priority: 999
+        };
+        const pos = p.insert_at === 'end' || !p.insert_at ? queueTasks.length : Math.min(p.insert_at - 1, queueTasks.length);
+        queueTasks.splice(pos, 0, task);
+        queueTasks.forEach((t, i) => t.priority = i + 1);
+        addChiefMsg('action', `+ Added: ${p.text}`);
+        break;
+      }
+      case 'remove_task': {
+        const removed = queueTasks.find(t => t.id === action.payload.task_id);
+        queueTasks = queueTasks.filter(t => t.id !== action.payload.task_id);
+        queueTasks.forEach((t, i) => t.priority = i + 1);
+        addChiefMsg('action', `- Removed: ${removed?.text || action.payload.task_id}`);
+        break;
+      }
+      case 'reorder_tasks': {
+        const idx = queueTasks.findIndex(t => t.id === action.payload.task_id);
+        if (idx !== -1) {
+          const [task] = queueTasks.splice(idx, 1);
+          const np = Math.min(action.payload.new_position - 1, queueTasks.length);
+          queueTasks.splice(np, 0, task);
+          queueTasks.forEach((t, i) => t.priority = i + 1);
+          addChiefMsg('action', `~ Moved "${task.text}" to #${action.payload.new_position}`);
+        }
+        break;
+      }
+      case 'skip_task':
+      case 'complete_task': {
+        completedTaskIds.add(action.payload.task_id);
+        const t = queueTasks.find(t => t.id === action.payload.task_id);
+        tasksCompleted++;
+        if (t?.category) categoriesTouched.add(t.category);
+        addChiefMsg('action', `> ${action.type === 'skip_task' ? 'Skipped' : 'Completed'}: ${t?.text || action.payload.task_id}`);
+        break;
+      }
+      case 'update_finance': {
+        if (todayData && todayData.finances && action.payload.month_income != null) {
+          todayData.finances.month_income = action.payload.month_income;
+          renderFinanceBar();
+          addChiefMsg('action', `$ Income updated to $${action.payload.month_income.toLocaleString()}`);
+        }
+        break;
+      }
+      case 'launch_task': {
+        const task = queueTasks.find(t => t.id === action.payload.task_id);
+        if (task) { launchTask(task); addChiefMsg('action', `> Launching: ${task.text}`); }
+        break;
+      }
+    }
+  }
+  renderQueue();
+  renderScoreboard();
+  saveState();
+  // Sync modified queue back to today.json
+  syncTodayJson();
+}
+
+async function syncTodayJson() {
+  if (!todayData) return;
+  const token = localStorage.getItem(CHIEF_TOKEN_KEY) || '';
+  const updated = { ...todayData, tasks: queueTasks };
+  try {
+    await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': token },
+      body: JSON.stringify({ type: 'update_today', payload: updated })
+    });
+  } catch {}
+}
+
+function initChiefInput() {
+  const input = document.getElementById('chiefInput');
+  const sendBtn = document.getElementById('chiefSendBtn');
+  if (!input || !sendBtn) return;
+  input.addEventListener('input', () => { sendBtn.disabled = !input.value.trim(); });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChiefMessage(); } });
+}
+
+function updateChiefFabState() {
+  document.getElementById('chiefFab')?.classList.toggle('timer-active', running);
+}
+
 // ==================== INIT ====================
 loadState();
 updateXpBar();
@@ -2174,6 +2878,16 @@ updateTimerTheme();
 updateSessions();
 updateStats();
 loadTodayData();
+
+// Chief chat init
+chiefConversation = loadChiefHistory();
+renderChiefHistory();
+initChiefInput();
+
+// Sync init
+drainOfflineQueue();
+startPolling();
+window.addEventListener('online', drainOfflineQueue);
 
 if (!soundEnabled) {
   const btn = document.getElementById('soundBtn');
@@ -2190,7 +2904,11 @@ requestAnimationFrame(() => {
 // Day rollover detection — reset daily state if date changes while app is open
 let _lastDate = getTodayDate();
 document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    syncResults();
+  }
   if (document.visibilityState === 'visible') {
+    drainOfflineQueue();
     const now = getTodayDate();
     if (now !== _lastDate) {
       _lastDate = now;
@@ -2207,6 +2925,8 @@ document.addEventListener('visibilitychange', () => {
       cracksWorked = new Set();
       manualTasks = [];
       lastCompletedTask = null;
+      chiefConversation = [];
+      localStorage.removeItem(CHIEF_CHAT_KEY);
       // Check if dayStreak should increment
       const raw = localStorage.getItem('the-grind-state');
       if (raw) {

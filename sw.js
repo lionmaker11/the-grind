@@ -1,4 +1,4 @@
-const CACHE_NAME = 'the-grind-v2';
+const CACHE_NAME = 'the-grind-v3';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -27,8 +27,19 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // Network-first for today.json (strip query params for cache key)
-  if (url.pathname === '/today.json') {
+  // API calls: network only, never cache. Return offline indicator on failure.
+  if (url.pathname.startsWith('/api/')) {
+    e.respondWith(
+      fetch(e.request).catch(() =>
+        new Response(JSON.stringify({ offline: true, error: 'No connection' }),
+          { status: 503, headers: { 'Content-Type': 'application/json' } })
+      )
+    );
+    return;
+  }
+
+  // Network-first for today.json and chief-briefing.md
+  if (url.pathname === '/today.json' || url.pathname === '/chief-briefing.md') {
     e.respondWith(
       fetch(e.request).then(res => {
         const clone = res.clone();
