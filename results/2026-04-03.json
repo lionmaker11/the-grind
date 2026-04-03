@@ -1,17 +1,81 @@
 {
   "date": "2026-04-03",
-  "last_synced": "2026-04-03T21:00:00Z",
+  "last_synced": "2026-04-03T18:55:41.009Z",
   "tasks": [
     {
       "id": "task-001",
-      "text": "Review MARCUS",
-      "status": "completed",
-      "pomos_done": 2,
-      "pomos_estimated": 2
+      "text": "Review MARCUS shadow mode performance",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On Business",
+      "project_name": "MARCUS"
+    },
+    {
+      "id": "task-002",
+      "text": "Call Sam — check 708P interior progress",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In Business",
+      "project_name": "708 Pallister"
+    },
+    {
+      "id": "task-003",
+      "text": "Review 3 stale MCD leads with Ali",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In Business",
+      "project_name": "Motor City Deals"
+    },
+    {
+      "id": "task-004",
+      "text": "Check VA appeal status online",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Finances",
+      "project_name": "VA Appeal"
+    },
+    {
+      "id": "task-005",
+      "text": "Update FINANCES.md with April income",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Finances",
+      "project_name": "IRS / Taxes"
+    },
+    {
+      "id": "task-006",
+      "text": "GrillaHQ — review MAO calculator PR",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On Business",
+      "project_name": "GrillaHQ"
+    },
+    {
+      "id": "task-007",
+      "text": "Tonal upper body workout",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Physical",
+      "project_name": "Fitness"
     }
   ],
   "summary": {
-    "pomodoros_completed": 2,
-    "daily_score": 30
+    "daily_score": 0,
+    "pomodoros_completed": 0,
+    "total_minutes": 0,
+    "tasks_completed": 0,
+    "total_tasks": 7,
+    "categories_touched": [],
+    "session_streak": 0,
+    "day_streak": 0,
+    "xp": 0,
+    "level": 1
   }
 }
