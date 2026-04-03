@@ -288,8 +288,8 @@
     border: 1px solid var(--border);
     color: var(--text-dim);
     font-size: 0.65rem;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     border-radius: 2px;
     cursor: pointer;
     display: flex;
@@ -2185,6 +2185,41 @@ if (!soundEnabled) {
 requestAnimationFrame(() => {
   const h = document.getElementById('topBar').offsetHeight;
   document.documentElement.style.setProperty('--top-bar-h', h + 'px');
+});
+
+// Day rollover detection — reset daily state if date changes while app is open
+let _lastDate = getTodayDate();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    const now = getTodayDate();
+    if (now !== _lastDate) {
+      _lastDate = now;
+      // Save current state so loadState can detect the day change
+      saveState();
+      // Reset daily variables
+      sessionStreak = 0;
+      pomodorosCompleted = 0;
+      totalMinutes = 0;
+      tasksCompleted = 0;
+      completedTaskIds = new Set();
+      taskPomosDone = {};
+      categoriesTouched = new Set();
+      cracksWorked = new Set();
+      manualTasks = [];
+      lastCompletedTask = null;
+      // Check if dayStreak should increment
+      const raw = localStorage.getItem('the-grind-state');
+      if (raw) {
+        const prev = JSON.parse(raw);
+        dayStreak = (prev.pomodorosCompleted || 0) >= 4 ? (prev.dayStreak || 0) + 1 : 0;
+      }
+      saveState();
+      updateXpBar();
+      updateStats();
+      updateSessions();
+      loadTodayData();
+    }
+  }
 });
 
 // Register service worker
