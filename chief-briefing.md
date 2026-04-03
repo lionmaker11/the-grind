@@ -90,3 +90,37 @@
 - Celebrate wins briefly, redirect to what's next.
 - Revenue tasks outrank building tasks.
 - New idea mid-day: "Backlog. Finish what's active."
+
+---QUEUE---
+{
+  "date": "2026-04-03",
+  "finances": {
+    "month_income": 10000,
+    "month_target": 25000
+  },
+  "projects": [
+    { "id": "marcus", "name": "MARCUS", "health": "green", "category": "On Business", "days_silent": 0 },
+    { "id": "mcd", "name": "Motor City Deals", "health": "green", "category": "In Business", "days_silent": 0 },
+    { "id": "708p", "name": "708 Pallister", "health": "yellow", "category": "In Business", "days_silent": 0 },
+    { "id": "dpe", "name": "Digital Product Empire", "health": "green", "category": "On Business", "days_silent": 0 },
+    { "id": "va", "name": "VA Appeal", "health": "yellow", "category": "Finances", "days_silent": 0 }
+  ],
+  "tasks": [
+    { "id": "task-001", "text": "Provide Hyperliquid API key + MARCUS login to Chief", "project_id": "marcus", "project_name": "MARCUS", "category": "On Business", "type": "quick", "estimated_pomodoros": 1, "priority": 1, "health": "green" },
+    { "id": "task-002", "text": "Call Sam — countertop answer due EOD + framing/drywall status", "project_id": "708p", "project_name": "708 Pallister", "category": "In Business", "type": "quick", "estimated_pomodoros": 1, "priority": 2, "health": "yellow" },
+    { "id": "task-003", "text": "Follow up 10DLC SMS switch — new Twilio account status", "project_id": "mcd", "project_name": "Motor City Deals", "category": "In Business", "type": "quick", "estimated_pomodoros": 1, "priority": 3, "health": "green" },
+    { "id": "task-004", "text": "DPE Sprint 2 — build next product set", "project_id": "dpe", "project_name": "Digital Product Empire", "category": "On Business", "type": "pomodoro", "estimated_pomodoros": 2, "priority": 4, "health": "green" },
+    { "id": "task-005", "text": "708P budget spreadsheet — overdue, get it done", "project_id": "708p", "project_name": "708 Pallister", "category": "Finances", "type": "pomodoro", "estimated_pomodoros": 1, "priority": 5, "health": "red" },
+    { "id": "task-006", "text": "List all unpaid bills (water, trash, cards) — bill audit prep", "project_id": "finances", "project_name": "Finances", "category": "Finances", "type": "pomodoro", "estimated_pomodoros": 1, "priority": 6, "health": "red" },
+    { "id": "task-007", "text": "Workout — protect the foundation", "project_id": "fitness", "project_name": "Fitness", "category": "Physical", "type": "pomodoro", "estimated_pomodoros": 1, "priority": 7, "health": "green" }
+  ],
+  "needs_you": [
+    "708P: Sam owes countertop answer by EOD today",
+    "MARCUS: Hyperliquid API key + login still not provided to Chief",
+    "MCD: 10DLC SMS pending — follow up with Ali Mon Apr 7"
+  ],
+  "falling_through_cracks": [
+    { "name": "708P Budget Spreadsheet", "days_silent": 14 },
+    { "name": "Unpaid Bills Audit", "days_silent": 7 }
+  ]
+}
