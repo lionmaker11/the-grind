@@ -17,18 +17,24 @@ export default async function handler(req, res) {
     const queueIdx = briefing.indexOf(queueDelimiter);
 
     if (queueIdx >= 0) {
-      const jsonStr = briefing.substring(queueIdx + queueDelimiter.length).trim();
-      // Find the JSON object — it may be wrapped in ```json ... ``` or just raw
-      let cleaned = jsonStr;
-      if (cleaned.startsWith('```')) {
-        cleaned = cleaned.replace(/^```(?:json)?\s*/, '').replace(/\s*```\s*$/, '');
+      let jsonStr = briefing.substring(queueIdx + queueDelimiter.length).trim();
+      // Strip end delimiter if present (Chief may add ---END QUEUE---)
+      const endDelimiters = ['---END QUEUE---', '---END-QUEUE---', '---ENDQUEUE---'];
+      for (const end of endDelimiters) {
+        const endIdx = jsonStr.indexOf(end);
+        if (endIdx >= 0) jsonStr = jsonStr.substring(0, endIdx).trim();
+      }
+      // Strip code fences if present
+      if (jsonStr.startsWith('```')) {
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*/, '').replace(/\s*```\s*$/, '');
       }
       try {
-        const queue = JSON.parse(cleaned);
+        const queue = JSON.parse(jsonStr);
         return res.status(200).json(queue);
       } catch (parseErr) {
         // JSON parse failed — fall back to static today.json
         console.error('Queue JSON parse error:', parseErr.message);
+        console.error('Raw JSON string (first 200 chars):', jsonStr.substring(0, 200));
       }
     }
 
