@@ -1,6 +1,6 @@
 {
   "date": "2026-04-04",
-  "last_synced": "2026-04-04T18:34:12.296Z",
+  "last_synced": "2026-04-04T18:37:35.514Z",
   "tasks": [
     {
       "id": "task-001",
@@ -55,38 +55,19 @@
       "pomos": 0,
       "category": "Mental",
       "project_name": null
-    },
-    {
-      "id": "chief-1775327647293-oy9o",
-      "text": "Research: 708 Pallister history + Detroit Historic court cases since 2023",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
-      "category": "In Business",
-      "project_name": null
     }
   ],
   "needs_you_handled": [],
   "needs_you_pending": [
-    {
-      "id": "ny-001",
-      "text": "10DLC: follow up with Ali — Monday Apr 7",
-      "project": "Motor City Deals",
-      "due": "2026-04-07"
-    },
-    {
-      "id": "ny-002",
-      "text": "Countertops: Sam following up on installer Monday",
-      "project": "708 Pallister",
-      "due": "2026-04-06"
-    }
+    "10DLC: follow up with Ali — Monday Apr 7",
+    "Countertops: Sam following up on installer Monday"
   ],
   "summary": {
     "daily_score": 10,
     "pomodoros_completed": 0,
     "total_minutes": 0,
     "tasks_completed": 0,
-    "total_tasks": 7,
+    "total_tasks": 6,
     "categories_touched": [],
     "session_streak": 0,
     "day_streak": 0,
