@@ -2009,7 +2009,8 @@ function renderNeedsYou() {
   const list = document.getElementById('needsList');
   list.innerHTML = todayData.needs_you.map((n, i) => {
     const done = completedNeeds.has(i);
-    return `<div class="needs-item ${done ? 'done' : ''}" onclick="completeNeedsItem(${i})">${escHtml(n)}</div>`;
+    const nLabel = typeof n === 'string' ? n : (n.text || '');
+    return `<div class="needs-item ${done ? 'done' : ''}" onclick="completeNeedsItem(${i})">${escHtml(nLabel)}</div>`;
   }).join('');
 }
 
@@ -2883,8 +2884,8 @@ function buildResultsPayload() {
       category: t.category || null,
       project_name: t.project_name || null
     })),
-    needs_you_handled: todayData?.needs_you ? todayData.needs_you.filter((_, i) => completedNeeds.has(i)) : [],
-    needs_you_pending: todayData?.needs_you ? todayData.needs_you.filter((_, i) => !completedNeeds.has(i)) : [],
+    needs_you_handled: todayData?.needs_you ? todayData.needs_you.filter((_, i) => completedNeeds.has(i)).map(n => typeof n === 'string' ? n : (n.text || '')) : [],
+    needs_you_pending: todayData?.needs_you ? todayData.needs_you.filter((_, i) => !completedNeeds.has(i)).map(n => typeof n === 'string' ? n : (n.text || '')) : [],
     summary: {
       daily_score: calcDailyScore(),
       pomodoros_completed: pomodorosCompleted,
