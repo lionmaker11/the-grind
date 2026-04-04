@@ -5,22 +5,13 @@ Score: **10/100** — zero execution day. 0/4 tasks completed, 0 pomodoros. No c
 
 **Adaptation:** Light queue today. Max 6 tasks. Saturday flex day. No guilt — reset and move.
 
-**Carry-over Needs You:**
-- ⚠️ Sam: countertop answer was due Apr 3 — **text him this morning**
-- 10DLC: follow up with Ali **Monday Apr 7** (not today)
-
 ## Active Ventures
-- **MARCUS**: v0.8.31 in PR pipeline. Security audit remediation overnight — 3 CRITICALs + P0 secrets fixed (commit #366). 194 trades analyzed, NY-only strategy validated. 366 total commits. Still need API key from T.J.
+- **MARCUS**: v0.8.31 in PR pipeline. Security audit remediation — 3 CRITICALs + P0 secrets fixed. 194 trades analyzed, NY-only strategy validated. 366 total commits. Still need API key from T.J.
 - **Motor City Deals**: Command Center live on Railway. 10DLC re-submitted on new Twilio account — waiting approval. SMS blocked until then. Ali follow-up Monday.
-- **708 Pallister**: Waterproofing done. Basement framing + drywall in progress (Sam says done by EOD today). **Saturday site visit with Sam — today.** Countertop answer overdue.
+- **708 Pallister**: Framing + drywall DONE ✅ (confirmed today). Countertop installer was on vacation — Sam following up Monday.
 - **DPE / AgentSideHustle**: Sprint 1 COMPLETE — 6 products live on Gumroad, email nurture deployed, webhook live. Sprint 2 starting.
-- **BiggerSpreads**: On hold ($600/mo data cost still running — is this still active?)
-- **VA Appeal**: Docket status, expedite request processing 2-3 weeks. Decision 60-120 days out.
-
-## Repo Activity (last 24h)
-- `Marcusv2`: Security audit remediation — 3 CRITICALs + P0 secrets fixed (#366)
-- `agentsidehustle`: Sprint 1 DONE — 6 products live, email nurture deployed, Gumroad webhook live
-- **New repos found:** `the-grind` (deployed PWA, Claude co-authored), `polytrade` (15 days silent — parked?)
+- **BiggerSpreads**: ON HOLD. $600/month subscription CANCELLED Apr 4, 2026. No active spend.
+- **VA Appeal**: Expedite request processing 2-3 weeks. Decision 60-120 days out.
 
 ## Financial Position
 - Month income: ~$10,000/mo ($5K VA + $5K MCD variable)
@@ -28,26 +19,24 @@ Score: **10/100** — zero execution day. 0/4 tasks completed, 0 pomodoros. No c
 - 90-day goal: $50K by June 15
 - Outstanding: water bill unpaid, Andrea's credit cards maxed, full bill list due Apr 17
 - Crypto: .75 BTC goal (DCA approach)
-- BiggerSpreads $600/mo — confirm if still running
+- BiggerSpreads $600/mo: CANCELLED ✅
 
 ## Patterns to Watch
 - 🔴 Yesterday was a zero day — don't let it become two in a row
-- 💰 Financial bill list keeps getting deferred (now Apr 17 deadline)
-- 💪 Workout missed yesterday — get it in today
-- 📐 "On the Business" strategy work hasn't had a dedicated block this week
+- 💰 Financial bill list keeps getting deferred (hard deadline Apr 17)
+- 💪 Workout committed for today — no excuses
+- 📐 "On the Business" strategy work needs a dedicated block this week (Wednesday)
 - MARCUS API key + login creds still not provided to Chief
 
 ## This Week's Commitments
-1. Saturday site visit with Sam at 708 Pallister (TODAY)
-2. Monday: MCD execution + Ali 10DLC follow-up
-3. Wednesday: Buildium integration + strategy block
-4. April 17: Full bills list with amounts (HARD DEADLINE)
-5. DPE Sprint 2 kickoff
+1. Monday: MCD execution + Ali 10DLC follow-up + Sam countertop follow-up
+2. Wednesday: Buildium integration + strategy block
+3. April 17: Full bills list with amounts (HARD DEADLINE)
+4. DPE Sprint 2 kickoff
 
 ## Family / Schedule
-- **Week A — Aurelia is with T.J. this weekend**
-- Saturday: flexible day, site visit, family time
-- All kids home (Tommy, Niko, Sofia full-time + Aurelia this weekend)
+- **Week B — Aurelia NOT with T.J. this weekend**
+- All other kids home (Tommy, Niko, Sofia full-time)
 - Family dinner 6 PM — non-negotiable
 - Sunday: NO WORK except 6 PM planning + trash out
 
@@ -58,78 +47,87 @@ Score: **10/100** — zero execution day. 0/4 tasks completed, 0 pomodoros. No c
   "finances": { "month_income": 10000, "month_target": 25000 },
   "yesterday": { "score": 10, "pomodoros": 0, "tasks_completed": 0, "adaptation": "lighten" },
   "projects": [
-    { "name": "MARCUS", "health": "green", "days_silent": 0, "note": "security audit shipped overnight" },
+    { "name": "MARCUS", "health": "green", "days_silent": 0, "note": "security audit shipped" },
     { "name": "Motor City Deals", "health": "yellow", "days_silent": 1, "note": "10DLC pending, SMS blocked" },
-    { "name": "708 Pallister", "health": "yellow", "days_silent": 0, "note": "site visit today, countertop answer overdue" },
+    { "name": "708 Pallister", "health": "green", "days_silent": 0, "note": "framing/drywall done, countertops Monday" },
     { "name": "DPE", "health": "green", "days_silent": 0, "note": "Sprint 1 complete, Sprint 2 starting" },
-    { "name": "BiggerSpreads", "health": "gray", "days_silent": 999, "note": "on hold, $600/mo cost" }
+    { "name": "BiggerSpreads", "health": "gray", "days_silent": 999, "note": "on hold, subscription cancelled" }
   ],
   "tasks": [
     {
       "id": "task-001",
-      "text": "Text Sam — countertop answer (was due yesterday). Get status before site visit.",
-      "type": "quick",
-      "pomos": 0,
-      "category": "In the Business",
-      "project": "708 Pallister",
-      "time_slot": "morning",
-      "done_when": "Sam has responded with countertop answer or timeline"
-    },
-    {
-      "id": "task-002",
-      "text": "708 Pallister site visit with Sam — inspect basement framing + drywall progress",
-      "type": "pomodoro",
-      "pomos": 2,
-      "category": "In the Business",
-      "project": "708 Pallister",
-      "time_slot": "mid-morning",
-      "done_when": "Framing/drywall inspected, photos taken, next steps confirmed with Sam"
-    },
-    {
-      "id": "task-003",
-      "text": "Workout — full session. Missed yesterday, don't skip two in a row.",
+      "text": "Workout",
       "type": "pomodoro",
       "pomos": 2,
       "category": "Physical",
       "project": "Fitness",
       "time_slot": "morning",
-      "done_when": "Full workout completed"
+      "done_when": "Workout complete"
+    },
+    {
+      "id": "task-002",
+      "text": "708 Pallister — budget spreadsheet. What's been spent, what's left, where are we.",
+      "type": "pomodoro",
+      "pomos": 1,
+      "category": "Finances",
+      "project": "708 Pallister",
+      "time_slot": "mid-morning",
+      "done_when": "Spreadsheet updated with current numbers"
+    },
+    {
+      "id": "task-003",
+      "text": "DPE Sprint 2 — plan next sprint: pick 3 tasks, write done-conditions, lock it in",
+      "type": "pomodoro",
+      "pomos": 1,
+      "category": "On the Business",
+      "project": "DPE",
+      "time_slot": "afternoon",
+      "done_when": "Sprint 2 tasks defined with done-conditions"
     },
     {
       "id": "task-004",
-      "text": "Finance check-in: confirm BiggerSpreads $600/mo still running. Note any bills due this week.",
+      "text": "Plants — 5-15 min",
       "type": "quick",
       "pomos": 0,
-      "category": "Finances",
-      "project": "Finances",
-      "time_slot": "afternoon",
-      "done_when": "BiggerSpreads status confirmed, weekly bill exposure noted"
+      "category": "Physical",
+      "project": "Personal",
+      "time_slot": "evening",
+      "done_when": "Plants watered"
     },
     {
       "id": "task-005",
-      "text": "Family time — Aurelia is home this weekend. Be present.",
-      "type": "quick",
+      "text": "Family dinner — 6 PM",
+      "type": "anchor",
       "pomos": 0,
       "category": "Relationships",
       "project": "Family",
-      "time_slot": "afternoon",
-      "done_when": "Quality time with kids, family dinner at 6 PM"
+      "time_slot": "evening",
+      "done_when": "Dinner with family"
     },
     {
       "id": "task-006",
-      "text": "Plants + reading — wind down by 9:30 PM",
-      "type": "quick",
+      "text": "Reading — 9:30 PM. Lights out 10.",
+      "type": "anchor",
       "pomos": 0,
-      "category": "Spiritual",
-      "project": "Personal",
+      "category": "Mental",
+      "project": "Mental",
       "time_slot": "evening",
-      "done_when": "Plants watered, reading started by 9:30, lights out by 10"
+      "done_when": "Read until 10 PM"
     }
   ],
   "needs_you": [
-    "Sam: countertop answer — text him this morning",
-    "the-grind repo: confirm this is yours and deployed?",
-    "polytrade repo: active or parked?"
+    {
+      "id": "ny-001",
+      "text": "10DLC: follow up with Ali — Monday Apr 7",
+      "project": "Motor City Deals",
+      "due": "2026-04-07"
+    },
+    {
+      "id": "ny-002",
+      "text": "Countertops: Sam following up on installer Monday",
+      "project": "708 Pallister",
+      "due": "2026-04-06"
+    }
   ],
   "falling_through_cracks": []
 }
