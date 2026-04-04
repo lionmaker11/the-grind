@@ -1,6 +1,6 @@
 {
   "date": "2026-04-04",
-  "last_synced": "2026-04-04T18:31:17.230Z",
+  "last_synced": "2026-04-04T18:34:12.296Z",
   "tasks": [
     {
       "id": "task-001",
@@ -57,12 +57,12 @@
       "project_name": null
     },
     {
-      "id": "chief-1775327472227-9nb4",
-      "text": "Research: 708 Pallister history + Detroit Historic court cases since 2023 (for Chief)",
+      "id": "chief-1775327647293-oy9o",
+      "text": "Research: 708 Pallister history + Detroit Historic court cases since 2023",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
-      "category": "Research",
+      "category": "In Business",
       "project_name": null
     }
   ],
