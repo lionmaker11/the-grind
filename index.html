@@ -3585,9 +3585,16 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('online', () => { drainOfflineQueue(); updateChiefStatus(); });
 window.addEventListener('offline', updateChiefStatus);
 
-// Register service worker
+// Register service worker with auto-update
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    // Check for updates on every page load
+    reg.update();
+  }).catch(() => {});
+  // Auto-reload when new SW activates
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
 }
 </script>
 </body>
