@@ -1,6 +1,6 @@
 {
   "date": "2026-04-04",
-  "last_synced": "2026-04-04T17:07:47.423Z",
+  "last_synced": "2026-04-04T17:07:54.338Z",
   "tasks": [
     {
       "id": "task-001",
@@ -32,9 +32,9 @@
     {
       "id": "task-004",
       "text": "Plants — 5-15 min",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "Physical",
       "project_name": null
     },
@@ -73,18 +73,19 @@
     }
   ],
   "summary": {
-    "daily_score": 33,
+    "daily_score": 40,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 2,
+    "tasks_completed": 3,
     "total_tasks": 6,
     "categories_touched": [
       "Finances",
-      "On the Business"
+      "On the Business",
+      "Physical"
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 130,
+    "xp": 210,
     "level": 2
   }
 }
