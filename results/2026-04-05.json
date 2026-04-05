@@ -1,6 +1,6 @@
 {
   "date": "2026-04-05",
-  "last_synced": "2026-04-05T11:38:48.494Z",
+  "last_synced": "2026-04-05T11:39:00.366Z",
   "tasks": [
     {
       "id": "task-001",
@@ -23,27 +23,27 @@
     {
       "id": "task-003",
       "text": "DPE Sprint 2",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "On the Business",
       "project_name": null
     },
     {
       "id": "task-004",
       "text": "Plants — 5-15 min",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "Physical",
       "project_name": null
     },
     {
       "id": "task-005",
       "text": "Family dinner — 6 PM",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "Relationships",
       "project_name": null
     },
@@ -73,17 +73,20 @@
     }
   ],
   "summary": {
-    "daily_score": 27,
+    "daily_score": 40,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 1,
+    "tasks_completed": 4,
     "total_tasks": 6,
     "categories_touched": [
-      "Finances"
+      "Finances",
+      "On the Business",
+      "Relationships",
+      "Physical"
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 260,
+    "xp": 410,
     "level": 3
   }
 }
