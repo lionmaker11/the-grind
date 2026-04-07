@@ -1,160 +1,167 @@
-# Chief Briefing — 2026-04-06
+# Chief Briefing — 2026-04-07
 
 ## Active Ventures
-- **Motor City Deals**: MCD operational day (Mon). 10DLC re-registration pending on new Twilio account — follow up with Ali tomorrow (Apr 7). MCDCommand had major audit cleanup (5-phase remediation, dedup, guardrails). Email outreach to agents should start while waiting on 10DLC.
-- **MARCUS**: Marcusv2 active — TradFi perpetual integration landed (HIP-3 builder + trading hours gate). 3 critical audit fixes shipped (subscriber partial exit, funding engine slippage, secrets cleanup). Shadow mode. T.J. still needs to provide Hyperliquid API key + app login creds.
-- **708 Pallister**: Basement framing/drywall DONE ✅. Waterproofing DONE ✅. Budget spreadsheet DONE ✅. **Countertops: Sam following up on installer TODAY.** Daily check-in with Sam required.
-- **The Grind**: Results syncing. App operational.
-- **TokenPolice**: Active dev — Claude usage limits via OAuth API, NUMERIC parser fix.
-- **AgentSideHustle**: Site 401 fixed, Bluesky posts rewritten, lead magnets created for parenting + GLP-1, listed on Whop.
-- **BiggerSpreads**: Paused (gray). $600/month data cost — is this still running?
+- **Motor City Deals**: MCD operational focus today — email workflow testing, agent CSV upload, campaign scheduling, end-to-end conversation test. 10DLC re-registration pending on new Twilio account — follow up with Ali today. MCDCommand got integrations tab fix yesterday (AppConfig + Twilio/Resend/Anthropic keys).
+- **MARCUS**: Marcusv2 active — TradFi perpetual integration landed, 3 critical audit fixes shipped. Shadow mode. 2 days since last commit (Apr 4). T.J. still needs to provide Hyperliquid API key + app login creds. 30-min deeper session scheduled today.
+- **708 Pallister**: Basement framing/drywall DONE ✅. Waterproofing DONE ✅. Budget spreadsheet DONE ✅. Countertop installer follow-up overdue from Sam (was due Apr 6). Daily check-in with Sam required.
+- **The Grind**: App operational, results syncing.
+- **TokenPolice**: Active dev — comprehensive v2 update shipped yesterday (timezone fix, auto-refresh, insights, security).
+- **AgentSideHustle / DPE**: Autonomous pipeline running — 4 commits yesterday (social posts, sprint tracker). Sprint 2 complete. Products live on Gumroad.
+- **🆕 Lionmaker Systems**: New repo detected yesterday — Next.js + Sanity CMS site for Lionmaker Systems. Heavy Claude-assisted build. Needs classification — is this the public-facing MCD/Lionmaker site?
+- **BiggerSpreads**: Paused (gray). $600/month data cost — confirm if still active.
 
 ## Financial Position
 - Month income: $0 of $25,000 target (April just started)
 - Baseline: ~$10K/mo ($5K VA + ~$5K MCD variable)
 - Gap to freedom: $15K/month
-- ⚠️ Water bills: UNPAID — amount unknown
-- ⚠️ Andrea's credit cards: maxed, bankruptcy discussion needed
-- ⚠️ T.J.'s credit cards: maxed
+- ✅ Water bills: PAID (confirmed Apr 6)
+- ✅ Andrea's credit cards: HANDLED (confirmed Apr 6)
+- ⚠️ T.J.'s credit cards: still maxed
 - Mortgage: $3,400/month (current)
 - BiggerSpreads data: $600/month — confirm if still active
+- VA appeal: expedite request processing 2-3 weeks, decision 60-120 days. Check early May.
+- Full unpaid bills audit due: Apr 17
 
 ## Patterns to Watch
-- Yesterday's score: 40 (below 50) — lightening today's queue
-- Workout skipped Saturday → Monday workout is NON-NEGOTIABLE
-- Reading skipped Saturday → include tonight
-- Mental category missed 2+ days → reading block tonight
-- Spiritual category needs attention → breathwork with workout
-- MCD operational work needs consistent daily attention with Ali
-- MARCUS API credentials still not provided — stalling integration
+- No results file from yesterday — score unknown. Keeping queue moderate.
+- Confirmed schedule exists from planning session — executing that plan today.
+- MCD email outreach has been on the list since Apr 3 — today's the day to test and launch.
+- MARCUS API credentials still not provided — 10+ days stalling.
+- mcd-agent-org / Roman investigation scheduled today (Pomo 7).
+- Lionmaker Systems repo needs classification — new project appeared overnight.
 
 ## This Week's Commitments
-1. Aurelia spring break week — she arrives TODAY. Tell her why you want her here. Let her pick 3 activities. Plan 2 dad-daughter activities by Wed.
-2. 10DLC follow-up with Ali (Mon Apr 7)
-3. Sam countertop installer follow-up (TODAY)
-4. MCD email outreach to agents (start this week)
+1. Aurelia spring break — she's home all week. Tell her why you want her here. Let her pick 3 activities. Plan 2 dad-daughter activities by Wed.
+2. MCD email outreach: test → upload → launch (TODAY, Pomos 1-4)
+3. 10DLC follow-up with Ali (TODAY, Pomo 6)
+4. Sam countertop installer follow-up (OVERDUE — was due Apr 6)
 5. Gift "from baby Sophia" — get ready ASAP
 6. Alex/OpenClaw: Buildium integration (due Wed Apr 8)
+7. Full unpaid bills list (due Apr 17)
 
 ## Family / Schedule
 - **Spring Break Week** — Aurelia home all week. No school logistics.
-- Sofia (baby) arriving soon — gift prep needed
+- Sofia (baby) due any day — gift prep needed
 - Tommy (~2yr) and Niko (~1yr) full-time
 - Family dinner every evening (non-negotiable)
 
+## Repo Activity (Last 24h)
+- **MCDCommand**: 1 commit — integrations tab fix (AppConfig + API keys)
+- **agentsidehustle**: 4 commits — autonomous pipeline (social posts, sprint tracker)
+- **tokenpolice**: 1 commit — comprehensive v2 update
+- **the-grind**: 1 commit — chief briefing update
+- **🆕 lionmaker-systems**: New repo — Next.js + Sanity CMS site, 10+ commits, Claude-assisted build
+
 ---QUEUE---
 {
-  "date": "2026-04-06",
-  "day_type": "MCD Operational",
+  "date": "2026-04-07",
+  "day_type": "MCD Operational + Deep Work",
   "finances": { "month_income": 0, "month_target": 25000 },
   "projects": [
-    { "name": "Motor City Deals", "health": "yellow", "days_silent": 3 },
-    { "name": "708 Pallister", "health": "green", "days_silent": 2 },
-    { "name": "MARCUS", "health": "green", "days_silent": 2 },
-    { "name": "The Grind", "health": "green", "days_silent": 1 },
+    { "name": "Motor City Deals", "health": "yellow", "days_silent": 0 },
+    { "name": "708 Pallister", "health": "green", "days_silent": 3 },
+    { "name": "MARCUS", "health": "green", "days_silent": 3 },
+    { "name": "The Grind", "health": "green", "days_silent": 0 },
     { "name": "TokenPolice", "health": "green", "days_silent": 0 },
     { "name": "AgentSideHustle", "health": "green", "days_silent": 0 },
-    { "name": "BiggerSpreads", "health": "gray", "days_silent": 99 },
-    { "name": "GrillaHQ", "health": "yellow", "days_silent": 3 }
+    { "name": "Lionmaker Systems", "health": "green", "days_silent": 0, "note": "NEW — needs classification" },
+    { "name": "BiggerSpreads", "health": "gray", "days_silent": 999, "note": "paused" }
   ],
   "tasks": [
     {
-      "id": "task-001",
-      "text": "Workout — Mon strength session + 5 min breathwork",
-      "project": "Health",
-      "category": "Physical",
-      "type": "pomodoro",
-      "pomos": 2,
-      "priority": 1,
-      "time_slot": "6:15-7:15 AM",
-      "done_when": "Full workout completed, breathwork done"
-    },
-    {
-      "id": "task-002",
-      "text": "Sam check-in — countertop installer status",
-      "project": "708 Pallister",
-      "category": "In the Business",
-      "type": "quick",
-      "pomos": 0,
-      "priority": 2,
-      "time_slot": "8:00 AM",
-      "done_when": "Talked to Sam, have installer ETA"
-    },
-    {
-      "id": "task-003",
-      "text": "Aurelia welcome — tell her WHY, let her pick 3 activities",
-      "project": "Family",
-      "category": "Relationships",
-      "type": "quick",
-      "pomos": 0,
-      "priority": 3,
-      "time_slot": "9:00 AM",
-      "done_when": "Had the conversation, she picked activities"
-    },
-    {
-      "id": "task-004",
-      "text": "MCD operational block — review pipeline with Ali, email outreach prep",
+      "id": "t1",
+      "time": "9:00 AM",
+      "task": "MCD: Test agent email workflow with your own email addresses",
       "project": "Motor City Deals",
-      "category": "In the Business",
       "type": "pomodoro",
-      "pomos": 2,
-      "priority": 4,
-      "time_slot": "10:00 AM-12:00 PM",
-      "done_when": "Ali check-in done, 10 agent emails drafted or sent"
+      "sprints": 1,
+      "done": "test emails received and look correct",
+      "status": "pending"
     },
     {
-      "id": "task-005",
-      "text": "Water bill — find amount, set up payment",
-      "project": "Finances",
-      "category": "Finances",
-      "type": "quick",
-      "pomos": 0,
-      "priority": 5,
-      "time_slot": "1:00 PM",
-      "done_when": "Amount known, payment scheduled or made"
+      "id": "t2",
+      "time": "9:30 AM",
+      "task": "MCD: Upload agent CSV + configure campaign scheduling",
+      "project": "Motor City Deals",
+      "type": "pomodoro",
+      "sprints": 1,
+      "done": "list uploaded, campaign queued",
+      "status": "pending"
     },
     {
-      "id": "task-006",
-      "text": "MARCUS 15-min check-in — review TradFi integration status",
+      "id": "t3",
+      "time": "10:00 AM",
+      "task": "MCD: Test full conversation workflow end-to-end",
+      "project": "Motor City Deals",
+      "type": "pomodoro",
+      "sprints": 1,
+      "done": "reply triggers confirmed working",
+      "status": "pending"
+    },
+    {
+      "id": "t4",
+      "time": "10:30 AM",
+      "task": "MCD: Final review — pull trigger or schedule campaign",
+      "project": "Motor City Deals",
+      "type": "pomodoro",
+      "sprints": 1,
+      "done": "campaign live or scheduled",
+      "status": "pending"
+    },
+    {
+      "id": "t5",
+      "time": "11:00 AM",
+      "task": "MARCUS: 30-min deeper session — review shadow mode, identify one improvement",
       "project": "MARCUS",
-      "category": "On the Business",
-      "type": "quick",
-      "pomos": 0,
-      "priority": 6,
-      "time_slot": "2:00 PM",
-      "done_when": "Checked trading dashboard, noted any issues"
+      "type": "pomodoro",
+      "sprints": 1,
+      "done": "one improvement identified or logged",
+      "status": "pending"
     },
     {
-      "id": "task-007",
-      "text": "Family dinner + Aurelia time",
-      "project": "Family",
-      "category": "Relationships",
+      "id": "t6",
+      "time": "12:00 PM",
+      "task": "MCD: Follow up with Ali on 10DLC approval status",
+      "project": "Motor City Deals",
       "type": "quick",
-      "pomos": 0,
-      "priority": 7,
-      "time_slot": "6:00 PM",
-      "done_when": "Dinner done, quality time with Aurelia"
+      "done": "status confirmed, next step clear",
+      "status": "pending"
     },
     {
-      "id": "task-008",
-      "text": "Plants + Reading — 9:30 PM lights out 10",
-      "project": "Personal",
-      "category": "Mental",
+      "id": "t7",
+      "time": "12:30 PM",
+      "task": "Ask Claude Code: what does Roman / mcd-agent-org actually do?",
+      "project": "Motor City Deals",
+      "type": "pomodoro",
+      "sprints": 1,
+      "done": "clear answer, logged to vault",
+      "status": "pending"
+    },
+    {
+      "id": "t8",
+      "time": "1:00 PM",
+      "task": "708 Pallister: Check in with Sam — countertop installer status (OVERDUE)",
+      "project": "708 Pallister",
       "type": "quick",
-      "pomos": 0,
-      "priority": 8,
-      "time_slot": "9:00-10:00 PM",
-      "done_when": "Plants watered, 30 min reading done"
+      "done": "Sam confirms installer timeline or escalation plan",
+      "status": "pending"
+    },
+    {
+      "id": "t9",
+      "time": "9:30 PM",
+      "task": "Reading time",
+      "project": "Mental",
+      "type": "habit",
+      "done": "30 min reading",
+      "status": "pending"
     }
   ],
   "needs_you": [
-    { "id": "ny-001", "text": "10DLC: follow up with Ali — tomorrow Apr 7", "project": "Motor City Deals", "due": "2026-04-07" },
-    { "id": "ny-002", "text": "Countertops: Sam following up on installer TODAY", "project": "708 Pallister", "due": "2026-04-06" },
-    { "id": "ny-003", "text": "Gift from baby Sophia — get ready ASAP", "project": "Family", "due": "2026-04-08" }
+    { "id": "ny1", "text": "Provide Hyperliquid API key to Chief for MARCUS monitoring", "project": "MARCUS", "due": null },
+    { "id": "ny2", "text": "Provide MARCUS app login credentials to Chief", "project": "MARCUS", "due": null },
+    { "id": "ny3", "text": "Classify lionmaker-systems repo — is this the public MCD/Lionmaker site?", "project": "Lionmaker Systems", "due": "2026-04-08" },
+    { "id": "ny4", "text": "Confirm if BiggerSpreads $600/mo data cost is still active", "project": "BiggerSpreads", "due": null }
   ],
-  "falling_through_cracks": [
-    { "name": "BiggerSpreads", "days_silent": 99, "note": "$600/mo data cost — confirm if still active" },
-    { "name": "mcd-agent-org", "days_silent": 20, "note": "What is Roman the GM doing? Status unknown" }
-  ]
+  "falling_through_cracks": []
 }
 ---END QUEUE---
