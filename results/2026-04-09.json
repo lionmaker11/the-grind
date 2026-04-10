@@ -1,6 +1,6 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:29:02.332Z",
+  "last_synced": "2026-04-10T00:29:24.740Z",
   "tasks": [
     {
       "id": "t1",
@@ -95,24 +95,9 @@
   ],
   "needs_you_handled": [],
   "needs_you_pending": [
-    {
-      "id": "ny1",
-      "text": "Verify MARCUS is trading again after 18-day MDD lockout",
-      "project": "MARCUS",
-      "due": "2026-04-09"
-    },
-    {
-      "id": "ny2",
-      "text": "MCD email outreach launch — 6 days overdue",
-      "project": "Motor City Deals",
-      "due": "2026-04-09"
-    },
-    {
-      "id": "ny3",
-      "text": "Sam countertop follow-up — 3 days overdue",
-      "project": "708 Pallister",
-      "due": "2026-04-09"
-    }
+    "Verify MARCUS is trading again after 18-day MDD lockout",
+    "MCD email outreach launch — 6 days overdue",
+    "Sam countertop follow-up — 3 days overdue"
   ],
   "summary": {
     "daily_score": 0,
