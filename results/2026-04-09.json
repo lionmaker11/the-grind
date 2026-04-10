@@ -1,0 +1,129 @@
+{
+  "date": "2026-04-09",
+  "last_synced": "2026-04-10T00:16:21.678Z",
+  "tasks": [
+    {
+      "id": "t1",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Relationships",
+      "project_name": null
+    },
+    {
+      "id": "t2",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In the Business",
+      "project_name": null
+    },
+    {
+      "id": "t3",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On the Business",
+      "project_name": null
+    },
+    {
+      "id": "t4",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In the Business",
+      "project_name": null
+    },
+    {
+      "id": "t5",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In the Business",
+      "project_name": null
+    },
+    {
+      "id": "t6",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "In the Business",
+      "project_name": null
+    },
+    {
+      "id": "t7",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On the Business",
+      "project_name": null
+    },
+    {
+      "id": "t8",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Relationships",
+      "project_name": null
+    },
+    {
+      "id": "t9",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "On the Business",
+      "project_name": null
+    },
+    {
+      "id": "t10",
+      "text": "",
+      "status": "pending",
+      "completion_type": null,
+      "pomos": 0,
+      "category": "Finances",
+      "project_name": null
+    }
+  ],
+  "needs_you_handled": [],
+  "needs_you_pending": [
+    {
+      "id": "ny1",
+      "text": "Verify MARCUS is trading again after 18-day MDD lockout",
+      "project": "MARCUS",
+      "due": "2026-04-09"
+    },
+    {
+      "id": "ny2",
+      "text": "MCD email outreach launch — 6 days overdue",
+      "project": "Motor City Deals",
+      "due": "2026-04-09"
+    },
+    {
+      "id": "ny3",
+      "text": "Sam countertop follow-up — 3 days overdue",
+      "project": "708 Pallister",
+      "due": "2026-04-09"
+    }
+  ],
+  "summary": {
+    "daily_score": 0,
+    "pomodoros_completed": 0,
+    "total_minutes": 0,
+    "tasks_completed": 0,
+    "total_tasks": 10,
+    "categories_touched": [],
+    "session_streak": 0,
+    "day_streak": 0,
+    "xp": 410,
+    "level": 3
+  }
+}
