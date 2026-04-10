@@ -1,6 +1,6 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:54:46.208Z",
+  "last_synced": "2026-04-10T00:54:52.128Z",
   "tasks": [
     {
       "id": "t1",
@@ -14,9 +14,9 @@
     {
       "id": "t2",
       "text": "Call/text Sam — countertop installer status (3 days overdue)",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "In the Business",
       "project_name": "708 Pallister"
     },
@@ -100,17 +100,18 @@
     "Sam countertop follow-up — 3 days overdue"
   ],
   "summary": {
-    "daily_score": 14,
+    "daily_score": 36,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 1,
+    "tasks_completed": 2,
     "total_tasks": 10,
     "categories_touched": [
-      "Relationships"
+      "Relationships",
+      "In the Business"
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 460,
+    "xp": 540,
     "level": 4
   }
 }
