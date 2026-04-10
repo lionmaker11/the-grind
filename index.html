@@ -2034,7 +2034,7 @@ function renderCracks() {
   document.getElementById('cracksSection').style.display = 'block';
   const list = document.getElementById('cracksList');
   list.innerHTML = todayData.falling_through_cracks.map(c =>
-    `<div class="crack-item"><span class="crack-name">${escHtml(c.name)}</span><span class="crack-days">${c.days_silent}d SILENT</span></div>`
+    `<div class="crack-item"><span class="crack-name">${escHtml(c.project || c.name || 'Unknown')}</span><span class="crack-days">${c.days_overdue || c.days_silent || 0}d OVERDUE</span></div>`
   ).join('');
 }
 
@@ -2117,7 +2117,7 @@ function quickCompleteTask(el, task) {
   if (task.category) categoriesTouched.add(task.category);
 
   if (todayData && todayData.falling_through_cracks) {
-    const crackNames = todayData.falling_through_cracks.map(c => c.name.toLowerCase());
+    const crackNames = todayData.falling_through_cracks.map(c => (c.project || c.name || '').toLowerCase());
     if (task.project_name && crackNames.some(cn => task.project_name.toLowerCase().includes(cn.split(' ')[0].toLowerCase()))) {
       cracksWorked.add(task.project_id);
     }
@@ -2631,7 +2631,7 @@ function completeSession() {
 
       // Check if task is on a falling-through-cracks project
       if (todayData && todayData.falling_through_cracks) {
-        const crackNames = todayData.falling_through_cracks.map(c => c.name.toLowerCase());
+        const crackNames = todayData.falling_through_cracks.map(c => (c.project || c.name || '').toLowerCase());
         if (task.project_name && crackNames.some(cn => task.project_name.toLowerCase().includes(cn.split(' ')[0].toLowerCase()))) {
           cracksWorked.add(task.project_id);
         }
