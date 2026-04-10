@@ -1863,7 +1863,13 @@ async function loadTodayData() {
     const data = await res.json();
 
     todayData = data;
-    queueTasks = (data.tasks || []).sort((a,b) => a.priority - b.priority);
+    // Normalize task fields — Chief queue uses 'task'/'project'/'pomodoros', app expects 'text'/'project_name'/'estimated_pomodoros'
+    queueTasks = (data.tasks || []).map(t => ({
+      ...t,
+      text: t.text || t.task || t.name || '',
+      project_name: t.project_name || t.project || '',
+      estimated_pomodoros: t.estimated_pomodoros || t.pomodoros || 1
+    })).sort((a,b) => a.priority - b.priority);
 
     // Check if stale
     if (data.date && data.date !== getTodayDate()) {
@@ -1946,7 +1952,7 @@ function renderQueue() {
         <div class="swipe-bg"><span class="swipe-done-label">DONE</span></div>
         <div class="swipe-content">
           <div class="task-info">
-            <div class="task-text">${escHtml(task.text || task.name || '')}</div>
+            <div class="task-text">${escHtml(task.text || task.task || task.name || '')}</div>
             <div class="task-meta">
               ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
               <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
@@ -1970,7 +1976,7 @@ function renderQueue() {
       div.innerHTML = `
         <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;width:100%;">
           <div class="task-info">
-            <div class="task-text">${escHtml(task.text || task.name || '')}</div>
+            <div class="task-text">${escHtml(task.text || task.task || task.name || '')}</div>
             <div class="task-meta">
               ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
               <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
@@ -2258,7 +2264,7 @@ function launchTask(task) {
   totalTime = timeLeft;
   mode = 'work';
 
-  document.getElementById('timerTaskName').textContent = (task.text || task.name || '').toUpperCase();
+  document.getElementById('timerTaskName').textContent = (task.text || task.task || task.name || '').toUpperCase();
   document.getElementById('timerProjectName').textContent = task.project_name ? `// ${task.project_name}` : '';
   const pomos = task.estimated_pomodoros || 1;
   const done = taskPomosDone[task.id] || 0;
