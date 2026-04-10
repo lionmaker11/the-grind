@@ -1,6 +1,6 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:55:21.459Z",
+  "last_synced": "2026-04-10T00:55:29.499Z",
   "tasks": [
     {
       "id": "t1",
@@ -86,9 +86,9 @@
     {
       "id": "t10",
       "text": "Financial check — confirm BiggerSpreads $600/mo still active or cancelled",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "Finances",
       "project_name": "Finances"
     }
@@ -100,19 +100,20 @@
     "Sam countertop follow-up — 3 days overdue"
   ],
   "summary": {
-    "daily_score": 50,
+    "daily_score": 60,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 6,
+    "tasks_completed": 7,
     "total_tasks": 10,
     "categories_touched": [
       "Relationships",
       "In the Business",
-      "On the Business"
+      "On the Business",
+      "Finances"
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 800,
+    "xp": 850,
     "level": 5
   }
 }
