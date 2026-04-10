@@ -1,6 +1,6 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:54:58.539Z",
+  "last_synced": "2026-04-10T00:55:05.140Z",
   "tasks": [
     {
       "id": "t1",
@@ -41,9 +41,9 @@
     {
       "id": "t5",
       "text": "Call Ali — 10DLC approval status + daily MCD check-in",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "In the Business",
       "project_name": "Motor City Deals"
     },
@@ -103,7 +103,7 @@
     "daily_score": 50,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 3,
+    "tasks_completed": 4,
     "total_tasks": 10,
     "categories_touched": [
       "Relationships",
@@ -112,7 +112,7 @@
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 590,
+    "xp": 640,
     "level": 4
   }
 }
