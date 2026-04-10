@@ -1,96 +1,96 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:29:24.740Z",
+  "last_synced": "2026-04-10T00:54:46.208Z",
   "tasks": [
     {
       "id": "t1",
-      "text": "",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "text": "Aurelia school drop-off",
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "Relationships",
-      "project_name": null
+      "project_name": "Family"
     },
     {
       "id": "t2",
-      "text": "",
+      "text": "Call/text Sam — countertop installer status (3 days overdue)",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "In the Business",
-      "project_name": null
+      "project_name": "708 Pallister"
     },
     {
       "id": "t3",
-      "text": "",
+      "text": "Verify MARCUS is actively trading post-MDD fix",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "On the Business",
-      "project_name": null
+      "project_name": "MARCUS"
     },
     {
       "id": "t4",
-      "text": "",
+      "text": "MCD email outreach — test workflow, upload list, LAUNCH (6 DAYS OVERDUE)",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "In the Business",
-      "project_name": null
+      "project_name": "Motor City Deals"
     },
     {
       "id": "t5",
-      "text": "",
+      "text": "Call Ali — 10DLC approval status + daily MCD check-in",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "In the Business",
-      "project_name": null
+      "project_name": "Motor City Deals"
     },
     {
       "id": "t6",
-      "text": "",
+      "text": "MCD deal work with Ali — pipeline review, follow-ups, any active deals",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "In the Business",
-      "project_name": null
+      "project_name": "Motor City Deals"
     },
     {
       "id": "t7",
-      "text": "",
+      "text": "Classify lionmaker-systems — write 1-paragraph scope + revenue path or kill it",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "On the Business",
-      "project_name": null
+      "project_name": "Lionmaker Systems"
     },
     {
       "id": "t8",
-      "text": "",
+      "text": "Aurelia school pickup",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "Relationships",
-      "project_name": null
+      "project_name": "Family"
     },
     {
       "id": "t9",
-      "text": "",
+      "text": "MARCUS deep check — review post-fix trading activity, confirm all failsafes working",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "On the Business",
-      "project_name": null
+      "project_name": "MARCUS"
     },
     {
       "id": "t10",
-      "text": "",
+      "text": "Financial check — confirm BiggerSpreads $600/mo still active or cancelled",
       "status": "pending",
       "completion_type": null,
       "pomos": 0,
       "category": "Finances",
-      "project_name": null
+      "project_name": "Finances"
     }
   ],
   "needs_you_handled": [],
@@ -100,15 +100,17 @@
     "Sam countertop follow-up — 3 days overdue"
   ],
   "summary": {
-    "daily_score": 0,
+    "daily_score": 14,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 0,
+    "tasks_completed": 1,
     "total_tasks": 10,
-    "categories_touched": [],
+    "categories_touched": [
+      "Relationships"
+    ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 410,
-    "level": 3
+    "xp": 460,
+    "level": 4
   }
 }
