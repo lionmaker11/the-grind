@@ -1,6 +1,6 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:54:52.128Z",
+  "last_synced": "2026-04-10T00:54:58.539Z",
   "tasks": [
     {
       "id": "t1",
@@ -23,9 +23,9 @@
     {
       "id": "t3",
       "text": "Verify MARCUS is actively trading post-MDD fix",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "On the Business",
       "project_name": "MARCUS"
     },
@@ -100,18 +100,19 @@
     "Sam countertop follow-up — 3 days overdue"
   ],
   "summary": {
-    "daily_score": 36,
+    "daily_score": 50,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 2,
+    "tasks_completed": 3,
     "total_tasks": 10,
     "categories_touched": [
       "Relationships",
-      "In the Business"
+      "In the Business",
+      "On the Business"
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 540,
+    "xp": 590,
     "level": 4
   }
 }
