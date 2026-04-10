@@ -1,6 +1,6 @@
 {
   "date": "2026-04-09",
-  "last_synced": "2026-04-10T00:55:05.140Z",
+  "last_synced": "2026-04-10T00:55:21.459Z",
   "tasks": [
     {
       "id": "t1",
@@ -59,18 +59,18 @@
     {
       "id": "t7",
       "text": "Classify lionmaker-systems — write 1-paragraph scope + revenue path or kill it",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 2,
       "category": "On the Business",
       "project_name": "Lionmaker Systems"
     },
     {
       "id": "t8",
       "text": "Aurelia school pickup",
-      "status": "pending",
-      "completion_type": null,
-      "pomos": 0,
+      "status": "done",
+      "completion_type": "timed",
+      "pomos": 1,
       "category": "Relationships",
       "project_name": "Family"
     },
@@ -103,7 +103,7 @@
     "daily_score": 50,
     "pomodoros_completed": 0,
     "total_minutes": 0,
-    "tasks_completed": 4,
+    "tasks_completed": 6,
     "total_tasks": 10,
     "categories_touched": [
       "Relationships",
@@ -112,7 +112,7 @@
     ],
     "session_streak": 0,
     "day_streak": 0,
-    "xp": 640,
-    "level": 4
+    "xp": 800,
+    "level": 5
   }
 }
