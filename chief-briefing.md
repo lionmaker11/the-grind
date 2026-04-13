@@ -1,82 +1,136 @@
-# Chief Briefing — 2026-04-11
-
-## 👶 Sofia Update — Day 2
-Sofia born April 9. Andrea recovering. Lighter Saturday queue — protect family time but don't lose momentum on overdue items.
+# Chief Briefing — 2026-04-13
 
 ## Active Ventures
-- **Motor City Deals**: EMAIL OUTREACH **8 DAYS OVERDUE** (was due Apr 3). 10DLC follow-up with Ali due TODAY. Pipeline dead without outbound motion. MCDCommand 4.7 days silent.
-- **MARCUS**: ✅ PR #370 MERGED — trading unblocked after 20 days of silence (confidence gate was misconfigured). Monitor for first trades today/tomorrow. This is a big win.
-- **708 Pallister**: Countertop installer follow-up with Sam still overdue. Daily check-in needed. Basement framing/drywall ✅, waterproofing ✅.
-- **DPE / AgentSideHustle**: Sprint 2 complete. TokenPolice Sprint 1 shipped. Pricing fix deployed.
-- **Lionmaker Systems**: Classification deadline **Apr 13 (T-2 days)**. Last commit Apr 9. Needs formal scope + revenue path document before deadline.
-- **GrillaHQ / MCDCommand**: 4.7 days silent — approaching 7-day yellow threshold. Tied to MCD outreach.
+- **MARCUS**: Live (post-MDD fix). Last verified trading Apr 9. Needs deep check — all failsafes, post-fix activity review.
+- **Motor City Deals**: 10DLC still pending re-registration (new Twilio acct). Email outreach LAUNCH now 10+ days overdue — this is the #1 avoidance item. Monday = Ali day.
+- **708 Pallister**: Framing/drywall done ✅. Countertop installer status still pending Sam follow-up (installer was on vacation). Daily check-in recurring.
+- **agentsidehustle / DPE**: 🟢 Sprint 4 shipped overnight — 20 new products live on Whop + marketing pipeline. Big win.
+- **lionmaker-systems**: 🟢 Real estate brand site — /apply qualification funnel live, 8 UX revisions, mobile fixes. Heavy T.J. work Sunday night (00:58–01:40 UTC Mon).
+- **GrillaHQ / MCDCommand**: 6.7 days silent. 1 day from yellow threshold. Today IS Monday MCD day — commits expected.
+- **BiggerSpreads**: Paused ($600/mo data confirmed active Apr 9).
 
 ## Financial Position
-- Month income: ~$10,000 ($5K VA + $5K MCD variable)
-- Pace: Static — no new MCD deals closing without outreach
-- Outstanding: Water bills status unclear, Andrea's credit cards handled, BiggerSpreads $600/mo active
-- Crypto goal: 0.75 BTC within 90 days (from March — clock running)
-- Full bills audit due Apr 17
+- Monthly target: $25,000. Steady base ~$10K (VA + MCD variable + MARCUS).
+- Pace: Behind. MCD launch stall is the gating revenue item.
+- Outstanding:
+  - Water bill — handled "for now" (T.J. revisits later)
+  - Full bill list — T.J. requested Apr 17 extension
+  - Mortgage $3,400 — current but tight
+  - Andrea's credit cards — maxed, bankruptcy still on table
 
 ## Patterns to Watch
-- 🔴 **MCD email outreach 8 days overdue** — #1 revenue blocker. Saturday is a good day to finally knock this out without interruptions.
-- 🟡 10DLC follow-up with Ali — due today per ACTIVE.md
-- 🟡 Lionmaker-systems classification deadline T-2 days
-- ✅ MARCUS trading unblocked — monitor for activity
-- Categories missed recently: Physical (baby week), Mental, Spiritual
-- No results file for yesterday — tracking gap
-
-## Repo Activity
-- **Marcusv2**: PR #370 merged — unblocked trading (confidence gate fix). 20-day trading drought should end.
-- **tokenpolice**: Sync-client pricing fix (was using old Opus rates)
-- **the-grind**: Daily briefing push
-- **MCDCommand**: 4.7 days silent
-- **lionmaker-systems**: Last commit Apr 9 (demo animations)
+- 🚨 **Sunday work pattern** — 2nd Sunday in a row working lionmaker-systems late. No-work day per anchors. Flag and talk Wed.
+- 🚨 **MCD email outreach avoidance** — overdue 10+ days. Classic avoidance. Front-loading today as priority 1 after workout.
+- 📉 **Grind app disengagement** — no results logged Apr 10, 11, 12. Score streak broken. Queue lightened to 6 tasks today to re-engage.
+- 📐 On-the-Business still underweight vs In-the-Business — acceptable this week (revenue push).
+- ✅ Good: agentsidehustle / lionmaker-systems shipping hard.
 
 ## This Week's Commitments
-1. MCD email outreach — LAUNCH (8 days overdue)
-2. 10DLC approval follow-up with Ali (due TODAY Apr 11)
-3. 708 Pallister countertop resolution with Sam
-4. MARCUS — verify trading resumes post-PR #370
-5. Lionmaker-systems classification (due Apr 13)
-6. Full bills audit (due Apr 17)
+1. MCD email outreach LAUNCH (no more slipping)
+2. 10DLC approval confirmation with Ali
+3. MARCUS post-fix verification (deep check)
+4. Pallister countertop installer — closed loop with Sam
+5. agentsidehustle Sprint 4 product review + feedback
+6. Sofia baby gift "from baby Sophia" ready (ASAP family)
 
 ## Family / Schedule
-- Saturday — flexible day, lighter queue
-- Sofia is 2 days old — protect family time
-- No school logistics (Saturday)
-- Aurelia spring break activities if she's still visiting
+- **Week B** — NO Aurelia school logistics today
+- Tommy, Niko, Sofia full-time
+- Monday = MCD with Ali + 📐 On-the-Business attention needed Wed
+- Family dinner non-negotiable
+- 9:30 PM reading / 10 PM bed
 
 ---QUEUE---
 {
-  "date": "2026-04-11",
+  "date": "2026-04-13",
+  "day_type": "monday_mcd",
+  "week": "B",
   "finances": { "month_income": 10000, "month_target": 25000 },
   "projects": [
-    {"name": "Motor City Deals", "health": "red", "days_silent": 4.7, "note": "Email outreach 8 days overdue, 10DLC follow-up due today"},
-    {"name": "MARCUS", "health": "green", "days_silent": 0.4, "note": "PR #370 merged — trading unblocked after 20 days"},
-    {"name": "708 Pallister", "health": "yellow", "days_silent": null, "note": "Countertop installer follow-up overdue"},
-    {"name": "Lionmaker Systems", "health": "yellow", "days_silent": 1.5, "note": "Classification deadline Apr 13"},
-    {"name": "DPE / AgentSideHustle", "health": "green", "days_silent": 1.4, "note": "Sprint 2 complete"},
-    {"name": "TokenPolice", "health": "green", "days_silent": 0.5, "note": "Sprint 1 shipped"},
-    {"name": "GrillaHQ", "health": "yellow", "days_silent": 4.7, "note": "Tied to MCD outreach"}
+    { "name": "MARCUS", "health": "green", "days_silent": 2 },
+    { "name": "Motor City Deals", "health": "yellow", "days_silent": 0, "note": "10DLC pending, launch 10+ days overdue" },
+    { "name": "708 Pallister", "health": "green", "days_silent": 0, "note": "countertop installer pending Sam" },
+    { "name": "agentsidehustle", "health": "green", "days_silent": 0, "note": "Sprint 4 shipped" },
+    { "name": "lionmaker-systems", "health": "green", "days_silent": 0, "note": "/apply funnel live" },
+    { "name": "MCDCommand", "health": "yellow", "days_silent": 6, "note": "1 day from red" }
   ],
   "tasks": [
-    {"id": "sat-1", "text": "708 Pallister — text Sam for countertop installer update", "project": "708 Pallister", "type": "quick", "sprints": 0, "time_slot": "morning", "category": "In the Business", "priority": 1},
-    {"id": "sat-2", "text": "MCD — text Ali re: 10DLC approval status", "project": "Motor City Deals", "type": "quick", "sprints": 0, "time_slot": "morning", "category": "In the Business", "priority": 2},
-    {"id": "sat-3", "text": "MARCUS — check if any trades executed post-PR #370 merge", "project": "MARCUS", "type": "quick", "sprints": 0, "time_slot": "mid-morning", "category": "On the Business", "priority": 3},
-    {"id": "sat-4", "text": "MCD email outreach — draft and send first batch of agent emails (DONE = 10+ emails sent)", "project": "Motor City Deals", "type": "pomodoro", "sprints": 3, "time_slot": "mid-morning", "category": "In the Business", "priority": 4},
-    {"id": "sat-5", "text": "Lionmaker-systems — write classification doc: scope, category, revenue path, active/paused (DONE = doc committed)", "project": "Lionmaker Systems", "type": "pomodoro", "sprints": 1, "time_slot": "afternoon", "category": "On the Business", "priority": 5},
-    {"id": "sat-6", "text": "Finance check — review bills list, confirm water bill status, update FINANCES.md (DONE = file updated)", "project": "Finances", "type": "pomodoro", "sprints": 1, "time_slot": "afternoon", "category": "Finances", "priority": 6},
-    {"id": "sat-7", "text": "Family time — be present with Andrea and Sofia, help with kids", "project": "Family", "type": "block", "sprints": 0, "time_slot": "evening", "category": "Relationships", "priority": 7},
-    {"id": "sat-8", "text": "Plants — evening routine 5-15 min", "project": "Personal", "type": "quick", "sprints": 0, "time_slot": "evening", "category": "Physical", "priority": 8}
+    {
+      "id": "1",
+      "text": "💪 Workout — lift session (Mon/Wed/Fri anchor)",
+      "project": "Physical",
+      "type": "pomodoro",
+      "pomodoros": 2,
+      "slot": "6:15 AM",
+      "done": "session logged, stretched, protein in"
+    },
+    {
+      "id": "2",
+      "text": "🏠 708 Pallister daily check-in with Sam — confirm countertop installer status, push for install date",
+      "project": "708 Pallister",
+      "type": "quick",
+      "slot": "9:00 AM",
+      "done": "Sam replied with installer date or new ETA"
+    },
+    {
+      "id": "3",
+      "text": "💼 MCD EMAIL OUTREACH — LAUNCH TODAY. Upload CSV, configure campaign, pull the trigger. No more delays.",
+      "project": "Motor City Deals",
+      "type": "pomodoro",
+      "pomodoros": 3,
+      "slot": "9:30 AM",
+      "done": "first batch of outreach emails sent, deliverability confirmed"
+    },
+    {
+      "id": "4",
+      "text": "☎️ Call Ali — 10DLC approval status, daily pipeline review, any active deals",
+      "project": "Motor City Deals",
+      "type": "quick",
+      "slot": "11:00 AM",
+      "done": "10DLC status known, pipeline reviewed, next-steps captured"
+    },
+    {
+      "id": "5",
+      "text": "🤖 MARCUS deep check — confirm post-MDD fix trading, verify all failsafes, review recent trades",
+      "project": "MARCUS",
+      "type": "pomodoro",
+      "pomodoros": 1,
+      "slot": "1:30 PM",
+      "done": "trades reviewed, failsafes verified, note logged"
+    },
+    {
+      "id": "6",
+      "text": "💰 Finance 15-min — list 3 top unpaid bills with amounts (due Apr 17 commitment to T.J.)",
+      "project": "Finances",
+      "type": "pomodoro",
+      "pomodoros": 1,
+      "slot": "3:00 PM",
+      "done": "bill list written in FINANCES.md with amounts"
+    },
+    {
+      "id": "7",
+      "text": "🎁 Sofia baby gift 'from baby Sophia' — order or pick up (birth imminent)",
+      "project": "Family",
+      "type": "quick",
+      "slot": "4:00 PM",
+      "done": "gift purchased and ready"
+    },
+    {
+      "id": "8",
+      "text": "🌱 Plants 10 min + 9:30 PM reading (anchor)",
+      "project": "Spiritual / Mental",
+      "type": "quick",
+      "slot": "7:30 PM",
+      "done": "plants watered, 20+ min reading before bed"
+    }
   ],
   "needs_you": [
-    {"id": "ny-1", "text": "10DLC follow-up with Ali — due TODAY", "project": "Motor City Deals", "due": "2026-04-11"},
-    {"id": "ny-2", "text": "Lionmaker-systems classification — deadline Apr 13 (T-2)", "project": "Lionmaker Systems", "due": "2026-04-13"}
+    { "id": "ny1", "text": "Sofia birth — gift ready?", "project": "Family", "due": "ASAP" },
+    { "id": "ny2", "text": "10DLC approval — confirm today with Ali", "project": "MCD", "due": "today" }
   ],
   "falling_through_cracks": [
-    {"project": "MCD Email Outreach", "days_overdue": 8, "note": "Was due Apr 3 — #1 revenue blocker"},
-    {"project": "MCDCommand", "days_silent": 4.7, "note": "Approaching 7-day yellow threshold"}
+    { "project": "MCDCommand", "days": 7, "note": "1 day from red threshold — Monday is MCD day, commits expected" },
+    { "project": "MCD email outreach launch", "days": 10, "note": "avoidance pattern — task #3 today, no more slipping" }
   ]
 }
 ---END QUEUE---
