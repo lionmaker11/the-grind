@@ -1,138 +1,166 @@
 {
-  "date": "2026-04-03",
+  "date": "2026-04-14",
+  "day_type": "office-deep-work",
   "finances": {
     "month_income": 10000,
     "month_target": 25000
   },
   "projects": [
     {
-      "id": "marcus",
-      "name": "MARCUS",
-      "health": "green",
-      "category": "On Business",
-      "days_silent": 0
+      "name": "MCDCommand",
+      "health": "red",
+      "days_silent": 7.5,
+      "note": "Crossed 7-day threshold. Push commit or pause today."
     },
     {
-      "id": "mcd",
-      "name": "Motor City Deals",
+      "name": "Marcusv2",
       "health": "green",
-      "category": "In Business",
-      "days_silent": 0
+      "days_silent": 0,
+      "note": "Trading pipeline hardening merged"
     },
     {
-      "id": "708p",
-      "name": "708 Pallister",
+      "name": "708-pallister",
+      "health": "green",
+      "note": "Framing done, countertops pending Sam"
+    },
+    {
+      "name": "agentsidehustle",
+      "health": "green",
+      "note": "Sprint 1 diagnosis running"
+    },
+    {
+      "name": "the-grind",
       "health": "yellow",
-      "category": "In Business",
-      "days_silent": 0
-    },
-    {
-      "id": "dpe",
-      "name": "Digital Product Empire",
-      "health": "green",
-      "category": "On Business",
-      "days_silent": 0
-    },
-    {
-      "id": "va",
-      "name": "VA Appeal",
-      "health": "yellow",
-      "category": "Finances",
-      "days_silent": 0
+      "days_silent": 5,
+      "note": "App re-entry needed \u2014 no results logged since Apr 9"
     }
   ],
   "tasks": [
     {
-      "id": "task-001",
-      "text": "Provide Hyperliquid API key + MARCUS login to Chief",
-      "project_id": "marcus",
-      "project_name": "MARCUS",
-      "category": "On Business",
+      "id": 1,
+      "time": "06:30",
+      "task": "Open The Grind app \u2014 log today, re-enter rhythm",
+      "project": "grind",
       "type": "quick",
-      "estimated_pomodoros": 1,
-      "priority": 1,
-      "health": "green"
+      "category": "mental",
+      "done_when": "Today's date appears in results/"
     },
     {
-      "id": "task-002",
-      "text": "Call Sam — countertop answer due EOD + framing/drywall status",
-      "project_id": "708p",
-      "project_name": "708 Pallister",
-      "category": "In Business",
+      "id": 2,
+      "time": "07:00",
+      "task": "Morning gratitude + visualization (Neville layer) \u2014 3 things, state of the wish fulfilled",
+      "project": "self",
       "type": "quick",
-      "estimated_pomodoros": 1,
-      "priority": 2,
-      "health": "yellow"
+      "category": "spiritual",
+      "done_when": "Written or spoken aloud"
     },
     {
-      "id": "task-003",
-      "text": "Follow up 10DLC SMS switch — new Twilio account status",
-      "project_id": "mcd",
-      "project_name": "Motor City Deals",
-      "category": "In Business",
+      "id": 3,
+      "time": "08:30",
+      "task": "Daily 15-min MARCUS check-in \u2014 verify #371 hardening stable in live",
+      "project": "marcus",
       "type": "quick",
-      "estimated_pomodoros": 1,
-      "priority": 3,
-      "health": "green"
+      "category": "in-the-business",
+      "done_when": "Status noted in vault"
     },
     {
-      "id": "task-004",
-      "text": "DPE Sprint 2 — build next product set",
-      "project_id": "dpe",
-      "project_name": "Digital Product Empire",
-      "category": "On Business",
-      "type": "pomodoro",
-      "estimated_pomodoros": 2,
-      "priority": 4,
-      "health": "green"
+      "id": 4,
+      "time": "08:45",
+      "task": "Daily Sam check-in \u2014 countertops installer status",
+      "project": "708-pallister",
+      "type": "quick",
+      "category": "in-the-business",
+      "done_when": "Sam replied"
     },
     {
-      "id": "task-005",
-      "text": "708P budget spreadsheet — overdue, get it done",
-      "project_id": "708p",
-      "project_name": "708 Pallister",
-      "category": "Finances",
-      "type": "pomodoro",
-      "estimated_pomodoros": 1,
-      "priority": 5,
-      "health": "red"
+      "id": 5,
+      "time": "09:00",
+      "task": "\ud83d\udd34 MCDCommand: ship a commit OR decide to pause. 2 pomos. Break silence.",
+      "project": "mcd",
+      "type": "deep",
+      "pomodoros": 2,
+      "category": "in-the-business",
+      "done_when": "Commit pushed to main OR project marked paused in vault"
     },
     {
-      "id": "task-006",
-      "text": "List all unpaid bills (water, trash, cards) — bill audit prep",
-      "project_id": "finances",
-      "project_name": "Finances",
-      "category": "Finances",
-      "type": "pomodoro",
-      "estimated_pomodoros": 1,
-      "priority": 6,
-      "health": "red"
+      "id": 6,
+      "time": "10:30",
+      "task": "Ali sync \u2014 10DLC status on new Twilio account + what's blocking MCDCommand",
+      "project": "mcd",
+      "type": "quick",
+      "category": "in-the-business",
+      "done_when": "Call/text done, status logged"
     },
     {
-      "id": "task-007",
-      "text": "Workout — protect the foundation",
-      "project_id": "fitness",
-      "project_name": "Fitness",
-      "category": "Physical",
-      "type": "pomodoro",
-      "estimated_pomodoros": 1,
-      "priority": 7,
-      "health": "green"
+      "id": 7,
+      "time": "11:00",
+      "task": "\ud83d\udcb0 Unpaid bills list \u2014 amounts + due dates (deadline Apr 17). 1 pomo.",
+      "project": "finances",
+      "type": "deep",
+      "pomodoros": 1,
+      "category": "finances",
+      "done_when": "FINANCES.md updated with full list"
+    },
+    {
+      "id": 8,
+      "time": "13:00",
+      "task": "Agent email outreach batch \u2014 MCD inventory, push while 10DLC pending. 2 pomos.",
+      "project": "mcd",
+      "type": "deep",
+      "pomodoros": 2,
+      "category": "in-the-business",
+      "done_when": "Batch sent (quantity logged)"
+    },
+    {
+      "id": 9,
+      "time": "15:00",
+      "task": "MARCUS: review Marcusv2 hardening PR #371 logs \u2014 any regressions? 1 pomo.",
+      "project": "marcus",
+      "type": "deep",
+      "pomodoros": 1,
+      "category": "on-the-business",
+      "done_when": "Logs reviewed, notes in vault"
+    },
+    {
+      "id": 10,
+      "time": "19:30",
+      "task": "Family dinner + Aurelia one-on-one time (spring break commitment)",
+      "project": "family",
+      "type": "quick",
+      "category": "relationships",
+      "done_when": "Present, no phone"
     }
   ],
   "needs_you": [
-    "708P: Sam owes countertop answer by EOD today",
-    "MARCUS: Hyperliquid API key + login still not provided to Chief",
-    "MCD: 10DLC SMS pending — follow up with Ali Mon Apr 7"
+    {
+      "id": "nu1",
+      "text": "MCDCommand: ship or pause \u2014 7.5 days silent",
+      "project": "mcd",
+      "due": "2026-04-14"
+    },
+    {
+      "id": "nu2",
+      "text": "Unpaid bills list (2-week extension expires)",
+      "project": "finances",
+      "due": "2026-04-17"
+    },
+    {
+      "id": "nu3",
+      "text": "Hyperliquid API key + MARCUS app login for Chief",
+      "project": "marcus",
+      "due": null
+    }
   ],
   "falling_through_cracks": [
     {
-      "name": "708P Budget Spreadsheet",
-      "days_silent": 14
+      "project": "MCDCommand",
+      "days": 7.5,
+      "note": "Primary revenue product. Missed Monday MCD day."
     },
     {
-      "name": "Unpaid Bills Audit",
-      "days_silent": 7
+      "project": "the-grind",
+      "days": 5,
+      "note": "No app entries \u2014 re-engagement task is priority 1"
     }
   ]
 }
