@@ -1,136 +1,73 @@
-# Chief Briefing — 2026-04-13
+# Chief Briefing — 2026-04-14
 
 ## Active Ventures
-- **MARCUS**: Live (post-MDD fix). Last verified trading Apr 9. Needs deep check — all failsafes, post-fix activity review.
-- **Motor City Deals**: 10DLC still pending re-registration (new Twilio acct). Email outreach LAUNCH now 10+ days overdue — this is the #1 avoidance item. Monday = Ali day.
-- **708 Pallister**: Framing/drywall done ✅. Countertop installer status still pending Sam follow-up (installer was on vacation). Daily check-in recurring.
-- **agentsidehustle / DPE**: 🟢 Sprint 4 shipped overnight — 20 new products live on Whop + marketing pipeline. Big win.
-- **lionmaker-systems**: 🟢 Real estate brand site — /apply qualification funnel live, 8 UX revisions, mobile fixes. Heavy T.J. work Sunday night (00:58–01:40 UTC Mon).
-- **GrillaHQ / MCDCommand**: 6.7 days silent. 1 day from yellow threshold. Today IS Monday MCD day — commits expected.
-- **BiggerSpreads**: Paused ($600/mo data confirmed active Apr 9).
+- **MARCUS**: Live on Marcusv2. Yesterday: trading pipeline hardening — 4 silent failure fixes merged (#371). Healthy, active.
+- **Motor City Deals**: 🔴 **MCDCommand 7.5 days silent** — crossed 7-day threshold. Missed yesterday's Monday operational day. Primary revenue product cannot stall. 10DLC still pending on new Twilio account.
+- **708 Pallister**: Framing/drywall DONE. Countertops — installer back from vacation, Sam following up. Daily contractor check-in recurring.
+- **GrillaHQ**: Tied to MCDCommand — same silence flag.
+- **DPE (agentsidehustle)**: Sprint 1 $0 diagnosis kill-check running (Claude agent). 6 products live. Sprint 2 done.
+- **Lionmaker Brand**: No active push this week.
 
 ## Financial Position
-- Monthly target: $25,000. Steady base ~$10K (VA + MCD variable + MARCUS).
-- Pace: Behind. MCD launch stall is the gating revenue item.
+- Month income: tracking ~$10K/mo baseline (VA $5K + MCD variable)
+- Target: $25,000 — pace = behind, $15K gap to freedom
 - Outstanding:
-  - Water bill — handled "for now" (T.J. revisits later)
-  - Full bill list — T.J. requested Apr 17 extension
-  - Mortgage $3,400 — current but tight
-  - Andrea's credit cards — maxed, bankruptcy still on table
+  - 💰 Unpaid bills list **DUE IN 3 DAYS (Apr 17)** — T.J. got 2-week extension, time's almost up
+  - VA appeal: expedite submitted, decision 60-120d (check early May)
+  - Water bill: deferred, revisit
+  - Wife's cards maxed — bankruptcy plan pending
 
 ## Patterns to Watch
-- 🚨 **Sunday work pattern** — 2nd Sunday in a row working lionmaker-systems late. No-work day per anchors. Flag and talk Wed.
-- 🚨 **MCD email outreach avoidance** — overdue 10+ days. Classic avoidance. Front-loading today as priority 1 after workout.
-- 📉 **Grind app disengagement** — no results logged Apr 10, 11, 12. Score streak broken. Queue lightened to 6 tasks today to re-engage.
-- 📐 On-the-Business still underweight vs In-the-Business — acceptable this week (revenue push).
-- ✅ Good: agentsidehustle / lionmaker-systems shipping hard.
+- 📉 The Grind app: no results logged since Apr 9 (5 days, 2 mandatory days missed). Re-entry priority.
+- 🚨 MCDCommand silence = revenue avoidance pattern. Primary earner, zero commits in a week.
+- "On the Business" vs "In the Business" — MARCUS is getting love, MCD isn't. Revenue > building.
+- Finances deadline approaching — classic T.J. avoidance on bill tracking.
 
 ## This Week's Commitments
-1. MCD email outreach LAUNCH (no more slipping)
-2. 10DLC approval confirmation with Ali
-3. MARCUS post-fix verification (deep check)
-4. Pallister countertop installer — closed loop with Sam
-5. agentsidehustle Sprint 4 product review + feedback
-6. Sofia baby gift "from baby Sophia" ready (ASAP family)
+1. MCDCommand: ship a commit OR explicitly pause it today
+2. Finances: full unpaid bills list by Thursday Apr 17
+3. 10DLC follow-up with Ali — status check on new Twilio account
+4. Agent email outreach (from Apr 3 action item, still open)
+5. Daily Sam + MARCUS check-ins
 
 ## Family / Schedule
-- **Week B** — NO Aurelia school logistics today
-- Tommy, Niko, Sofia full-time
-- Monday = MCD with Ali + 📐 On-the-Business attention needed Wed
+- Tuesday = no Aurelia school logistics (Week A/B only affects Mon drop/pickup)
 - Family dinner non-negotiable
-- 9:30 PM reading / 10 PM bed
+- Aurelia spring break activities still on the books — one-on-one time commitment active
+- Tuesday = office / AI deep work day (not MCD operational day, but MCD red flag overrides)
 
 ---QUEUE---
 {
-  "date": "2026-04-13",
-  "day_type": "monday_mcd",
-  "week": "B",
+  "date": "2026-04-14",
+  "day_type": "office-deep-work",
   "finances": { "month_income": 10000, "month_target": 25000 },
   "projects": [
-    { "name": "MARCUS", "health": "green", "days_silent": 2 },
-    { "name": "Motor City Deals", "health": "yellow", "days_silent": 0, "note": "10DLC pending, launch 10+ days overdue" },
-    { "name": "708 Pallister", "health": "green", "days_silent": 0, "note": "countertop installer pending Sam" },
-    { "name": "agentsidehustle", "health": "green", "days_silent": 0, "note": "Sprint 4 shipped" },
-    { "name": "lionmaker-systems", "health": "green", "days_silent": 0, "note": "/apply funnel live" },
-    { "name": "MCDCommand", "health": "yellow", "days_silent": 6, "note": "1 day from red" }
+    { "name": "MCDCommand", "health": "red", "days_silent": 7.5, "note": "Crossed 7-day threshold. Push commit or pause today." },
+    { "name": "Marcusv2", "health": "green", "days_silent": 0, "note": "Trading pipeline hardening merged" },
+    { "name": "708-pallister", "health": "green", "note": "Framing done, countertops pending Sam" },
+    { "name": "agentsidehustle", "health": "green", "note": "Sprint 1 diagnosis running" },
+    { "name": "the-grind", "health": "yellow", "days_silent": 5, "note": "App re-entry needed — no results logged since Apr 9" }
   ],
   "tasks": [
-    {
-      "id": "1",
-      "text": "💪 Workout — lift session (Mon/Wed/Fri anchor)",
-      "project": "Physical",
-      "type": "pomodoro",
-      "pomodoros": 2,
-      "slot": "6:15 AM",
-      "done": "session logged, stretched, protein in"
-    },
-    {
-      "id": "2",
-      "text": "🏠 708 Pallister daily check-in with Sam — confirm countertop installer status, push for install date",
-      "project": "708 Pallister",
-      "type": "quick",
-      "slot": "9:00 AM",
-      "done": "Sam replied with installer date or new ETA"
-    },
-    {
-      "id": "3",
-      "text": "💼 MCD EMAIL OUTREACH — LAUNCH TODAY. Upload CSV, configure campaign, pull the trigger. No more delays.",
-      "project": "Motor City Deals",
-      "type": "pomodoro",
-      "pomodoros": 3,
-      "slot": "9:30 AM",
-      "done": "first batch of outreach emails sent, deliverability confirmed"
-    },
-    {
-      "id": "4",
-      "text": "☎️ Call Ali — 10DLC approval status, daily pipeline review, any active deals",
-      "project": "Motor City Deals",
-      "type": "quick",
-      "slot": "11:00 AM",
-      "done": "10DLC status known, pipeline reviewed, next-steps captured"
-    },
-    {
-      "id": "5",
-      "text": "🤖 MARCUS deep check — confirm post-MDD fix trading, verify all failsafes, review recent trades",
-      "project": "MARCUS",
-      "type": "pomodoro",
-      "pomodoros": 1,
-      "slot": "1:30 PM",
-      "done": "trades reviewed, failsafes verified, note logged"
-    },
-    {
-      "id": "6",
-      "text": "💰 Finance 15-min — list 3 top unpaid bills with amounts (due Apr 17 commitment to T.J.)",
-      "project": "Finances",
-      "type": "pomodoro",
-      "pomodoros": 1,
-      "slot": "3:00 PM",
-      "done": "bill list written in FINANCES.md with amounts"
-    },
-    {
-      "id": "7",
-      "text": "🎁 Sofia baby gift 'from baby Sophia' — order or pick up (birth imminent)",
-      "project": "Family",
-      "type": "quick",
-      "slot": "4:00 PM",
-      "done": "gift purchased and ready"
-    },
-    {
-      "id": "8",
-      "text": "🌱 Plants 10 min + 9:30 PM reading (anchor)",
-      "project": "Spiritual / Mental",
-      "type": "quick",
-      "slot": "7:30 PM",
-      "done": "plants watered, 20+ min reading before bed"
-    }
+    { "id": 1, "time": "06:30", "task": "Open The Grind app — log today, re-enter rhythm", "project": "grind", "type": "quick", "category": "mental", "done_when": "Today's date appears in results/" },
+    { "id": 2, "time": "07:00", "task": "Morning gratitude + visualization (Neville layer) — 3 things, state of the wish fulfilled", "project": "self", "type": "quick", "category": "spiritual", "done_when": "Written or spoken aloud" },
+    { "id": 3, "time": "08:30", "task": "Daily 15-min MARCUS check-in — verify #371 hardening stable in live", "project": "marcus", "type": "quick", "category": "in-the-business", "done_when": "Status noted in vault" },
+    { "id": 4, "time": "08:45", "task": "Daily Sam check-in — countertops installer status", "project": "708-pallister", "type": "quick", "category": "in-the-business", "done_when": "Sam replied" },
+    { "id": 5, "time": "09:00", "task": "🔴 MCDCommand: ship a commit OR decide to pause. 2 pomos. Break silence.", "project": "mcd", "type": "deep", "pomodoros": 2, "category": "in-the-business", "done_when": "Commit pushed to main OR project marked paused in vault" },
+    { "id": 6, "time": "10:30", "task": "Ali sync — 10DLC status on new Twilio account + what's blocking MCDCommand", "project": "mcd", "type": "quick", "category": "in-the-business", "done_when": "Call/text done, status logged" },
+    { "id": 7, "time": "11:00", "task": "💰 Unpaid bills list — amounts + due dates (deadline Apr 17). 1 pomo.", "project": "finances", "type": "deep", "pomodoros": 1, "category": "finances", "done_when": "FINANCES.md updated with full list" },
+    { "id": 8, "time": "13:00", "task": "Agent email outreach batch — MCD inventory, push while 10DLC pending. 2 pomos.", "project": "mcd", "type": "deep", "pomodoros": 2, "category": "in-the-business", "done_when": "Batch sent (quantity logged)" },
+    { "id": 9, "time": "15:00", "task": "MARCUS: review Marcusv2 hardening PR #371 logs — any regressions? 1 pomo.", "project": "marcus", "type": "deep", "pomodoros": 1, "category": "on-the-business", "done_when": "Logs reviewed, notes in vault" },
+    { "id": 10, "time": "19:30", "task": "Family dinner + Aurelia one-on-one time (spring break commitment)", "project": "family", "type": "quick", "category": "relationships", "done_when": "Present, no phone" }
   ],
   "needs_you": [
-    { "id": "ny1", "text": "Sofia birth — gift ready?", "project": "Family", "due": "ASAP" },
-    { "id": "ny2", "text": "10DLC approval — confirm today with Ali", "project": "MCD", "due": "today" }
+    { "id": "nu1", "text": "MCDCommand: ship or pause — 7.5 days silent", "project": "mcd", "due": "2026-04-14" },
+    { "id": "nu2", "text": "Unpaid bills list (2-week extension expires)", "project": "finances", "due": "2026-04-17" },
+    { "id": "nu3", "text": "Hyperliquid API key + MARCUS app login for Chief", "project": "marcus", "due": null }
   ],
   "falling_through_cracks": [
-    { "project": "MCDCommand", "days": 7, "note": "1 day from red threshold — Monday is MCD day, commits expected" },
-    { "project": "MCD email outreach launch", "days": 10, "note": "avoidance pattern — task #3 today, no more slipping" }
+    { "project": "MCDCommand", "days": 7.5, "note": "Primary revenue product. Missed Monday MCD day." },
+    { "project": "the-grind", "days": 5, "note": "No app entries — re-engagement task is priority 1" }
   ]
 }
 ---END QUEUE---
