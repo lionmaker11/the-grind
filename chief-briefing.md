@@ -1,73 +1,115 @@
-# Chief Briefing — 2026-04-14
+# Chief Briefing — 2026-04-17
 
 ## Active Ventures
-- **MARCUS**: Live on Marcusv2. Yesterday: trading pipeline hardening — 4 silent failure fixes merged (#371). Healthy, active.
-- **Motor City Deals**: 🔴 **MCDCommand 7.5 days silent** — crossed 7-day threshold. Missed yesterday's Monday operational day. Primary revenue product cannot stall. 10DLC still pending on new Twilio account.
-- **708 Pallister**: Framing/drywall DONE. Countertops — installer back from vacation, Sam following up. Daily contractor check-in recurring.
-- **GrillaHQ**: Tied to MCDCommand — same silence flag.
-- **DPE (agentsidehustle)**: Sprint 1 $0 diagnosis kill-check running (Claude agent). 6 products live. Sprint 2 done.
-- **Lionmaker Brand**: No active push this week.
+- **MARCUS**: Live on Marcusv2. 3 days since last commit (Apr 14) — normal cadence, no flag.
+- **Motor City Deals**: MCDCommand BACK ACTIVE — 3 commits merged Apr 16 (QA/UX polish PR #31, MMS attachments wired to DB). Silence broken. 10DLC still pending on new Twilio account.
+- **708 Pallister**: Framing/drywall DONE. Countertops — installer was on vacation, Sam following up. Daily contractor check-in recurring.
+- **GrillaHQ**: Tied to MCDCommand — activity resumed.
+- **DPE (agentsidehustle)**: Sprint 1 $0 diagnosis kill-check ran (Claude agent). 6 products live. Sprint 2 done.
+- **Lionmaker Brand**: No active push.
 
 ## Financial Position
 - Month income: tracking ~$10K/mo baseline (VA $5K + MCD variable)
 - Target: $25,000 — pace = behind, $15K gap to freedom
 - Outstanding:
-  - 💰 Unpaid bills list **DUE IN 3 DAYS (Apr 17)** — T.J. got 2-week extension, time's almost up
+  - 🚨 **Unpaid bills list DUE TODAY (Apr 17)** — T.J. got a 2-week extension on Mar 20. Time's up.
   - VA appeal: expedite submitted, decision 60-120d (check early May)
-  - Water bill: deferred, revisit
-  - Wife's cards maxed — bankruptcy plan pending
+  - Water bill: paid but revisit ongoing costs
+  - Wife's credit cards maxed — bankruptcy plan status unknown
 
 ## Patterns to Watch
-- 📉 The Grind app: no results logged since Apr 9 (5 days, 2 mandatory days missed). Re-entry priority.
-- 🚨 MCDCommand silence = revenue avoidance pattern. Primary earner, zero commits in a week.
-- "On the Business" vs "In the Business" — MARCUS is getting love, MCD isn't. Revenue > building.
-- Finances deadline approaching — classic T.J. avoidance on bill tracking.
+- 📉 The Grind app: no results logged since Apr 9 (5 mandatory weekdays missed). Re-entry mode active.
+- 💰 Finances: unpaid bills list has been deferred since Mar 20. Today is the hard deadline. No more extensions.
+- ✅ MCDCommand silence BROKEN — 3 commits landed Apr 16. Good sign. Keep momentum.
+- Sofia born Apr 9 — T.J. has a newborn + 3 other kids. Capacity is genuinely reduced. Queue stays light.
 
 ## This Week's Commitments
-1. MCDCommand: ship a commit OR explicitly pause it today
-2. Finances: full unpaid bills list by Thursday Apr 17
-3. 10DLC follow-up with Ali — status check on new Twilio account
-4. Agent email outreach (from Apr 3 action item, still open)
-5. Daily Sam + MARCUS check-ins
+1. Finances: full unpaid bills list — TODAY, non-negotiable
+2. MCDCommand: continue QA momentum from yesterday's PR
+3. 10DLC follow-up with Ali — status check
+4. Daily Sam check-in (708 Pallister countertops)
+5. Daily MARCUS 15-min check-in
 
 ## Family / Schedule
-- Tuesday = no Aurelia school logistics (Week A/B only affects Mon drop/pickup)
+- Week B — no Aurelia school logistics
+- Sofia is 8 days old. Andrea recovering. T.J. running point on all 4 kids.
 - Family dinner non-negotiable
-- Aurelia spring break activities still on the books — one-on-one time commitment active
-- Tuesday = office / AI deep work day (not MCD operational day, but MCD red flag overrides)
+
+## Repo Activity (Apr 17)
+- **MCDCommand**: 3 commits — Merged PR #31 (QA/UX polish). Tab-by-tab QA sweep, MMS attachments wired to DB, useCallback fix.
+- **agentsidehustle**: 1 Claude agent commit — Sprint 1 $0 diagnosis check-run.
+- **Marcusv2**: 3 days since last commit (Apr 14) — normal cadence.
 
 ---QUEUE---
 {
-  "date": "2026-04-14",
-  "day_type": "office-deep-work",
+  "date": "2026-04-17",
   "finances": { "month_income": 10000, "month_target": 25000 },
   "projects": [
-    { "name": "MCDCommand", "health": "red", "days_silent": 7.5, "note": "Crossed 7-day threshold. Push commit or pause today." },
-    { "name": "Marcusv2", "health": "green", "days_silent": 0, "note": "Trading pipeline hardening merged" },
-    { "name": "708-pallister", "health": "green", "note": "Framing done, countertops pending Sam" },
-    { "name": "agentsidehustle", "health": "green", "note": "Sprint 1 diagnosis running" },
-    { "name": "the-grind", "health": "yellow", "days_silent": 5, "note": "App re-entry needed — no results logged since Apr 9" }
+    {"name": "Motor City Deals", "health": "green", "days_silent": 1},
+    {"name": "708 Pallister", "health": "yellow", "days_silent": 10},
+    {"name": "MARCUS", "health": "green", "days_silent": 3},
+    {"name": "DPE", "health": "yellow", "days_silent": 5},
+    {"name": "Lionmaker Brand", "health": "gray", "days_silent": 30}
   ],
   "tasks": [
-    { "id": 1, "time": "06:30", "task": "Open The Grind app — log today, re-enter rhythm", "project": "grind", "type": "quick", "category": "mental", "done_when": "Today's date appears in results/" },
-    { "id": 2, "time": "07:00", "task": "Morning gratitude + visualization (Neville layer) — 3 things, state of the wish fulfilled", "project": "self", "type": "quick", "category": "spiritual", "done_when": "Written or spoken aloud" },
-    { "id": 3, "time": "08:30", "task": "Daily 15-min MARCUS check-in — verify #371 hardening stable in live", "project": "marcus", "type": "quick", "category": "in-the-business", "done_when": "Status noted in vault" },
-    { "id": 4, "time": "08:45", "task": "Daily Sam check-in — countertops installer status", "project": "708-pallister", "type": "quick", "category": "in-the-business", "done_when": "Sam replied" },
-    { "id": 5, "time": "09:00", "task": "🔴 MCDCommand: ship a commit OR decide to pause. 2 pomos. Break silence.", "project": "mcd", "type": "deep", "pomodoros": 2, "category": "in-the-business", "done_when": "Commit pushed to main OR project marked paused in vault" },
-    { "id": 6, "time": "10:30", "task": "Ali sync — 10DLC status on new Twilio account + what's blocking MCDCommand", "project": "mcd", "type": "quick", "category": "in-the-business", "done_when": "Call/text done, status logged" },
-    { "id": 7, "time": "11:00", "task": "💰 Unpaid bills list — amounts + due dates (deadline Apr 17). 1 pomo.", "project": "finances", "type": "deep", "pomodoros": 1, "category": "finances", "done_when": "FINANCES.md updated with full list" },
-    { "id": 8, "time": "13:00", "task": "Agent email outreach batch — MCD inventory, push while 10DLC pending. 2 pomos.", "project": "mcd", "type": "deep", "pomodoros": 2, "category": "in-the-business", "done_when": "Batch sent (quantity logged)" },
-    { "id": 9, "time": "15:00", "task": "MARCUS: review Marcusv2 hardening PR #371 logs — any regressions? 1 pomo.", "project": "marcus", "type": "deep", "pomodoros": 1, "category": "on-the-business", "done_when": "Logs reviewed, notes in vault" },
-    { "id": 10, "time": "19:30", "task": "Family dinner + Aurelia one-on-one time (spring break commitment)", "project": "family", "type": "quick", "category": "relationships", "done_when": "Present, no phone" }
+    {
+      "id": "t1",
+      "text": "Open The Grind app and log today",
+      "project": "Systems",
+      "category": "On the Business",
+      "type": "quick",
+      "pomos": 0,
+      "priority": 1,
+      "done_condition": "App opened, today's queue visible, at least 1 task logged"
+    },
+    {
+      "id": "t2",
+      "text": "Full unpaid bills list — amounts, due dates, creditors",
+      "project": "Finances",
+      "category": "Finances",
+      "type": "pomodoro",
+      "pomos": 2,
+      "priority": 2,
+      "done_condition": "Written list of every unpaid bill with dollar amounts shared with Chief"
+    },
+    {
+      "id": "t3",
+      "text": "Call/text Sam — countertop installer update + daily check-in",
+      "project": "708 Pallister",
+      "category": "In the Business",
+      "type": "quick",
+      "pomos": 0,
+      "priority": 3,
+      "done_condition": "Sam contacted, countertop timeline confirmed or escalated"
+    },
+    {
+      "id": "t4",
+      "text": "MCDCommand — continue QA momentum, pick next P0-P2 item",
+      "project": "Motor City Deals",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 2,
+      "priority": 4,
+      "done_condition": "At least 1 commit pushed or PR opened on MCDCommand"
+    },
+    {
+      "id": "t5",
+      "text": "MARCUS 15-min check-in — verify trading activity, review positions",
+      "project": "MARCUS",
+      "category": "On the Business",
+      "type": "quick",
+      "pomos": 1,
+      "priority": 5,
+      "done_condition": "MARCUS trading confirmed active, any issues flagged"
+    }
   ],
   "needs_you": [
-    { "id": "nu1", "text": "MCDCommand: ship or pause — 7.5 days silent", "project": "mcd", "due": "2026-04-14" },
-    { "id": "nu2", "text": "Unpaid bills list (2-week extension expires)", "project": "finances", "due": "2026-04-17" },
-    { "id": "nu3", "text": "Hyperliquid API key + MARCUS app login for Chief", "project": "marcus", "due": null }
+    {"id": "ny1", "text": "Unpaid bills list — 2-week extension expires TODAY", "project": "Finances", "due": "2026-04-17"},
+    {"id": "ny2", "text": "10DLC approval status — check with Ali", "project": "Motor City Deals", "due": "2026-04-17"}
   ],
   "falling_through_cracks": [
-    { "project": "MCDCommand", "days": 7.5, "note": "Primary revenue product. Missed Monday MCD day." },
-    { "project": "the-grind", "days": 5, "note": "No app entries — re-engagement task is priority 1" }
+    {"project": "708 Pallister", "days_silent": 10, "note": "No vault update since Apr 7. Countertops still pending."},
+    {"project": "DPE", "days_silent": 5, "note": "Sprint 1 $0 — kill-check ran but no human action since Apr 12."}
   ]
 }
 ---END QUEUE---
