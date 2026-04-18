@@ -1,54 +1,58 @@
-# Chief Briefing — 2026-04-17
+# Chief Briefing — 2026-04-18
 
 ## Active Ventures
-- **MARCUS**: Live on Marcusv2. 3 days since last commit (Apr 14) — normal cadence, no flag.
-- **Motor City Deals**: MCDCommand BACK ACTIVE — 3 commits merged Apr 16 (QA/UX polish PR #31, MMS attachments wired to DB). Silence broken. 10DLC still pending on new Twilio account.
-- **708 Pallister**: Framing/drywall DONE. Countertops — installer was on vacation, Sam following up. Daily contractor check-in recurring.
+- **Lionmaker Systems (Site)**: 🔥 HOT — 10 commits yesterday. V2 craft-layer pushed to production. Credential cards, consulting page, blog, CTAs all upgraded. Claude Opus co-authored.
+- **MARCUS**: 4 days since last commit (Apr 14) — normal cadence, no flag.
+- **Motor City Deals / MCDCommand**: 2 days since last commit (Apr 16) — healthy. QA/UX PR merged, MMS wired. 10DLC still pending on new Twilio account.
+- **708 Pallister**: Framing/drywall done. Countertops — installer was on vacation, Sam following up. Daily check-in recurring.
+- **DPE (agentsidehustle)**: 2 days since last commit. Sprint 2 done. 6 products live. Revenue = $0.
 - **GrillaHQ**: Tied to MCDCommand — activity resumed.
-- **DPE (agentsidehustle)**: Sprint 1 $0 diagnosis kill-check ran (Claude agent). 6 products live. Sprint 2 done.
-- **Lionmaker Brand**: No active push.
+- **Lionmaker Brand**: Dormant — site v2 push is the brand work right now.
 
 ## Financial Position
-- Month income: tracking ~$10K/mo baseline (VA $5K + MCD variable)
-- Target: $25,000 — pace = behind, $15K gap to freedom
+- Month income: ~$10,000 (VA $5K + MCD variable)
+- Target: $25,000 — pace = behind, $15K gap
 - Outstanding:
-  - 🚨 **Unpaid bills list DUE TODAY (Apr 17)** — T.J. got a 2-week extension on Mar 20. Time's up.
-  - VA appeal: expedite submitted, decision 60-120d (check early May)
-  - Water bill: paid but revisit ongoing costs
-  - Wife's credit cards maxed — bankruptcy plan status unknown
+  - 🚨 **Unpaid bills list was due yesterday (Apr 17)** — 2-week extension expired. This CANNOT slide further.
+  - VA appeal: expedite submitted, decision 60-120d
+  - T.J. + Andrea's credit cards maxed
+  - Mortgage: $3,400/mo — current but tight
 
 ## Patterns to Watch
-- 📉 The Grind app: no results logged since Apr 9 (5 mandatory weekdays missed). Re-entry mode active.
-- 💰 Finances: unpaid bills list has been deferred since Mar 20. Today is the hard deadline. No more extensions.
-- ✅ MCDCommand silence BROKEN — 3 commits landed Apr 16. Good sign. Keep momentum.
-- Sofia born Apr 9 — T.J. has a newborn + 3 other kids. Capacity is genuinely reduced. Queue stays light.
+- 📉 The Grind app: no results logged since Apr 9 — 6 mandatory weekdays missed. Re-entry mode. Sofia newborn is the reason, but the system only works if it's used.
+- 💰 Finances: unpaid bills list deadline passed. Chief will keep surfacing this until it's done.
+- 🔥 Lionmaker site got major love yesterday — 10 commits. Good energy. Channel some of that into revenue tasks.
+- 👶 Sofia is 9 days old. Capacity is reduced. Queue stays light.
 
-## This Week's Commitments
-1. Finances: full unpaid bills list — TODAY, non-negotiable
-2. MCDCommand: continue QA momentum from yesterday's PR
-3. 10DLC follow-up with Ali — status check
-4. Daily Sam check-in (708 Pallister countertops)
-5. Daily MARCUS 15-min check-in
+## This Week's Commitments (Remaining)
+1. ~~MCDCommand QA momentum~~ ✅ PR #31 merged
+2. Unpaid bills list — OVERDUE
+3. 10DLC follow-up with Ali
+4. Daily Sam check-in (708P countertops)
+5. MARCUS daily 15-min check-in
 
 ## Family / Schedule
+- **Saturday** — flexible day. No mandatory work.
 - Week B — no Aurelia school logistics
-- Sofia is 8 days old. Andrea recovering. T.J. running point on all 4 kids.
-- Family dinner non-negotiable
+- Sofia is 9 days old. Andrea recovering. T.J. running point on 4 kids.
+- Family time is the priority today.
 
-## Repo Activity (Apr 17)
-- **MCDCommand**: 3 commits — Merged PR #31 (QA/UX polish). Tab-by-tab QA sweep, MMS attachments wired to DB, useCallback fix.
-- **agentsidehustle**: 1 Claude agent commit — Sprint 1 $0 diagnosis check-run.
-- **Marcusv2**: 3 days since last commit (Apr 14) — normal cadence.
+## Repo Activity (Apr 18)
+- **lionmaker-systems**: 10 commits — v2 craft-layer site pushed to production. Credential cards upgraded, consulting page polished, blog views updated, CTAs added. Claude Opus co-authored.
+- **the-grind**: 1 commit — daily briefing data logged.
+- All other active repos within healthy thresholds.
 
 ---QUEUE---
 {
-  "date": "2026-04-17",
+  "date": "2026-04-18",
+  "day_type": "saturday_flexible",
   "finances": { "month_income": 10000, "month_target": 25000 },
   "projects": [
-    {"name": "Motor City Deals", "health": "green", "days_silent": 1},
+    {"name": "Lionmaker Systems", "health": "green", "days_silent": 0},
+    {"name": "Motor City Deals", "health": "green", "days_silent": 2},
     {"name": "708 Pallister", "health": "yellow", "days_silent": 10},
-    {"name": "MARCUS", "health": "green", "days_silent": 3},
-    {"name": "DPE", "health": "yellow", "days_silent": 5},
+    {"name": "MARCUS", "health": "green", "days_silent": 4},
+    {"name": "DPE", "health": "green", "days_silent": 2},
     {"name": "Lionmaker Brand", "health": "gray", "days_silent": 30}
   ],
   "tasks": [
@@ -64,52 +68,51 @@
     },
     {
       "id": "t2",
-      "text": "Full unpaid bills list — amounts, due dates, creditors",
+      "text": "Unpaid bills list — write down every bill, amount, due date",
       "project": "Finances",
       "category": "Finances",
       "type": "pomodoro",
-      "pomos": 2,
+      "pomos": 1,
       "priority": 2,
-      "done_condition": "Written list of every unpaid bill with dollar amounts shared with Chief"
+      "done_condition": "Full list of bills with amounts and due dates written in vault or spreadsheet"
     },
     {
       "id": "t3",
-      "text": "Call/text Sam — countertop installer update + daily check-in",
+      "text": "Text Sam — 708P countertop installer status",
       "project": "708 Pallister",
       "category": "In the Business",
       "type": "quick",
       "pomos": 0,
       "priority": 3,
-      "done_condition": "Sam contacted, countertop timeline confirmed or escalated"
+      "done_condition": "Sam responded with installer timeline"
     },
     {
       "id": "t4",
-      "text": "MCDCommand — continue QA momentum, pick next P0-P2 item",
-      "project": "Motor City Deals",
-      "category": "On the Business",
-      "type": "pomodoro",
-      "pomos": 2,
+      "text": "Family time — be present with the kids and Andrea",
+      "project": "Family",
+      "category": "Relationships",
+      "type": "anchor",
+      "pomos": 0,
       "priority": 4,
-      "done_condition": "At least 1 commit pushed or PR opened on MCDCommand"
+      "done_condition": "Intentional family time — no screens during dinner"
     },
     {
       "id": "t5",
-      "text": "MARCUS 15-min check-in — verify trading activity, review positions",
-      "project": "MARCUS",
-      "category": "On the Business",
+      "text": "Plants — 10 min evening check",
+      "project": "Home",
+      "category": "Physical",
       "type": "quick",
-      "pomos": 1,
+      "pomos": 0,
       "priority": 5,
-      "done_condition": "MARCUS trading confirmed active, any issues flagged"
+      "done_condition": "All plants watered and checked"
     }
   ],
   "needs_you": [
-    {"id": "ny1", "text": "Unpaid bills list — 2-week extension expires TODAY", "project": "Finances", "due": "2026-04-17"},
-    {"id": "ny2", "text": "10DLC approval status — check with Ali", "project": "Motor City Deals", "due": "2026-04-17"}
+    {"id": "n1", "text": "Unpaid bills list — 2-week extension expired yesterday", "project": "Finances", "due": "OVERDUE"}
   ],
   "falling_through_cracks": [
-    {"project": "708 Pallister", "days_silent": 10, "note": "No vault update since Apr 7. Countertops still pending."},
-    {"project": "DPE", "days_silent": 5, "note": "Sprint 1 $0 — kill-check ran but no human action since Apr 12."}
+    {"name": "708 Pallister", "days_silent": 10, "note": "Countertop installer follow-up stalled"},
+    {"name": "The Grind app", "days_silent": 9, "note": "No results logged since Apr 9"}
   ]
 }
 ---END QUEUE---
