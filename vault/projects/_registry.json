@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "updated": "2026-04-20",
+  "note": "v0 — confirm active/inactive split with T.J. before Muse uses this as source of truth.",
+  "projects": [
+    {
+      "id": "708-pallister",
+      "name": "708 Pallister",
+      "status": "active",
+      "priority": 1,
+      "folder": "vault/projects/708-pallister",
+      "aliases": ["Pallister"]
+    },
+    {
+      "id": "fast-track-uig",
+      "name": "FastTrack UIG",
+      "status": "active",
+      "priority": 2,
+      "folder": "vault/projects/fast-track-uig",
+      "aliases": ["FastTrack", "UIG"],
+      "note": "folder not yet created"
+    },
+    {
+      "id": "lionmaker-kettlebell",
+      "name": "Lionmaker Kettlebell App",
+      "status": "active",
+      "priority": 3,
+      "folder": "vault/projects/lionmaker-kettlebell",
+      "aliases": ["Kettlebell app"],
+      "note": "folder not yet created"
+    },
+    {
+      "id": "lionmaker-systems",
+      "name": "Lionmaker Systems",
+      "status": "active",
+      "priority": 4,
+      "folder": "vault/projects/lionmaker-systems",
+      "aliases": ["Lionmaker brand", "lionmaker11"]
+    },
+    {
+      "id": "va-disability",
+      "name": "VA Disability Appeal",
+      "status": "active",
+      "priority": 5,
+      "folder": "vault/projects/va-disability",
+      "aliases": ["VA Appeal", "VA"]
+    },
+    {
+      "id": "grillahq",
+      "name": "GrillaHQ",
+      "status": "active",
+      "priority": 6,
+      "folder": "vault/projects/grillahq",
+      "note": "folder not yet created"
+    },
+    {
+      "id": "alex-buildium",
+      "name": "Alex / Buildium Bot",
+      "status": "active",
+      "priority": 7,
+      "folder": "vault/projects/alex-buildium",
+      "aliases": ["Buildium"],
+      "note": "folder not yet created"
+    },
+    {
+      "id": "motor-city-deals",
+      "name": "Motor City Deals",
+      "status": "inactive",
+      "folder": "vault/projects/motor-city-deals",
+      "aliases": ["MCD", "MCDCommand"]
+    },
+    {
+      "id": "marcus",
+      "name": "MARCUS",
+      "status": "inactive",
+      "folder": "vault/projects/marcus"
+    },
+    {
+      "id": "mcd-agent-org",
+      "name": "MCD Agent Org",
+      "status": "inactive",
+      "folder": "vault/projects/mcd-agent-org",
+      "note": "Python companion to MCDCommand, stalled since 2026-03-17"
+    }
+  ]
+}
