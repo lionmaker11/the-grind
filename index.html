@@ -1494,7 +1494,7 @@
 
       <div id="manualFallback" style="display:none;">
         <div class="manual-fallback">
-          <div class="manual-note">// Chief hasn't loaded today's queue. Add tasks manually.</div>
+          <div class="manual-note">// Muse hasn't loaded today's queue. Add tasks manually.</div>
           <div class="manual-input-row">
             <input class="manual-input" id="manualInput" type="text" placeholder="input mission objective..." maxlength="80" onkeydown="if(event.key==='Enter')addManualTask()">
             <button class="manual-add-btn" onclick="addManualTask()">+</button>
@@ -1662,7 +1662,7 @@
 </div>
 
 <!-- ========== CHIEF CHAT ========== -->
-<button class="chief-fab" id="chiefFab" onclick="toggleChief()" aria-label="Chat with Chief">
+<button class="chief-fab" id="chiefFab" onclick="toggleChief()" aria-label="Chat with Muse">
   <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
   <div class="chief-fab-badge" id="chiefBadge"></div>
 </button>
@@ -1670,12 +1670,12 @@
 <div class="chief-panel" id="chiefPanel">
   <div class="chief-header">
     <div class="chief-header-dot"></div>
-    <div class="chief-header-title">CHIEF</div>
+    <div class="chief-header-title">MUSE</div>
     <div class="chief-header-status" id="chiefStatus">// online</div>
   </div>
   <div class="chief-messages" id="chiefMessages"></div>
   <div class="chief-input-row">
-    <input class="chief-input" id="chiefInput" type="text" placeholder="Talk to Chief..." maxlength="500" autocomplete="off" enterkeyhint="send">
+    <input class="chief-input" id="chiefInput" type="text" placeholder="Talk to Muse..." maxlength="500" autocomplete="off" enterkeyhint="send">
     <button class="chief-send-btn" id="chiefSendBtn" onclick="sendChiefMessage()" disabled>
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="currentColor"/></svg>
     </button>
@@ -1874,7 +1874,7 @@ async function loadTodayData() {
     // Check if stale
     if (data.date && data.date !== getTodayDate()) {
       document.getElementById('staleBanner').style.display = 'block';
-      document.getElementById('staleBanner').textContent = `// Queue from ${data.date} \u2014 Chief hasn't updated yet`;
+      document.getElementById('staleBanner').textContent = `// Queue from ${data.date} \u2014 Muse hasn't updated yet`;
     }
 
     renderFinanceBar();
@@ -3034,7 +3034,7 @@ function toggleChief() {
     } catch(e) {}
 
     if (chiefConversation.length === 0) {
-      addChiefSystemMessage('// CHIEF online. What do you need?');
+      addChiefSystemMessage('// MUSE online. What do you need?');
     }
 
     setTimeout(() => document.getElementById('chiefInput').focus(), 350);
@@ -3085,7 +3085,7 @@ async function sendChiefMessage() {
   messagesEl.appendChild(userMsgEl);
 
   if (!navigator.onLine) {
-    addChiefSystemMessage('// Chief is offline. Your message will be sent when you reconnect.');
+    addChiefSystemMessage('// Muse is offline. Your message will be sent when you reconnect.');
     return;
   }
 
@@ -3138,7 +3138,7 @@ async function sendChiefMessage() {
 
     const chiefMsgEl = document.createElement('div');
     chiefMsgEl.className = 'chief-msg chief';
-    chiefMsgEl.textContent = displayText || '// No response from Chief.';
+    chiefMsgEl.textContent = displayText || '// No response from Muse.';
     messagesEl.appendChild(chiefMsgEl);
 
     chiefConversation.push({ role: 'assistant', content: displayText });
@@ -3151,7 +3151,7 @@ async function sendChiefMessage() {
     chiefVerified = false;
     updateChiefStatus();
     if (!navigator.onLine) {
-      addChiefSystemMessage('// Chief is offline. Your message will be sent when you reconnect.');
+      addChiefSystemMessage('// Muse is offline. Your message will be sent when you reconnect.');
     } else {
       addChiefSystemMessage('// Connection failed: ' + (e.message || 'unknown error') + '. Try again.');
     }
