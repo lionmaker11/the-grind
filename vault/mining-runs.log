@@ -1,0 +1,41 @@
+
+2026-03-24 06:01 UTC — Session Miner Cron Run
+═══════════════════════════════════════════════
+Status: ✅ COMPLETE
+
+Sessions extracted: 13
+├─ Primary (115 msg, 120K): claude-conversation-2026-03-19-21a71d6f.md
+└─ Recent (2 msg each): 12× MARCUS Orchestrator runs
+
+Architecture Discoveries:
+  ✅ .claude/ folder configuration standard (apply to all Lionmaker projects)
+  ✅ Trello ↔ Calendar idempotent sync pattern
+  ✅ OpenClaw TTS config not hot-reloadable
+
+Security Findings:
+  ✅ Command injection fix (execFileSync vs execSync)
+  ✅ Parameter injection fix (JSON body vs URL params)
+  ⏳ Config audit needed (document hot-reload vs restart)
+
+Vault Files Created:
+  • sessions-mined-2026-03-24.md (9.2K)
+  • security-discoveries-2026-03.md (3.9K)
+  • claude-folder-standard.md (10.2K)
+
+Vault Files Updated:
+  • SHARED_CONTEXT.md (+550 bytes, Chief section added)
+
+Status Gaps Identified:
+  - Gateway sessions.resolve errors (heartbeat checks)
+  - MARCUS daily check-in status unknown
+  - Alex OpenClaw WhatsApp pairing unresolved
+
+Actionable Recommendations: 5
+  1. Build .claude/ structure in Chief, MARCUS, MCD
+  2. Master template at ~/.lionmaker/project-templates/master/
+  3. Audit OpenClaw config for hot-reload behavior
+  4. Investigate gateway sessions.resolve errors
+  5. Implement recommendations in RECOMMENDED_NEXT_STEPS.md
+
+Next scheduled run: [configured interval]
+

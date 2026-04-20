@@ -658,6 +658,181 @@
   }
   .manual-add-btn:hover { background: var(--cyan); color: #000; }
 
+  /* ========== RE-ENTRY MODE ========== */
+  .reentry-wrap {
+    text-align: center;
+    padding: 28px 4px 18px;
+    border: 1px solid var(--magenta);
+    border-radius: 3px;
+    background: linear-gradient(180deg, rgba(255,0,180,0.04) 0%, rgba(0,0,0,0) 100%);
+  }
+  .reentry-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--magenta);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .reentry-question {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .reentry-hint {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+  }
+  .reentry-input-row {
+    display: flex;
+    gap: 6px;
+    padding: 0 10px;
+    margin-bottom: 10px;
+  }
+  .reentry-input {
+    flex: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    resize: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .reentry-input:focus { border-color: var(--magenta); box-shadow: 0 0 10px rgba(255,0,180,0.25); }
+  .reentry-input::placeholder { color: var(--text-dim); font-style: italic; }
+  .reentry-mic {
+    width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--magenta);
+    border-radius: 2px;
+    background: rgba(255,0,180,0.08);
+    color: var(--magenta);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .reentry-mic svg { width: 18px; height: 18px; }
+  .reentry-mic:hover { background: var(--magenta); color: #fff; }
+  .reentry-mic.recording {
+    background: var(--magenta);
+    color: #fff;
+    animation: reentryPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes reentryPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,180,0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(255,0,180,0); }
+  }
+  .reentry-submit {
+    display: block;
+    margin: 0 10px;
+    width: calc(100% - 20px);
+    padding: 12px;
+    border: 1px solid var(--magenta);
+    background: var(--magenta);
+    color: #000;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: filter 0.2s, transform 0.1s;
+  }
+  .reentry-submit:hover:not(:disabled) { filter: brightness(1.15); }
+  .reentry-submit:active:not(:disabled) { transform: scale(0.98); }
+  .reentry-submit:disabled { opacity: 0.4; cursor: default; }
+  .reentry-proposed {
+    margin-top: 14px;
+    padding: 10px;
+    border-top: 1px dashed var(--border);
+  }
+  .reentry-proposed-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  .reentry-task {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .reentry-task-text {
+    flex: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    outline: none;
+  }
+  .reentry-task-text:focus { border-color: var(--cyan); }
+  .reentry-task-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .reentry-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .reentry-back, .reentry-confirm {
+    flex: 1;
+    padding: 10px;
+    border-radius: 2px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  .reentry-back {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .reentry-back:hover { color: var(--text); border-color: var(--text-dim); }
+  .reentry-confirm {
+    background: var(--cyan);
+    border: 1px solid var(--cyan);
+    color: #000;
+    font-weight: 700;
+  }
+  .reentry-confirm:hover { filter: brightness(1.15); }
+  .reentry-manual-link {
+    display: block;
+    margin: 14px auto 0;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+  .reentry-manual-link:hover { color: var(--text); }
+
   /* ========== SWIPE-TO-COMPLETE ========== */
   .swipe-bg {
     position: absolute;
@@ -1492,9 +1667,33 @@
 
       <div id="taskQueue"></div>
 
+      <div id="reentryPanel" style="display:none;">
+        <div class="reentry-wrap">
+          <div class="reentry-eyebrow">// MUSE</div>
+          <div class="reentry-question">What's the one thing today?</div>
+          <div class="reentry-hint" id="reentryHint">One sentence. I'll turn it into 1-3 moves.</div>
+          <div class="reentry-input-row">
+            <textarea class="reentry-input" id="reentryInput" maxlength="500" rows="2" placeholder="type, or hold the mic..."></textarea>
+            <button class="reentry-mic" id="reentryMicBtn" type="button" aria-label="Record answer">
+              <svg viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <button class="reentry-submit" onclick="submitReEntry()">TELL MUSE</button>
+          <div class="reentry-proposed" id="reentryProposed" style="display:none;">
+            <div class="reentry-proposed-title">// MOVES</div>
+            <div id="reentryProposedList"></div>
+            <div class="reentry-actions">
+              <button class="reentry-back" onclick="resetReEntry()">BACK</button>
+              <button class="reentry-confirm" onclick="confirmReEntryTasks()">LOCK IN</button>
+            </div>
+          </div>
+          <button class="reentry-manual-link" onclick="showManualOnly()">// skip — add tasks manually</button>
+        </div>
+      </div>
+
       <div id="manualFallback" style="display:none;">
         <div class="manual-fallback">
-          <div class="manual-note">// Chief hasn't loaded today's queue. Add tasks manually.</div>
+          <div class="manual-note">// add tasks manually</div>
           <div class="manual-input-row">
             <input class="manual-input" id="manualInput" type="text" placeholder="input mission objective..." maxlength="80" onkeydown="if(event.key==='Enter')addManualTask()">
             <button class="manual-add-btn" onclick="addManualTask()">+</button>
@@ -1662,7 +1861,7 @@
 </div>
 
 <!-- ========== CHIEF CHAT ========== -->
-<button class="chief-fab" id="chiefFab" onclick="toggleChief()" aria-label="Chat with Chief">
+<button class="chief-fab" id="chiefFab" onclick="toggleChief()" aria-label="Chat with Muse">
   <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
   <div class="chief-fab-badge" id="chiefBadge"></div>
 </button>
@@ -1670,12 +1869,12 @@
 <div class="chief-panel" id="chiefPanel">
   <div class="chief-header">
     <div class="chief-header-dot"></div>
-    <div class="chief-header-title">CHIEF</div>
+    <div class="chief-header-title">MUSE</div>
     <div class="chief-header-status" id="chiefStatus">// online</div>
   </div>
   <div class="chief-messages" id="chiefMessages"></div>
   <div class="chief-input-row">
-    <input class="chief-input" id="chiefInput" type="text" placeholder="Talk to Chief..." maxlength="500" autocomplete="off" enterkeyhint="send">
+    <input class="chief-input" id="chiefInput" type="text" placeholder="Talk to Muse..." maxlength="500" autocomplete="off" enterkeyhint="send">
     <button class="chief-send-btn" id="chiefSendBtn" onclick="sendChiefMessage()" disabled>
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="currentColor"/></svg>
     </button>
@@ -1874,7 +2073,7 @@ async function loadTodayData() {
     // Check if stale
     if (data.date && data.date !== getTodayDate()) {
       document.getElementById('staleBanner').style.display = 'block';
-      document.getElementById('staleBanner').textContent = `// Queue from ${data.date} \u2014 Chief hasn't updated yet`;
+      document.getElementById('staleBanner').textContent = `// Queue from ${data.date} \u2014 Muse hasn't updated yet`;
     }
 
     renderFinanceBar();
@@ -1885,11 +2084,21 @@ async function loadTodayData() {
   } catch(e) {
     todayData = null;
     queueTasks = [];
-    document.getElementById('manualFallback').style.display = 'block';
+    showReEntry();
     document.getElementById('financeRow').style.display = 'none';
     renderQueue();
     renderScoreboard();
   }
+}
+
+function showReEntry() {
+  if (manualTasks && manualTasks.length > 0) {
+    document.getElementById('reentryPanel').style.display = 'none';
+    document.getElementById('manualFallback').style.display = 'none';
+    return;
+  }
+  document.getElementById('reentryPanel').style.display = 'block';
+  document.getElementById('manualFallback').style.display = 'none';
 }
 
 // ==================== FINANCE BAR ====================
@@ -2251,8 +2460,191 @@ function addManualTask() {
   };
   manualTasks.push(task);
   input.value = '';
+  document.getElementById('reentryPanel').style.display = 'none';
   renderQueue();
   saveState();
+}
+
+// ==================== RE-ENTRY MODE ====================
+let reentryRecording = false;
+let reentryRecorder = null;
+let reentryChunks = [];
+let reentryProposed = [];
+
+function initReEntry() {
+  const micBtn = document.getElementById('reentryMicBtn');
+  if (!micBtn) return;
+  micBtn.addEventListener('click', e => {
+    e.preventDefault();
+    reentryRecording ? reentryStop() : reentryStart();
+  });
+  let holdTimer = null;
+  micBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    holdTimer = setTimeout(() => { holdTimer = null; reentryStart(); }, 0);
+  }, { passive: false });
+  micBtn.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    if (reentryRecording) reentryStop();
+  });
+  micBtn.addEventListener('touchcancel', e => {
+    e.preventDefault();
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    if (reentryRecording) reentryStop();
+  });
+}
+
+async function reentryStart() {
+  if (reentryRecording) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/mp4';
+    reentryRecorder = new MediaRecorder(stream, { mimeType });
+    reentryChunks = [];
+    reentryRecorder.ondataavailable = e => { if (e.data.size > 0) reentryChunks.push(e.data); };
+    reentryRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      if (reentryChunks.length > 0) reentryTranscribe(new Blob(reentryChunks, { type: mimeType }), mimeType);
+    };
+    reentryRecorder.start();
+    reentryRecording = true;
+    document.getElementById('reentryMicBtn').classList.add('recording');
+    document.getElementById('reentryHint').textContent = '// listening...';
+  } catch {
+    document.getElementById('reentryHint').textContent = '// mic blocked — type it';
+  }
+}
+
+function reentryStop() {
+  if (reentryRecorder && reentryRecorder.state === 'recording') {
+    try { reentryRecorder.stop(); } catch {}
+  }
+  reentryRecording = false;
+  document.getElementById('reentryMicBtn').classList.remove('recording');
+}
+
+async function reentryTranscribe(blob, mimeType) {
+  const hint = document.getElementById('reentryHint');
+  hint.textContent = '// transcribing...';
+  try {
+    const buffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
+    const res = await fetch('/api/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify({ audio: base64, mimeType })
+    });
+    if (!res.ok) { hint.textContent = '// voice unavailable — type it'; return; }
+    const data = await res.json();
+    if (data.text && data.text.trim()) {
+      document.getElementById('reentryInput').value = data.text.trim();
+      hint.textContent = '// hit TELL MUSE when ready';
+    } else {
+      hint.textContent = '// no speech — try again';
+    }
+  } catch {
+    hint.textContent = '// transcription error — type it';
+  }
+}
+
+async function submitReEntry() {
+  const input = document.getElementById('reentryInput');
+  const dump = input.value.trim();
+  if (!dump) return;
+  const submitBtn = document.querySelector('.reentry-submit');
+  const hint = document.getElementById('reentryHint');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'THINKING...';
+  hint.textContent = '// Muse is thinking...';
+  try {
+    const res = await fetch('/api/re-entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify({ dump })
+    });
+    if (!res.ok) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'TRY AGAIN';
+      hint.textContent = '// connection failed — try again';
+      return;
+    }
+    const data = await res.json();
+    renderReEntryProposed(data.tasks || []);
+  } catch {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'TRY AGAIN';
+    hint.textContent = '// connection failed — try again';
+  }
+}
+
+function renderReEntryProposed(tasks) {
+  const wrap = document.getElementById('reentryProposed');
+  const list = document.getElementById('reentryProposedList');
+  const submit = document.querySelector('.reentry-submit');
+  const hint = document.getElementById('reentryHint');
+  if (!tasks.length) {
+    submit.disabled = false;
+    submit.textContent = 'TRY AGAIN';
+    hint.textContent = '// Muse got nothing — rephrase';
+    return;
+  }
+  reentryProposed = tasks;
+  list.innerHTML = tasks.map((t, i) => `
+    <div class="reentry-task">
+      <input class="reentry-task-text" data-idx="${i}" value="${escHtml(t.text)}" maxlength="80">
+      <span class="reentry-task-meta">${t.estimated_pomodoros}p · ${escHtml(t.category)}</span>
+    </div>
+  `).join('');
+  wrap.style.display = 'block';
+  submit.style.display = 'none';
+  hint.textContent = '// edit if needed, then LOCK IN';
+}
+
+function confirmReEntryTasks() {
+  const textInputs = document.querySelectorAll('.reentry-task-text');
+  const tasks = Array.from(textInputs).map((el, i) => {
+    const t = reentryProposed[i] || {};
+    const text = el.value.trim() || t.text;
+    if (!text) return null;
+    return {
+      id: 'muse-' + Date.now() + '-' + i,
+      text,
+      type: 'pomodoro',
+      estimated_pomodoros: t.estimated_pomodoros || 1,
+      category: t.category || 'Personal',
+      priority: manualTasks.length + i + 1,
+      health: 'gray',
+      manual: true,
+      muse_origin: 're-entry'
+    };
+  }).filter(Boolean);
+  if (!tasks.length) return;
+  manualTasks.push(...tasks);
+  resetReEntry();
+  document.getElementById('reentryPanel').style.display = 'none';
+  renderQueue();
+  saveState();
+}
+
+function resetReEntry() {
+  document.getElementById('reentryInput').value = '';
+  document.getElementById('reentryProposed').style.display = 'none';
+  document.getElementById('reentryProposedList').innerHTML = '';
+  const submit = document.querySelector('.reentry-submit');
+  submit.disabled = false;
+  submit.textContent = 'TELL MUSE';
+  submit.style.display = 'block';
+  document.getElementById('reentryHint').textContent = "One sentence. I'll turn it into 1-3 moves.";
+  reentryProposed = [];
+}
+
+function showManualOnly() {
+  document.getElementById('reentryPanel').style.display = 'none';
+  document.getElementById('manualFallback').style.display = 'block';
 }
 
 // ==================== TASK LAUNCHING & NAVIGATION ====================
@@ -3034,7 +3426,7 @@ function toggleChief() {
     } catch(e) {}
 
     if (chiefConversation.length === 0) {
-      addChiefSystemMessage('// CHIEF online. What do you need?');
+      addChiefSystemMessage('// MUSE online. What do you need?');
     }
 
     setTimeout(() => document.getElementById('chiefInput').focus(), 350);
@@ -3085,7 +3477,7 @@ async function sendChiefMessage() {
   messagesEl.appendChild(userMsgEl);
 
   if (!navigator.onLine) {
-    addChiefSystemMessage('// Chief is offline. Your message will be sent when you reconnect.');
+    addChiefSystemMessage('// Muse is offline. Your message will be sent when you reconnect.');
     return;
   }
 
@@ -3138,7 +3530,7 @@ async function sendChiefMessage() {
 
     const chiefMsgEl = document.createElement('div');
     chiefMsgEl.className = 'chief-msg chief';
-    chiefMsgEl.textContent = displayText || '// No response from Chief.';
+    chiefMsgEl.textContent = displayText || '// No response from Muse.';
     messagesEl.appendChild(chiefMsgEl);
 
     chiefConversation.push({ role: 'assistant', content: displayText });
@@ -3151,7 +3543,7 @@ async function sendChiefMessage() {
     chiefVerified = false;
     updateChiefStatus();
     if (!navigator.onLine) {
-      addChiefSystemMessage('// Chief is offline. Your message will be sent when you reconnect.');
+      addChiefSystemMessage('// Muse is offline. Your message will be sent when you reconnect.');
     } else {
       addChiefSystemMessage('// Connection failed: ' + (e.message || 'unknown error') + '. Try again.');
     }
@@ -3521,6 +3913,7 @@ loadTodayData();
 drainOfflineQueue();
 startPolling();
 initVoiceInput();
+initReEntry();
 
 // Load Chief conversation
 try {

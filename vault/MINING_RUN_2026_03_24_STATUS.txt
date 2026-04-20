@@ -1,0 +1,90 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                   CLAUDE CODE SESSION MINING — COMPLETE                      ║
+║                          Tuesday, March 24, 2026 / 06:01 UTC                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ MINING EXECUTION
+   Runtime: ~/Documents/lionmaker-vault/scripts/mine-claude-sessions.sh
+   Sessions extracted: 13 (1 substantial + 12 MARCUS runs)
+   Status: Clean run, no errors
+
+📊 KEY FINDINGS
+   
+   Architecture Discoveries (3):
+   ├─ .claude/ folder configuration standard (new pattern for all projects)
+   ├─ Trello ↔ Calendar idempotent sync (design pattern documented)
+   └─ OpenClaw TTS config not hot-reloadable (requires full gateway restart)
+
+   Security Vulnerabilities Fixed (2):
+   ├─ Command injection (media-attach.js line 115) — ✅ Fixed via execFileSync
+   └─ Parameter injection (chief-sync.js line 143) — ✅ Fixed via JSON body
+
+   Project Status Updates:
+   ├─ Chief: TTS issue resolved ✅
+   ├─ Trello sync: Built & verified (0 duplicates) ✅
+   ├─ MARCUS: Orchestrator running ✅
+   └─ Gateway: sessions.resolve errors detected ⏳
+
+📁 VAULT UPDATES
+
+   New Documents (3 files, 27.3K):
+   ├─ sessions-mined-2026-03-24.md (9.2K) — Full mining report
+   ├─ security-discoveries-2026-03.md (3.9K) — Vulnerability details & lessons
+   └─ claude-folder-standard.md (10.2K) — Recommended .claude/ structure
+   
+   Updated Documents:
+   └─ SHARED_CONTEXT.md — Chief section added with TTS discovery & .claude/ pattern
+
+   Summary:
+   └─ MINING_SUMMARY_2026_03_24.md (4.2K) — Quick reference summary
+
+🎯 ACTIONABLE RECOMMENDATIONS
+
+   Priority 1 (This Week):
+   1. Investigate gateway sessions.resolve errors on heartbeat checks
+   2. Audit OpenClaw config for hot-reload vs restart behavior
+
+   Priority 2 (Next 2 Weeks):
+   3. Implement .claude/ structure in Chief project
+   4. Implement .claude/ structure in MARCUS project
+   5. Implement .claude/ structure in MCD Command Center
+
+   Priority 3 (Backlog):
+   6. Build master template: ~/.lionmaker/project-templates/master/
+   7. Apply template to all future Lionmaker projects
+
+📌 LESSONS LEARNED
+
+   ✓ Never interpolate user input into shell commands (use execFileSync)
+   ✓ Keep sensitive data in request bodies, not URL query params
+   ✓ Always test sync idempotency with multiple consecutive runs
+   ✓ Clarify problem statement before building solution
+   ✓ TTS config changes require full gateway restart (not hot-reload)
+
+🔐 SECURITY POSTURE
+
+   Status: ✅ Good
+   • 2 critical vulnerabilities identified and fixed
+   • Security lessons documented in security-discoveries-2026-03.md
+   • 20-point security checklist available for future projects
+   • Injection vulnerabilities prevention documented
+
+📍 FILES LOCATION
+
+   Main vault: ~/Documents/lionmaker-vault/
+   Session exports: ~/Documents/lionmaker-vault/_imports/claude-code-daily/
+   Mining log: ~/Documents/lionmaker-vault/mining-runs.log
+
+✨ NEXT STEPS
+
+   1. Read MINING_SUMMARY_2026_03_24.md (quick reference)
+   2. Review claude-folder-standard.md (implementation guide)
+   3. Address Priority 1 items (gateway investigation)
+   4. Schedule Priority 2 items for implementation
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Cron job completed successfully. Vault is synchronized with latest discoveries.
+All actionable insights extracted and documented.
+
+Next scheduled run: [configured interval]
