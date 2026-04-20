@@ -1,93 +1,236 @@
 # Chief Briefing — 2026-04-20
 
-> ⚠️ **GRIND DARK — 7 weekdays with no activity (last entry: Apr 9).** Queue is minimal. Re-entry is task #1.
+> SYSTEM RESET. New workflow active. 3 tasks per project, daily cadence, voice check-ins.
 
-## Active Ventures
-- **Motor City Deals**: MCD operational day (Mon). 10DLC still pending since early April. Email outreach STILL not launched (17 days overdue from Apr 3 action item). Ali daily check-in needed.
-- **MARCUS**: ⚠️ Marcusv2 hits 7-day silence threshold tomorrow (last commit Apr 14). Needs a 15-min check-in.
-- **708 Pallister**: Countertop follow-up overdue (Sam, 14+ days). Basement framing/drywall done. Daily contractor check-in with Sam needed.
-- **Lionmaker Systems**: Active — 11 commits yesterday (consulting page polish, headshot, footer work). Co-authored with Claude Opus 4.7.
-- **AgentSideHustle**: Sprint 1 kill clock at T-10 days. Sprint 2/3 14-day checks overdue. s03-05/s03-06 still unlisted.
-- **GrillaHQ / DPE**: Silent. MCDCommand last active Apr 16.
+## Active Projects
+- **TheGrind**: Rebuilding app to match new workflow. Agent integration priority.
+- **Lionmaker Systems**: AI dev for RE brokerages (lionmaker.io). Execution checklist driven. 11 commits yesterday on consulting page.
+- **Alex Buildium Bot**: Buildium integration for Alex Farhat. Standard work, ship it.
+- **UIL Fast Track**: Liquidity providing education. Step-by-step through their program + calendar.
+- **Lionmaker Kettlebell App**: Nearly done. iOS App Store launch target. KB training = T.J.'s workout plan.
 
-## Financial Position
-- Month income: ~$10,000 (VA $5K + MCD ~$5K)
-- Pace: Baseline only — no new MCD deals tracked this month
-- Outstanding: T.J.'s credit cards maxed, mortgage $3,400/month, crypto goal (.75 BTC) stalled
-- ⚠️ MCD email outreach (revenue task) has been overdue since Apr 3 — this is the #1 revenue lever sitting idle
+## Lightweight
+- **708 Pallister**: Countertop follow-up with Sam (overdue). Framing/drywall done.
+- **Motor City Deals**: Ali check-in. A2P resubmitted, waiting. Fading out.
 
-## Patterns to Watch
-- 🔴 7 weekday Grind absence — longest gap since launch
-- 🔴 MCD email outreach overdue 17 days — revenue task keeps getting skipped
-- ⚠️ Marcusv2 going silent (6 days, threshold tomorrow)
-- ⚠️ 708 Pallister countertop follow-up stale (14+ days)
-- ✅ lionmaker-systems got heavy attention yesterday (11 commits) — building energy is there
-- Context: Sofia born Apr 9 (11 days ago). New baby grace period is real but the machine needs to restart.
+## Off Board
+- MARCUS: Running. No action.
+- GrillaHQ: Blocked on A2P.
+- BiggerSpreads: Cancelled/hold.
 
-## Family / Schedule
-- **Week A** → Aurelia school drop-off 7:30 AM, pickup 2:30–3:15 PM
-- Monday = workout day (6:15 AM) + MCD day (with Ali)
-- Sofia is 11 days old — Andrea needs support
+## Workout
+- Kettlebell training (PDF plan pending from T.J.)
+- Mon/Wed/Fri 6:15 AM
+
+## Family
+- Sofia 11 days old
 - Family dinner non-negotiable
-
-## Repo Activity (Apr 20)
-- **lionmaker-systems**: 11 commits (consulting page polish, headshot, footer, bug fixes)
-- **agentsidehustle**: Automated weekly health report
-- **Marcusv2**: ⚠️ 6 days silent (threshold tomorrow)
-- **MCDCommand**: 3 days silent (OK)
+- Week A = Aurelia school logistics
 
 ---QUEUE---
 {
   "date": "2026-04-20",
+  "workflow": "3-per-project",
   "finances": {"month_income": 10000, "month_target": 25000},
   "projects": [
-    {"name": "Motor City Deals", "health": "yellow", "days_silent": 3},
-    {"name": "MARCUS", "health": "yellow", "days_silent": 6},
-    {"name": "708 Pallister", "health": "yellow", "days_silent": 14},
-    {"name": "Lionmaker Systems", "health": "green", "days_silent": 0},
-    {"name": "AgentSideHustle", "health": "yellow", "days_silent": 0},
-    {"name": "GrillaHQ", "health": "gray", "days_silent": 14},
-    {"name": "BiggerSpreads", "health": "gray", "days_silent": 999}
+    {"id": "grind", "name": "TheGrind", "health": "yellow", "category": "On the Business"},
+    {"id": "lionmaker-sys", "name": "Lionmaker Systems", "health": "green", "category": "On the Business"},
+    {"id": "buildium", "name": "Alex Buildium Bot", "health": "yellow", "category": "On the Business"},
+    {"id": "uil", "name": "UIL Fast Track", "health": "yellow", "category": "On the Business"},
+    {"id": "kb-app", "name": "Lionmaker Kettlebell App", "health": "yellow", "category": "On the Business"},
+    {"id": "pallister", "name": "708 Pallister", "health": "yellow", "category": "In the Business"},
+    {"id": "mcd", "name": "Motor City Deals", "health": "yellow", "category": "In the Business"}
   ],
   "tasks": [
     {
       "id": "t1",
-      "text": "Open The Grind and log today",
-      "project": "The Grind",
+      "text": "TheGrind: Define new app structure for 3-tasks-per-project workflow",
+      "project_id": "grind",
       "category": "On the Business",
-      "type": "quick",
-      "pomos": 0,
+      "type": "pomodoro",
+      "pomos": 2,
       "priority": 1,
-      "done_condition": "Grind app open, today's date loaded, first task checked off"
+      "done_condition": "New UI wireframe or spec doc written"
     },
     {
       "id": "t2",
-      "text": "Call Ali — MCD pipeline check-in + 10DLC status + launch email outreach TODAY",
-      "project": "Motor City Deals",
-      "category": "In the Business",
+      "text": "TheGrind: Add voice input capability for task check-ins",
+      "project_id": "grind",
+      "category": "On the Business",
       "type": "pomodoro",
       "pomos": 2,
       "priority": 2,
-      "done_condition": "Ali called, 10DLC status confirmed, email outreach list uploaded and first batch sent OR concrete blocker identified"
+      "done_condition": "Voice-to-text working in app for task updates"
     },
     {
       "id": "t3",
-      "text": "Workout — Mon lifting session",
-      "project": "Health",
+      "text": "TheGrind: Remove time-slot assignments, switch to priority-ordered list",
+      "project_id": "grind",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 3,
+      "done_condition": "Tasks display as priority list, no time columns"
+    },
+    {
+      "id": "t4",
+      "text": "Lionmaker Systems: Continue consulting page polish",
+      "project_id": "lionmaker-sys",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 2,
+      "priority": 4,
+      "done_condition": "Page updates pushed and live"
+    },
+    {
+      "id": "t5",
+      "text": "Lionmaker Systems: Review execution checklist, identify next 3 actions",
+      "project_id": "lionmaker-sys",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 5,
+      "done_condition": "Checklist reviewed, next 3 tasks documented"
+    },
+    {
+      "id": "t6",
+      "text": "Lionmaker Systems: Draft outreach email template for brokerages",
+      "project_id": "lionmaker-sys",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 6,
+      "done_condition": "Email template written and saved"
+    },
+    {
+      "id": "t7",
+      "text": "Buildium: Set up API auth scaffold for Alex",
+      "project_id": "buildium",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 2,
+      "priority": 7,
+      "done_condition": "API connection working, auth confirmed"
+    },
+    {
+      "id": "t8",
+      "text": "Buildium: Tenant list endpoint integration",
+      "project_id": "buildium",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 8,
+      "done_condition": "Tenant data pulling correctly"
+    },
+    {
+      "id": "t9",
+      "text": "Buildium: Test end-to-end workflow",
+      "project_id": "buildium",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 9,
+      "done_condition": "Full workflow tested, no errors"
+    },
+    {
+      "id": "t10",
+      "text": "UIL Fast Track: Complete next module/lesson",
+      "project_id": "uil",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 2,
+      "priority": 10,
+      "done_condition": "Module completed, notes taken"
+    },
+    {
+      "id": "t11",
+      "text": "UIL Fast Track: Set up LP wallet",
+      "project_id": "uil",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 11,
+      "done_condition": "Wallet created and funded"
+    },
+    {
+      "id": "t12",
+      "text": "UIL Fast Track: Review calendar, note next live events",
+      "project_id": "uil",
+      "category": "On the Business",
+      "type": "quick",
+      "pomos": 0,
+      "priority": 12,
+      "done_condition": "Upcoming events noted, reminders set"
+    },
+    {
+      "id": "t13",
+      "text": "Kettlebell App: Finish remaining screens",
+      "project_id": "kb-app",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 2,
+      "priority": 13,
+      "done_condition": "All screens functional"
+    },
+    {
+      "id": "t14",
+      "text": "Kettlebell App: App Store submission prep (screenshots, metadata)",
+      "project_id": "kb-app",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 14,
+      "done_condition": "Screenshots captured, description written"
+    },
+    {
+      "id": "t15",
+      "text": "Kettlebell App: Integrate workout plan from PDF",
+      "project_id": "kb-app",
+      "category": "On the Business",
+      "type": "pomodoro",
+      "pomos": 1,
+      "priority": 15,
+      "done_condition": "Workout data loaded into app DB"
+    },
+    {
+      "id": "t16",
+      "text": "708 Pallister: Text Sam — countertop installer status (14+ days overdue)",
+      "project_id": "pallister",
+      "category": "In the Business",
+      "type": "quick",
+      "pomos": 0,
+      "priority": 16,
+      "done_condition": "Sam replied with update"
+    },
+    {
+      "id": "t17",
+      "text": "MCD: Check in with Ali — current closings + A2P status",
+      "project_id": "mcd",
+      "category": "In the Business",
+      "type": "quick",
+      "pomos": 0,
+      "priority": 17,
+      "done_condition": "Ali called/texted, status confirmed"
+    },
+    {
+      "id": "t18",
+      "text": "Workout: Kettlebell session (plan TBD from PDF)",
+      "project_id": "fitness",
       "category": "Physical",
       "type": "pomodoro",
       "pomos": 2,
-      "priority": 3,
-      "done_condition": "Full lifting session completed on Tonal or at gym"
+      "priority": 18,
+      "done_condition": "Full KB session completed"
     }
   ],
   "needs_you": [
-    {"id": "n1", "text": "MCD email outreach — 17 days overdue. Revenue is sitting on the table.", "project": "Motor City Deals", "due": "today"},
-    {"id": "n2", "text": "Sam countertop follow-up — 14+ days stale", "project": "708 Pallister", "due": "today"}
+    {"id": "n1", "text": "Send workout PDF to Chief", "project": "Fitness"},
+    {"id": "n2", "text": "Send Lionmaker Systems execution checklist to Chief", "project": "Lionmaker Systems"},
+    {"id": "n3", "text": "Provide UIL calendar access/details", "project": "UIL Fast Track"}
   ],
   "falling_through_cracks": [
-    {"project": "708 Pallister", "days_silent": 14, "note": "Countertop installer follow-up overdue"},
-    {"project": "Marcusv2", "days_silent": 6, "note": "Hits 7-day threshold tomorrow"}
+    {"project": "708 Pallister", "days_silent": 14, "note": "Countertop follow-up overdue"},
+    {"project": "MCD", "days_silent": 17, "note": "Email outreach never launched — but project is fading"}
   ]
 }
 ---END QUEUE---
