@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>18 — Onboard: Q1 Recording</title>
+<link rel="stylesheet" href="shared.css?v=6">
+<style>
+  /* 18-only: transcript sits IN-CONTEXT directly under the question bubble */
+  .transcript-inline {
+    align-self: flex-end;
+    max-width: 88%;
+    padding: 12px 14px;
+    border: 1px dashed rgba(0,240,255,.45);
+    border-radius: var(--r-md);
+    background: rgba(0,240,255,.05);
+    font-family: var(--font-body);
+    font-size: .95rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin-top: -2px;
+  }
+  .transcript-inline::after {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--cyan);
+    margin-left: 4px;
+    vertical-align: -2px;
+    animation: caret-blink 1s steps(2) infinite;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="18 Onboard Q1 Recording">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="onboard">
+      <div class="onboard-musehead">
+        <span class="muse-dot listening"></span>
+        <img src="assets/muse-portrait.png" class="muse-avatar" alt="Muse">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span class="muse-title">MUSE</span>
+          <span class="muse-status listening">// ONBOARDING · 1/3 · LISTENING</span>
+        </div>
+      </div>
+
+      <div class="onboard-convo">
+        <div class="muse-row">
+          <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+          <div class="bubble muse" style="font-size:1.05rem;line-height:1.45;padding:14px 16px">
+            What projects are you running right now?
+          </div>
+        </div>
+
+        <div class="transcript-inline">
+          I've got Pallister, that's the commercial deal, and Lionmaker Systems which is
+        </div>
+      </div>
+
+      <div class="big-mic-wrap" style="margin-top:auto">
+        <div class="big-mic recording">●</div>
+        <div class="mic-timer">0:12 LISTENING...</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="caption">18 / 21 — Q1 · RECORDING</div>
+</div>
+</body>
+</html>

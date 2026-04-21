@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>15 — TopBar: Showcase</title>
+<link rel="stylesheet" href="shared.css?v=5">
+<style>
+  .showcase {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(0,240,255,.04), transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(255,0,222,.03), transparent 60%),
+      #050509;
+    padding: 48px 24px;
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+  .showcase::before {
+    content:''; position:fixed; inset:0; z-index:1000; pointer-events:none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
+  }
+  .showcase-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: .9rem;
+    letter-spacing: 4px;
+    color: var(--text);
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .showcase-sub {
+    font-family: var(--font-mono);
+    font-size: .65rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: -18px;
+    margin-bottom: 12px;
+  }
+  .tb-row {
+    width: 390px;
+    position: relative;
+  }
+  .tb-label {
+    font-family: var(--font-mono);
+    font-size: .58rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+  .tb-frame {
+    width: 390px;
+    height: 56px;
+    background: rgba(10,10,18,.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    display: flex; align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    position: relative;
+  }
+  .tb-note {
+    font-family: var(--font-mono);
+    font-size: .55rem;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+    padding-left: 4px;
+    max-width: 390px;
+    line-height: 1.6;
+  }
+  .tb-note b { color: var(--cyan); font-weight: 400; }
+  .tb-frame::before {
+    content:''; position:absolute; top:-1px; left:20px; right:20px; height:1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+</style>
+</head>
+<body>
+<div class="showcase">
+  <div class="showcase-title">TOPBAR · 3 VARIANTS</div>
+  <div class="showcase-sub">56PX · FIXED · ROTATING STATUS SLOT</div>
+
+  <!-- Default -->
+  <div class="tb-row">
+    <div class="tb-label">01 · DEFAULT (CLOCK)</div>
+    <div class="tb-frame">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status" style="margin-left:auto">TUE · 09:41</span>
+    </div>
+    <div class="tb-note">Resting state. Status slot shows <b>day · time</b>. Color: <b>text-dim</b>. No chrome decoration, no border on status.</div>
+  </div>
+
+  <!-- Undo -->
+  <div class="tb-row">
+    <div class="tb-label">02 · UNDO ACTIVE (POST-MUSE FILE)</div>
+    <div class="tb-frame">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status undo" style="margin-left:auto">+ FILED TO PALLISTER (P2) <span class="undo-link">[UNDO]</span></span>
+    </div>
+    <div class="tb-note">Transient. Rotates in for <b>5s</b> after Muse files a task. Color: <b>cyan</b>. Thin cyan border, 6% cyan fill. <b>[undo]</b> link is underlined. Fades back to clock on timeout or tap.</div>
+  </div>
+
+  <!-- Offline -->
+  <div class="tb-row">
+    <div class="tb-label">03 · OFFLINE</div>
+    <div class="tb-frame">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="" style="filter:drop-shadow(0 0 6px rgba(255,0,60,.4)) saturate(.7);animation:none">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status offline" style="margin-left:auto">// OFFLINE</span>
+    </div>
+    <div class="tb-note">Persistent while disconnected. Color: <b style="color:rgba(255,0,60,.7)">muted red</b>. Logo eyes-pulse stops, saturation drops. No border. Muse FAB dims in parallel.</div>
+  </div>
+
+  <div style="margin-top:24px;padding-top:20px;border-top:1px dashed var(--border);max-width:390px;width:100%">
+    <div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:1.5px;color:var(--text-muted);text-transform:uppercase;line-height:1.7">
+      <div style="color:var(--text-dim);margin-bottom:6px">// PRIORITY ORDER:</div>
+      <div>1. OFFLINE — sticky, overrides everything</div>
+      <div>2. UNDO — 5s transient, overrides clock</div>
+      <div>3. CLOCK — default baseline</div>
+      <div style="margin-top:10px;color:var(--text-dim)">// FUTURE SLOTS:</div>
+      <div>· POMO MM:SS (while Focus active)</div>
+      <div>· ● REC (while Muse listening)</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

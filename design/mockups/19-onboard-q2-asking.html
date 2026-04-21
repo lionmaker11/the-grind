@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>19 — Onboard: Q2 Asking</title>
+<link rel="stylesheet" href="shared.css?v=6">
+<style>
+  /* 19-only: history compressed up top, current question hugs the mic */
+  .q2-history {
+    display: flex; flex-direction: column;
+    gap: 8px;
+    padding-bottom: 14px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    opacity: .7;
+  }
+  .q2-history .bubble {
+    padding: 10px 12px;
+    font-size: .85rem;
+    line-height: 1.4;
+  }
+  .q2-history .muse-avatar-bubble { width: 20px; height: 20px; }
+
+  .q2-current {
+    margin-top: auto;
+    display: flex; flex-direction: column;
+    gap: 14px;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="19 Onboard Q2 Asking">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="onboard">
+      <div class="onboard-musehead">
+        <span class="muse-dot listening"></span>
+        <img src="assets/muse-portrait.png" class="muse-avatar" alt="Muse">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span class="muse-title">MUSE</span>
+          <span class="muse-status listening">// ONBOARDING · 2/3</span>
+        </div>
+      </div>
+
+      <!-- previous Q+A — compressed, faded, anchored top -->
+      <div class="q2-history">
+        <div class="muse-row">
+          <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+          <div class="bubble muse">What projects are you running right now?</div>
+        </div>
+        <div class="bubble user" style="max-width:88%">
+          I've got Pallister which is my commercial real estate deal with Rick, Lionmaker Systems which is my umbrella brand and TheGrind V2 is a project under it, and MARCUS which is my trading bot.
+        </div>
+      </div>
+
+      <!-- current question — hugs the mic affordance -->
+      <div class="q2-current">
+        <div class="muse-row">
+          <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+          <div class="bubble muse" style="font-size:1.05rem;line-height:1.45;padding:14px 16px">
+            What's on fire? Anything overdue or due this week.
+          </div>
+        </div>
+
+        <div class="big-mic-wrap" style="padding:8px 0 0">
+          <div class="big-mic armed">●</div>
+          <div class="mic-hint">Hold to speak — release when done</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="caption">19 / 21 — Q2 · ANSWER-IN-CONTEXT</div>
+</div>
+</body>
+</html>

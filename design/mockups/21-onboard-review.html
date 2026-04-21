@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>21 — Onboard: Review</title>
+<link rel="stylesheet" href="shared.css?v=6">
+<style>
+  /* 21-only tweaks */
+  .btn-icon.edit:hover   { color: var(--cyan); border-color: var(--cyan); }
+  .btn-icon.delete:hover { color: var(--red);  border-color: var(--red); }
+
+  /* viewport leaves room for the pinned lock CTA */
+  .review-viewport { padding-bottom: 104px; }
+
+  /* Pinned CTA dock — always visible, blurred dark gradient fade above */
+  .lock-dock {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 40;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(10,10,18,0) 0%, rgba(10,10,18,.85) 40%, rgba(10,10,18,.98) 100%);
+  }
+  .lock-dock .review-lock {
+    pointer-events: auto;
+    margin-top: 0;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="21 Onboard Review">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="topbar">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status">SETUP</span>
+    </div>
+
+    <div class="viewport review-viewport">
+      <div class="review-eyebrow">
+        ➤ // HERE'S WHAT I FILED.<br>FIX ANYTHING THAT'S WRONG.
+      </div>
+
+      <!-- Pallister (yellow) -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat yellow"></span>
+          <span class="project-name">708 PALLISTER</span>
+          <span class="project-meta">5D · 3 TASKS</span>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p1">P1</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-meta overdue">⚡ 14+ DAYS OVERDUE</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p2">P2</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <div class="task-meta due">DUE FRI</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p3">P3</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Review Rick's budget</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <button class="add-task-ghost">+ ADD TASK</button>
+      </div>
+
+      <!-- Lionmaker (green) -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat green"></span>
+          <span class="project-name">LIONMAKER SYSTEMS</span>
+          <span class="project-meta">0D · 3 TASKS</span>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p1">P1</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Ship V2 DESIGN.md to repo</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p2">P2</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Port V1 components to Preact</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p3">P3</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Wire up Muse FAB overlay</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <button class="add-task-ghost">+ ADD TASK</button>
+      </div>
+
+      <!-- MARCUS (red) -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat red"></span>
+          <span class="project-name">MARCUS</span>
+          <span class="project-meta">9D · 2 TASKS</span>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p1">P1</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Verify trading resumed after MDD lockout</div>
+            <div class="task-meta overdue">⚡ 9 DAYS QUIET</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="p-badge p2">P2</span>
+          <div style="flex:1;min-width:0">
+            <div class="task-text">Review funding rate arb logs</div>
+          </div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <button class="add-task-ghost">+ ADD TASK</button>
+      </div>
+
+      <button class="add-project-ghost">+ ADD PROJECT</button>
+    </div>
+
+    <!-- Pinned CTA — always visible -->
+    <div class="lock-dock">
+      <button class="review-lock" style="width:100%">LOCK IT IN ▶</button>
+    </div>
+
+  </div>
+  <div class="caption">21 / 21 — REVIEW · LOCK IT IN</div>
+</div>
+</body>
+</html>
