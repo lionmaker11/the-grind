@@ -271,8 +271,15 @@ export default async function handler(req, res) {
     if (!task_id) return res.status(400).json({ error: 'Missing task_id' });
     const taskObj = backlog.tasks.find(t => t.id === task_id);
     if (!taskObj) return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
-    taskObj.status = 'done';
-    taskObj.completed = today();
+    // Recurring tasks stay pending; we just stamp last_completed so the UI can
+    // mark "done today" and reset with the next calendar day.
+    if (taskObj.recurring === 'daily') {
+      taskObj.last_completed = today();
+      taskObj.status = 'pending';
+    } else {
+      taskObj.status = 'done';
+      taskObj.completed = today();
+    }
     const msg = `backlog: complete ${task_id} in ${project_id}`;
     const [result] = await Promise.all([
       writeBacklog(project_id, backlog, sha, msg),
