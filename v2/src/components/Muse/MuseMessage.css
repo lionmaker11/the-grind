@@ -1,0 +1,48 @@
+/* MuseMessage.css — bubble variants.
+   Ported from shared.css .bubble family (mockups 10/11). */
+
+.muse-bubble {
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid;
+  max-width: 85%;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.muse-bubble--user {
+  background: rgba(0, 240, 255, 0.10);
+  border-color: rgba(0, 240, 255, 0.35);
+  align-self: flex-end;
+  color: var(--text);
+}
+
+.muse-bubble--muse {
+  background: rgba(255, 0, 222, 0.08);
+  border-color: rgba(255, 0, 222, 0.35);
+  align-self: flex-start;
+  color: var(--text);
+}
+
+.muse-bubble--action {
+  align-self: center;
+  padding: 5px 12px;
+  background: rgba(255, 230, 0, 0.06);
+  border-color: rgba(255, 230, 0, 0.3);
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  max-width: 90%;
+  text-align: center;
+}
+
+.muse-bubble--error {
+  background: rgba(255, 0, 60, 0.06);
+  border-color: rgba(255, 0, 60, 0.3);
+  color: rgba(255, 0, 60, 0.85);
+}

@@ -2,6 +2,12 @@
 
 Repository: `lionmaker11/the-grind`. Currently in V2 rebuild. Production `/` is intentionally down during build — V1 has been deleted and V2 is under construction at `/v2/`.
 
+## Build state
+
+See `/vault/build/PHASES.md` for current phase, decision log, approved `/api/*`
+exceptions, and patterns observed during the build. Read that file first
+in any new Claude Code session before touching code.
+
 ## Authoritative sources (read in this order)
 
 1. `/DESIGN.md` — V2 architectural spec. The contract.

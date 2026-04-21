@@ -1,9 +1,9 @@
 import { readdirSync } from 'fs';
 import {
-  readRegistry as readLocalRegistry,
   readBacklog as readLocalBacklog,
+  fetchRegistryLive,
+  fetchBacklogLive,
   sortByPriority,
-  getActiveProjects,
   nextTaskId
 } from './_lib/vault.js';
 
@@ -127,32 +127,38 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-cache, no-store');
 
     if (projectId) {
-      const backlog = readLocalBacklog(projectId);
+      const backlog = await fetchBacklogLive(projectId);
       if (!backlog) return res.status(404).json({ error: `Unknown project: ${projectId}` });
       return res.status(200).json({ backlog });
     }
 
-    // No project_id → summary of all active + lightweight projects
-    const registry = readLocalRegistry();
+    // No project_id → summary of all active + lightweight projects.
+    // Live read from GitHub so writes from /api/backlog POST are visible
+    // immediately rather than on next deploy.
+    const registry = await fetchRegistryLive();
     const entries = registry?.projects || [];
-    const summary = [];
+    const active = entries.filter(p => p.status === 'active' || p.status === 'lightweight');
 
-    for (const p of entries) {
-      if (p.status !== 'active' && p.status !== 'lightweight') continue;
-      const bl = readLocalBacklog(p.id);
-      if (!bl) continue;
+    const rows = await Promise.all(active.map(async (p) => {
+      const bl = await fetchBacklogLive(p.id);
+      if (!bl) return null;
       const pending = sortByPriority((bl.tasks || []).filter(t => t.status !== 'done'));
-      summary.push({
+      return {
         project_id: p.id,
         project_name: bl.project_name || p.name,
         priority: p.priority,
         task_count: (bl.tasks || []).length,
         last_touched: p.last_touched || null,
         top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority }))
-      });
-    }
+      };
+    }));
+    const summary = rows.filter(Boolean);
 
-    // Include projects on disk not in registry so we don't lose data
+    // Orphan-folder recovery — folders under /vault/projects with no
+    // registry entry. Stays on the local bundle: listing orphans needs
+    // a dir walk, which would cost an extra GitHub tree call per GET
+    // for a rare recovery case. If the bundle is stale, a missed orphan
+    // resolves on next deploy.
     try {
       const projectsDir = new URL('../vault/projects', import.meta.url).pathname;
       const folders = readdirSync(projectsDir, { withFileTypes: true })
@@ -185,9 +191,10 @@ export default async function handler(req, res) {
 
   if (!op || !project_id) return res.status(400).json({ error: 'Missing op or project_id' });
 
-  // op: load is read-only — skip GitHub fetch, use local file
+  // op: load is read-only — uses the live read path so Muse sees tasks
+  // she just filed earlier in the same conversation.
   if (op === 'load') {
-    const backlog = readLocalBacklog(project_id);
+    const backlog = await fetchBacklogLive(project_id);
     if (!backlog) return res.status(404).json({ error: `Unknown project: ${project_id}` });
     const n = Math.max(1, Math.min(10, parseInt(count, 10) || 3));
     const pending = sortByPriority((backlog.tasks || []).filter(t => t.status !== 'done'));

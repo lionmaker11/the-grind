@@ -1,0 +1,128 @@
+/* MuseInput.css — footer row: input + mic + send.
+   Ported from shared.css .muse-footer / .muse-input / .muse-mic / .muse-send. */
+
+.muse-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  background: var(--bg-sheet);
+}
+
+.muse-input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px; /* prevents iOS zoom on focus */
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  outline: none;
+  min-height: var(--touch-min);
+}
+
+.muse-input::placeholder {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.muse-input:focus-visible {
+  border-color: var(--cyan);
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+}
+
+.muse-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.muse-input.live {
+  border-color: var(--magenta);
+}
+
+/* ── mic button ── */
+.muse-mic {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--magenta);
+  color: var(--magenta);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+}
+
+.muse-mic.recording {
+  background: var(--magenta);
+  color: #000;
+  animation: muse-mic-pulse 1s ease-in-out infinite;
+}
+
+.muse-mic.dimmed,
+.muse-mic:disabled {
+  opacity: 0.35;
+  border-color: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.muse-mic:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ── send button ── */
+.muse-send {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+}
+
+.muse-send.dimmed,
+.muse-send:disabled {
+  opacity: 0.35;
+  border-color: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.muse-send:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .muse-mic.recording { animation: none; }
+}

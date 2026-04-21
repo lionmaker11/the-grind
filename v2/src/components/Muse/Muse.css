@@ -1,0 +1,30 @@
+/* Muse FAB button styling — inherits .muse-fab layout from global.css and
+   adds button-element resets + focus/active feedback.
+   The sheet + conversation-specific styles live in MuseSheet/Message/Input
+   stylesheets. */
+
+.muse-fab--btn {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  font: inherit;
+  /* color + background + size come from global.css .muse-fab */
+  transition: transform var(--dur-micro) var(--ease-out), filter var(--dur-micro) var(--ease-out);
+}
+
+.muse-fab--btn:active {
+  transform: scale(0.94);
+}
+
+.muse-fab--btn:hover {
+  filter: brightness(1.1);
+}
+
+.muse-fab--btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.muse-fab--btn > span {
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
