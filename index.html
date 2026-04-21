@@ -3547,6 +3547,32 @@ async function sendChiefMessage() {
   document.getElementById('chiefSendBtn').disabled = false;
 }
 
+async function callBacklogApi(body) {
+  try {
+    const res = await fetch('/api/backlog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: data?.error || `HTTP ${res.status}` };
+    return data;
+  } catch (e) {
+    return { ok: false, error: e.message || 'network error' };
+  }
+}
+
+function appendActionMsg(text) {
+  const messagesEl = document.getElementById('chiefMessages');
+  if (!messagesEl) return;
+  const el = document.createElement('div');
+  el.className = 'chief-msg action';
+  el.textContent = text;
+  messagesEl.appendChild(el);
+  chiefConversation.push({ role: 'action', content: text });
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
 function executeChiefActions(actions) {
   if (!Array.isArray(actions)) return;
   const messagesEl = document.getElementById('chiefMessages');
@@ -3677,6 +3703,71 @@ function executeChiefActions(actions) {
           launchTask(task);
           if (chiefOpen) toggleChief();
         }
+        break;
+      }
+      case 'add_to_backlog': {
+        callBacklogApi({
+          op: 'add',
+          project_id: action.project_id,
+          task: {
+            text: action.text,
+            done_condition: action.done_condition || null,
+            category: action.category || null,
+            estimated_pomodoros: action.estimated_pomodoros || null
+          }
+        }).then(r => {
+          const label = r?.task?.id ? `${action.project_id}:${r.task.id}` : action.project_id;
+          const msg = r?.ok
+            ? `+ Backlog [${label}]: ${action.text}`
+            : `! Backlog add failed: ${r?.error || 'unknown'}`;
+          appendActionMsg(msg);
+        });
+        break;
+      }
+      case 'remove_from_backlog': {
+        callBacklogApi({
+          op: 'remove',
+          project_id: action.project_id,
+          task_id: action.task_id
+        }).then(r => {
+          const msg = r?.ok
+            ? `- Backlog [${action.project_id}]: removed ${action.task_id}`
+            : `! Backlog remove failed: ${r?.error || 'unknown'}`;
+          appendActionMsg(msg);
+        });
+        break;
+      }
+      case 'load_more': {
+        callBacklogApi({
+          op: 'load',
+          project_id: action.project_id,
+          count: action.count || 3
+        }).then(r => {
+          if (!r?.ok || !Array.isArray(r.tasks)) {
+            appendActionMsg(`! Load failed: ${r?.error || 'unknown'}`);
+            return;
+          }
+          const basePriority = queueTasks.length
+            ? Math.max(...queueTasks.map(t => t.priority || 0))
+            : 0;
+          r.tasks.forEach((t, i) => {
+            queueTasks.push({
+              id: t.id,
+              text: t.text,
+              type: 'pomodoro',
+              estimated_pomodoros: t.estimated_pomodoros || 2,
+              priority: basePriority + i + 1,
+              health: 'gray',
+              category: t.category || null,
+              project_name: r.project_name || action.project_id
+            });
+          });
+          appendActionMsg(`+ Loaded ${r.tasks.length} from ${r.project_name || action.project_id}`);
+          renderQueue();
+          renderScoreboard();
+          saveState();
+          syncTodayJson();
+        });
         break;
       }
     }
