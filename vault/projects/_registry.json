@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-04-20",
-  "note": "v0 — confirm active/inactive split with T.J. before Muse uses this as source of truth.",
+  "updated": "2026-04-21",
   "projects": [
     {
       "id": "708-pallister",
@@ -17,8 +16,7 @@
       "status": "active",
       "priority": 2,
       "folder": "vault/projects/fast-track-uig",
-      "aliases": ["FastTrack", "UIG"],
-      "note": "folder not yet created"
+      "aliases": ["FastTrack", "UIG"]
     },
     {
       "id": "lionmaker-kettlebell",
@@ -26,8 +24,7 @@
       "status": "active",
       "priority": 3,
       "folder": "vault/projects/lionmaker-kettlebell",
-      "aliases": ["Kettlebell app"],
-      "note": "folder not yet created"
+      "aliases": ["Kettlebell app"]
     },
     {
       "id": "lionmaker-systems",
@@ -50,8 +47,7 @@
       "name": "GrillaHQ",
       "status": "active",
       "priority": 6,
-      "folder": "vault/projects/grillahq",
-      "note": "folder not yet created"
+      "folder": "vault/projects/grillahq"
     },
     {
       "id": "alex-buildium",
@@ -59,8 +55,34 @@
       "status": "active",
       "priority": 7,
       "folder": "vault/projects/alex-buildium",
-      "aliases": ["Buildium"],
-      "note": "folder not yet created"
+      "aliases": ["Buildium"]
+    },
+    {
+      "id": "the-grind",
+      "name": "TheGrind (meta)",
+      "status": "lightweight",
+      "priority": 8,
+      "folder": "vault/projects/the-grind",
+      "aliases": ["TheGrind", "grind app"],
+      "note": "Self-improvement backlog for the app itself. Lightweight = not in daily queue rotation; Muse pulls from it only when T.J. asks."
+    },
+    {
+      "id": "biggerspreads",
+      "name": "BiggerSpreads",
+      "status": "active",
+      "priority": 9,
+      "folder": "vault/projects/biggerspreads",
+      "aliases": ["BiggerSpreads", "Bigger Spreads"],
+      "note": "SaaS. On hold pending June 2026 AI-obsolete decision."
+    },
+    {
+      "id": "lionmaker",
+      "name": "Lionmaker",
+      "status": "active",
+      "priority": 10,
+      "folder": "vault/projects/lionmaker",
+      "aliases": ["Lionmaker brand"],
+      "note": "Distinct from lionmaker-systems. Confirm scope with T.J."
     },
     {
       "id": "motor-city-deals",

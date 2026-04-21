@@ -1,3 +1,5 @@
+> **RETIRED 2026-04-21.** This file describes the pre-rewrite push/queue/brief model. See `vault/systems/muse-system.md` and `vault/systems/OWNERSHIP.md` for the current spec. Kept for historical reference only.
+
 # TheGrind — Build Specification
 
 ## What It Is
