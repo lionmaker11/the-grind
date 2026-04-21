@@ -1,4 +1,5 @@
 {
+  "schema_version": 1,
   "project_id": "alex-buildium",
   "project_name": "Alex / Buildium Bot",
   "tasks": [

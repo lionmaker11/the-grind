@@ -59,6 +59,15 @@
       "aliases": ["Buildium"]
     },
     {
+      "id": "the-grind",
+      "name": "TheGrind (meta)",
+      "status": "lightweight",
+      "priority": 8,
+      "folder": "vault/projects/the-grind",
+      "aliases": ["TheGrind", "grind app"],
+      "note": "Self-improvement backlog for the app itself. Lightweight = not in daily queue rotation; Muse pulls from it only when T.J. asks."
+    },
+    {
       "id": "motor-city-deals",
       "name": "Motor City Deals",
       "status": "inactive",

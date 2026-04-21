@@ -14,12 +14,19 @@ The cron + model + name are configured in the Claude Code web UI. This directory
 
 | File | Model | Cron | Status | Purpose |
 |---|---|---|---|---|
-| `morning.md` | Sonnet 4.6 | 06:00 Mon-Sat | **drafted** | Read EOD from yesterday, write today's queue |
-| `midday.md` | Haiku 4.5 | 12:00 Mon-Sat | scaffold-only | Quick progress check, nudge if stalled |
-| `eod.md` | Sonnet 4.6 | 17:30 Mon-Sat | **drafted** | EOD rollup — what got done, what didn't, blockers |
-| `sunday-review.md` | Opus 4.7 | 07:00 Sun | scaffold-only | Weekly review across all projects, set priorities |
+| `morning.md` | Sonnet 4.6 | 06:00 Mon-Sat | **drafted** | Prepare today's queue in TheGrind app |
+| `midday.md` | Haiku 4.5 | 12:00 Mon-Sat | scaffold-only | (optional) Nudge T.J. to open the app if stalled |
+| `eod.md` | Sonnet 4.6 | 17:30 Mon-Sat | **drafted** | Reconcile today's queue + file captures to backlogs |
+| `sunday-review.md` | Opus 4.7 | 07:00 Sun | scaffold-only | Weekly queue reset across all active projects |
 
-"drafted" = prompt body exists in this directory but is **not yet wired** in the Claude Code web UI. See wiring timeline below.
+"drafted" = prompt body exists and follows the intake-only contract; **not yet wired** in the Claude Code web UI.
+
+## Muse's role (do not drift)
+Muse maintains TheGrind app and nothing else. She does NOT push narrative briefs, emails, or Telegram messages. T.J. voice-dumps into the app; Muse intakes, interprets, delegates to the right queue/backlog, and asks one tight clarifying question only when routing is genuinely ambiguous. Reminders to voice-dump come from the app at the start and end of the day — Muse is the listener, not the reporter.
+
+## Retired surfaces
+- `vault/daily-briefs/grind/*.md` — no longer written. EOD now updates state in-place; no markdown brief.
+- `chief-briefing.md` — scheduled for deletion in Week 4.
 
 ## Wiring timeline
 - **Day 1 (now):** Re-Entry Mode only. No routines yet.

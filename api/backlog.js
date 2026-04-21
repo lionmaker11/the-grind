@@ -1,20 +1,12 @@
-import { readFileSync, readdirSync, existsSync } from 'fs';
+import { readdirSync } from 'fs';
 import { join } from 'path';
+import {
+  readRegistry as readLocalRegistry,
+  readBacklog as readLocalBacklog,
+  nextTaskId
+} from './_lib/vault.js';
 
 const REPO = 'lionmaker11/the-grind';
-const REGISTRY_PATH = 'vault/projects/_registry.json';
-
-const ID_PREFIX = {
-  'the-grind': 'tg',
-  'lionmaker-systems': 'ls',
-  'alex-buildium': 'ab',
-  'fast-track-uig': 'uig',
-  'lionmaker-kettlebell': 'kb',
-  'grillahq': 'gh',
-  '708-pallister': 'pal',
-  'motor-city-deals': 'mcd',
-  'va-disability': 'va'
-};
 
 async function ghRequest(path, method, body) {
   const opts = {
@@ -54,30 +46,6 @@ async function writeBacklog(projectId, backlog, sha, commitMessage) {
   }
   const err = await resp.text();
   return { ok: false, status: resp.status, error: err };
-}
-
-function nextTaskId(projectId, tasks) {
-  const prefix = ID_PREFIX[projectId] || projectId.slice(0, 3);
-  let max = 0;
-  for (const t of tasks || []) {
-    const m = String(t.id || '').match(new RegExp(`^${prefix}-(\\d+)$`));
-    if (m) max = Math.max(max, parseInt(m[1], 10));
-  }
-  return `${prefix}-${String(max + 1).padStart(3, '0')}`;
-}
-
-function readLocalBacklog(projectId) {
-  const path = join(process.cwd(), 'vault', 'projects', projectId, 'backlog.json');
-  if (!existsSync(path)) return null;
-  try { return JSON.parse(readFileSync(path, 'utf-8')); }
-  catch { return null; }
-}
-
-function readLocalRegistry() {
-  const path = join(process.cwd(), REGISTRY_PATH);
-  if (!existsSync(path)) return null;
-  try { return JSON.parse(readFileSync(path, 'utf-8')); }
-  catch { return null; }
 }
 
 export default async function handler(req, res) {
