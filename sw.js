@@ -1,4 +1,5 @@
-const CACHE_NAME = 'the-grind-v15';
+// sw.js v16 — bumped with Muse/voice-dump/attachment endpoints. See CLAUDE.md.
+const CACHE_NAME = 'the-grind-v16';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -27,13 +28,56 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // API calls: network only, never cache. Return offline indicator on failure.
+  // Network-first with cache fallback for readable API routes
+  if (url.pathname === '/api/today' || url.pathname === '/api/check-update') {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(new Request(url.pathname), clone));
+        return res;
+      }).catch(() => caches.match(new Request(url.pathname)))
+    );
+    return;
+  }
+
+  // Network-only: write/upload/audio routes — must never be cached
+  if (
+    url.pathname === '/api/upload' ||
+    url.pathname === '/api/sync' ||
+    url.pathname === '/api/transcribe'
+  ) {
+    e.respondWith(
+      fetch(e.request).catch(() =>
+        new Response(JSON.stringify({ ok: false, offline: true, error: 'offline' }),
+          { status: 503, headers: { 'Content-Type': 'application/json' } })
+      )
+    );
+    return;
+  }
+
+  // Remaining API calls: network only, never cache
   if (url.pathname.startsWith('/api/')) {
     e.respondWith(
       fetch(e.request).catch(() =>
         new Response(JSON.stringify({ offline: true, error: 'No connection' }),
           { status: 503, headers: { 'Content-Type': 'application/json' } })
       )
+    );
+    return;
+  }
+
+  // Network-first for today.json, vault/daily/, and chief-briefing.md
+  if (
+    url.pathname === '/today.json' ||
+    url.pathname === '/chief-briefing.md' ||
+    url.pathname.startsWith('/vault/daily/')
+  ) {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(new Request(url.pathname), clone));
+        return res;
+      }).catch(() => caches.match(new Request(url.pathname)))
     );
     return;
   }
