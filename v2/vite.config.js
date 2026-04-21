@@ -11,7 +11,7 @@ import preact from '@preact/preset-vite';
 // deployment that hosts /api/*, so /api/* calls resolve natively with no proxy.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const proxyTarget = env.VITE_API_PROXY_TARGET || 'https://the-grind.vercel.app';
+  const proxyTarget = env.VITE_API_PROXY_TARGET || 'https://the-grind-gold.vercel.app';
 
   return {
     plugins: [preact()],
