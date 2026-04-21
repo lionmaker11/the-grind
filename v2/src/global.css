@@ -6,6 +6,11 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
 html {
   background: var(--bg);
   color: var(--text);
@@ -202,6 +207,7 @@ body::after {
   cursor: pointer;
 }
 
+
 .btn-icon {
   width: var(--touch-min);
   height: var(--touch-min);
@@ -232,6 +238,22 @@ body::after {
   z-index: 50;
   display: flex;
   justify-content: center;
+}
+
+/* Focus ring for EXECUTE — pseudo-element on the wrap so clip-path on .btn-primary
+   can't clip it. Chamfers at 6px (wrap is 4px larger all around than the 10px button). */
+.execute-wrap:has(.btn-primary:focus-visible)::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: var(--cyan);
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  pointer-events: none;
+}
+
+.execute-wrap:has(.btn-primary:focus-visible) .btn-primary {
+  position: relative;
+  z-index: 1;
 }
 
 /* ---- Muse FAB ---- */

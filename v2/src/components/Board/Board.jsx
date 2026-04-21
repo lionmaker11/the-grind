@@ -25,38 +25,38 @@ export function Board() {
       ? `CACHED · LAST SYNC ${formatTime(lastFetchAt)}`
       : 'CACHED · NO SYNC YET';
     return (
-      <div class="board">
+      <main class="board">
         <div class="section-title">IN CONTEXT</div>
         <div class="section-sub section-sub--offline">{syncLabel}</div>
         {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}
         <div class="muse-offline-note">// MUSE OFFLINE — voice filing paused</div>
-        <div class="execute-wrap"><button class="btn-primary" type="button">▶ EXECUTE</button></div>
-        <div class="muse-fab dimmed" aria-hidden="true">●</div>
-      </div>
+        <div class="execute-wrap"><button class="btn-primary" type="button"><span aria-hidden="true">▶ </span>EXECUTE</button></div>
+        <div class="muse-fab dimmed" aria-hidden="true" tabindex="-1">●</div>
+      </main>
     );
   }
 
   if (allEmpty) {
     return (
-      <div class="board">
+      <main class="board">
         <div class="section-title">IN CONTEXT</div>
         <div class="section-sub">0 PENDING · BOARD CLEAR</div>
         <EmptyState />
-        <div class="muse-fab" aria-hidden="true">●</div>
-      </div>
+        <div class="muse-fab" aria-hidden="true" tabindex="-1">●</div>
+      </main>
     );
   }
 
   const totalPending = summary.reduce((n, p) => n + (p.task_count || 0), 0);
 
   return (
-    <div class="board">
+    <main class="board">
       <div class="section-title">IN CONTEXT</div>
       <div class="section-sub">{summary.length} PROJECTS · {totalPending} PENDING</div>
       {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}
-      <button class="add-project-ghost" type="button">+ NEW PROJECT</button>
-      <div class="execute-wrap"><button class="btn-primary" type="button">▶ EXECUTE</button></div>
-      <div class="muse-fab" aria-hidden="true">●</div>
-    </div>
+      <button class="add-project-ghost" type="button"><span aria-hidden="true">+ </span>NEW PROJECT</button>
+      <div class="execute-wrap"><button class="btn-primary" type="button"><span aria-hidden="true">▶ </span>EXECUTE</button></div>
+      <div class="muse-fab" aria-hidden="true" tabindex="-1">●</div>
+    </main>
   );
 }

@@ -24,10 +24,10 @@ export function TopBar() {
   const statusText = error ? '// OFFLINE' : clock;
 
   return (
-    <div class="topbar">
-      <img src="/assets/lionmaker-logo.png" class="logo-mark" alt="" />
+    <header class="topbar">
+      <img src="/assets/lionmaker-logo.png" class="logo-mark" alt="Lionmaker" />
       <span class="wordmark">THEGRIND</span>
       <span class={statusClass}>{statusText}</span>
-    </div>
+    </header>
   );
 }
