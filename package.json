@@ -2,6 +2,7 @@
   "name": "the-grind",
   "version": "2.0.0",
   "private": true,
+  "type": "module",
   "description": "Gamified personal command center + Pomodoro execution engine",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0"
