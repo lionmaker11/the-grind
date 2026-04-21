@@ -2,6 +2,51 @@
   "schema_version": 1,
   "project_id": "va-disability",
   "project_name": "VA Disability Appeal",
-  "tasks": [],
-  "notes": "Seeded empty 2026-04-21. Decision 60-120 days out; check early May. Tasks to be captured via EOD conversation."
+  "tasks": [
+    {
+      "id": "va-001",
+      "text": "File financial-hardship expedite request with VA Board of Appeals",
+      "done_condition": "Expedite request submitted with supporting docs; confirmation received",
+      "category": "Legal",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "va-002",
+      "text": "Revoke current attorney representation while preserving appeal standing",
+      "done_condition": "Revocation letter filed; successor representation (VSO or pro se) documented with Board",
+      "category": "Legal",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "va-003",
+      "text": "Pull full list of 9 appeal issues from current Board docket",
+      "done_condition": "Complete issue list in vault/projects/va-disability/",
+      "category": "Research",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "va-004",
+      "text": "Appeal VA debt-waiver denial (Post-9/11 housing allowance)",
+      "done_condition": "Appeal filed; tracking number in hand",
+      "category": "Legal",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "va-005",
+      "text": "Document attorney fee dispute and bar-complaint case",
+      "done_condition": "Timeline + evidence compiled; decision made on whether to file",
+      "category": "Legal",
+      "priority": 4,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
 }

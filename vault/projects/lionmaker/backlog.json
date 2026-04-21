@@ -2,5 +2,24 @@
   "schema_version": 1,
   "project_id": "lionmaker",
   "project_name": "Lionmaker",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "lm-001",
+      "text": "Decide what the Lionmaker repo becomes (brand site, storefront, content hub, or retire)",
+      "done_condition": "Scope decision logged; README seeded OR repo archived",
+      "category": "On Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "lm-002",
+      "text": "Confirm scope split between Lionmaker (brand) and Lionmaker Systems (consulting)",
+      "done_condition": "Boundary documented so tasks route to the right project",
+      "category": "On Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
 }
