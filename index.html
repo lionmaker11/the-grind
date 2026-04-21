@@ -447,6 +447,218 @@
     text-align: center;
   }
 
+  /* ==================== PROJECT BOARD ==================== */
+  .project-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .project-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(0,245,255,0.04);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .project-card-header:hover { background: rgba(0,245,255,0.08); }
+  .project-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gray);
+    flex-shrink: 0;
+  }
+  .project-dot.p-high { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+  .project-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    color: var(--text);
+    flex: 1;
+    text-transform: uppercase;
+  }
+  .project-count {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+  }
+  .project-expand {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-left: 8px;
+  }
+  .project-tasks { padding: 6px 0; }
+  .project-tasks .empty-row {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    letter-spacing: 1px;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-row.done-today { opacity: 0.55; }
+  .task-row.done-today .task-row-text { text-decoration: line-through; }
+
+  .p-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    padding: 3px 6px;
+    border-radius: 2px;
+    border: 1px solid;
+    flex-shrink: 0;
+    cursor: pointer;
+    min-width: 26px;
+    text-align: center;
+  }
+  .p-badge.p1 { color: var(--cyan);    border-color: rgba(0,245,255,0.5); background: rgba(0,245,255,0.08); }
+  .p-badge.p2 { color: var(--green);   border-color: rgba(0,255,136,0.5); background: rgba(0,255,136,0.06); }
+  .p-badge.p3 { color: var(--yellow);  border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.06); }
+  .p-badge.p4 { color: var(--indigo);  border-color: rgba(102,68,255,0.5); background: rgba(102,68,255,0.06); }
+  .p-badge.p5 { color: var(--gray);    border-color: rgba(136,136,136,0.4); background: rgba(136,136,136,0.05); }
+
+  .task-row-text {
+    flex: 1;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .task-row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .row-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    padding: 3px 9px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .row-btn:hover { color: var(--text); border-color: var(--border-bright); }
+  .row-btn.launch:hover { color: var(--cyan); border-color: var(--cyan); }
+  .row-btn.done:hover { color: var(--green); border-color: var(--green); }
+  .row-btn.attach:hover { color: var(--magenta); border-color: var(--magenta); }
+  .row-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .board-empty {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    padding: 40px 20px;
+    text-align: center;
+    border: 1px dashed var(--border);
+    border-radius: 2px;
+    margin-bottom: 12px;
+  }
+  .board-empty .vd-cta {
+    display: block;
+    margin-top: 10px;
+    color: var(--magenta);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* Per-project drawer */
+  .project-drawer {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--cyan);
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .project-drawer.open { transform: translateY(0); }
+  .project-drawer-header {
+    position: sticky; top: 0;
+    background: var(--bg-panel);
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .project-drawer-title {
+    flex: 1;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: var(--cyan);
+  }
+  .project-drawer-close {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  /* Priority-review mode banner */
+  .review-banner {
+    display: none;
+    background: rgba(255,0,255,0.06);
+    border: 1px solid rgba(255,0,255,0.35);
+    border-radius: 2px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .review-banner.show { display: flex; }
+  .review-banner-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--magenta);
+    letter-spacing: 1.5px;
+    flex: 1;
+  }
+
   .queue-task {
     display: flex;
     align-items: center;
@@ -1665,6 +1877,11 @@
         <div id="cracksList"></div>
       </div>
 
+      <div id="reviewBanner" class="review-banner">
+        <span class="review-banner-label">// PRIORITY REVIEW — WHAT MOVES UP?</span>
+        <button class="row-btn" onclick="dismissReviewBanner()">DISMISS</button>
+      </div>
+
       <div id="taskQueue"></div>
 
       <div id="reentryPanel" style="display:none;">
@@ -1679,6 +1896,7 @@
             </button>
           </div>
           <button class="reentry-submit" onclick="submitReEntry()">TELL MUSE</button>
+          <button class="reentry-manual-link" onclick="attachVoiceDumpPhoto()" style="color:var(--magenta);">// attach photo</button>
           <div class="reentry-proposed" id="reentryProposed" style="display:none;">
             <div class="reentry-proposed-title">// MOVES</div>
             <div id="reentryProposedList"></div>
@@ -2054,52 +2272,57 @@ function getTodayDate() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-// ==================== DATA LOADING ====================
-async function loadTodayData() {
+// ==================== DATA LOADING (Project Board) ====================
+// Shape from GET /api/backlog:
+//   { summary: [{ project_id, project_name, priority, task_count, top:[{id,text,priority,recurring?,last_completed?}] }] }
+let boardSummary = [];
+
+async function loadTodayData() { return loadBoardData(); }
+
+async function loadBoardData() {
   try {
-    const res = await fetch('/api/today?_=' + Date.now());
-    if (!res.ok) throw new Error('fetch failed');
+    const res = await fetch('/api/backlog?_=' + Date.now(), {
+      headers: { 'X-Chief-Token': CHIEF_TOKEN }
+    });
+    if (!res.ok) throw new Error('backlog fetch failed: ' + res.status);
     const data = await res.json();
-
-    todayData = data;
-    // Normalize task fields — Chief queue uses 'task'/'project'/'pomodoros', app expects 'text'/'project_name'/'estimated_pomodoros'
-    queueTasks = (data.tasks || []).map(t => ({
-      ...t,
-      text: t.text || t.task || t.name || '',
-      project_name: t.project_name || t.project || '',
-      estimated_pomodoros: t.estimated_pomodoros || t.pomodoros || 1
-    })).sort((a,b) => a.priority - b.priority);
-
-    // Check if stale
-    if (data.date && data.date !== getTodayDate()) {
-      document.getElementById('staleBanner').style.display = 'block';
-      document.getElementById('staleBanner').textContent = `// Queue from ${data.date} \u2014 Muse hasn't updated yet`;
-    }
-
-    renderFinanceBar();
-    renderQueue();
-    renderNeedsYou();
-    renderCracks();
-    renderScoreboard();
-  } catch(e) {
-    todayData = null;
+    boardSummary = Array.isArray(data.summary) ? data.summary : [];
     queueTasks = [];
-    showReEntry();
-    document.getElementById('financeRow').style.display = 'none';
-    renderQueue();
+    boardSummary.forEach(proj => {
+      (proj.top || []).forEach(t => {
+        queueTasks.push({
+          ...t,
+          project_id: proj.project_id,
+          project_name: proj.project_name,
+          estimated_pomodoros: t.estimated_pomodoros || 1,
+          text: t.text || ''
+        });
+      });
+    });
+    renderProjectBoard();
+    renderScoreboard();
+  } catch (e) {
+    boardSummary = [];
+    queueTasks = [];
+    renderProjectBoard();
     renderScoreboard();
   }
 }
 
-function showReEntry() {
-  if (manualTasks && manualTasks.length > 0) {
-    document.getElementById('reentryPanel').style.display = 'none';
-    document.getElementById('manualFallback').style.display = 'none';
-    return;
-  }
-  document.getElementById('reentryPanel').style.display = 'block';
-  document.getElementById('manualFallback').style.display = 'none';
+// Legacy finance/needs/cracks surfaces: data source retired. No-op stubs.
+function renderFinanceBar() {
+  const el = document.getElementById('financeRow');
+  if (el) el.style.display = 'none';
 }
+function renderNeedsYou() {
+  const el = document.getElementById('needsYouSection');
+  if (el) el.style.display = 'none';
+}
+function renderCracks() {
+  const el = document.getElementById('cracksSection');
+  if (el) el.style.display = 'none';
+}
+function showReEntry() { /* retired post-PR4 */ }
 
 // ==================== FINANCE BAR ====================
 function renderFinanceBar() {
@@ -2130,83 +2353,334 @@ function renderFinanceBar() {
   document.getElementById('financePace').textContent = `DAY ${dayOfMonth}/${daysInMonth}`;
 }
 
-// ==================== QUEUE RENDERING ====================
-function renderQueue() {
+// ==================== PROJECT BOARD RENDERING ====================
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function renderQueue() { return renderProjectBoard(); }
+
+function renderProjectBoard() {
   const container = document.getElementById('taskQueue');
-  const allTasks = queueTasks.length > 0 ? queueTasks : manualTasks;
+  if (!container) return;
   container.innerHTML = '';
 
-  if (allTasks.length === 0 && !todayData) return;
+  const manualCard = manualTasks.length > 0 ? {
+    project_id: '_manual',
+    project_name: 'MANUAL',
+    priority: 0,
+    task_count: manualTasks.length,
+    top: manualTasks.map(t => ({
+      id: t.id,
+      text: t.text || t.task || t.name || '',
+      priority: t.priority || 3,
+      manual: true
+    }))
+  } : null;
 
-  let isFirstIncomplete = true;
+  const cards = [];
+  if (manualCard) cards.push(manualCard);
+  boardSummary.forEach(p => cards.push(p));
 
-  allTasks.forEach(task => {
-    const isCompleted = completedTaskIds.has(task.id);
-    const isManual = !!task.manual;
-    const health = task.health || 'gray';
-    const isRed = health === 'red';
-    const typeIcon = task.type === 'quick' ? '\u26A1' : '\uD83C\uDFAF';
-    const pomos = task.estimated_pomodoros || 1;
-    const pomosDone = taskPomosDone[task.id] || 0;
+  if (cards.length === 0) {
+    container.innerHTML = '<div class="board-empty"><div>// NO PROJECTS LOADED</div><span class="vd-cta" onclick="openVoiceDump()">● VOICE DUMP TO SEED</span></div>';
+    const btn = document.getElementById('startBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'ALL CLEAR'; }
+    return;
+  }
 
-    const div = document.createElement('div');
-    div.className = 'queue-task' + (isCompleted ? ' completed' : '') +
-      (isRed && !isCompleted ? ' health-red' : '') +
-      (health === 'yellow' && !isCompleted ? ' health-yellow' : '') +
-      (health === 'green' && !isCompleted ? ' health-green' : '');
+  cards.forEach(proj => {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.dataset.projectId = proj.project_id;
 
-    if (!isCompleted) {
-      // Use swipe-content wrapper for incomplete tasks
-      div.innerHTML = `
-        <div class="swipe-bg"><span class="swipe-done-label">DONE</span></div>
-        <div class="swipe-content">
-          <div class="task-info">
-            <div class="task-text">${escHtml(task.text || task.task || task.name || '')}</div>
-            <div class="task-meta">
-              ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
-              <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
-            </div>
-          </div>
-          ${isRed ? '<span class="task-2x">2X</span>' : ''}
-        </div>
-      `;
-      // Show swipe hint on first incomplete task, first time only
-      if (isFirstIncomplete && !swipeHintShown) {
-        const hint = document.createElement('div');
-        hint.className = 'swipe-hint';
-        hint.textContent = 'SWIPE \u2192';
-        div.appendChild(hint);
-        swipeHintShown = true;
-        saveState();
-      }
-      if (isFirstIncomplete) isFirstIncomplete = false;
-      setupSwipeToComplete(div, task);
-    } else {
-      div.innerHTML = `
-        <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;width:100%;">
-          <div class="task-info">
-            <div class="task-text">${escHtml(task.text || task.task || task.name || '')}</div>
-            <div class="task-meta">
-              ${task.project_name ? `<span class="task-project">${escHtml(task.project_name)}</span>` : ''}
-              <span class="task-type-pomo">${typeIcon} ${isManual ? '' : pomosDone + '/' + pomos}</span>
-            </div>
-          </div>
-          ${isRed ? '<span class="task-2x">2X</span>' : ''}
-        </div>
-      `;
+    const topPri = (proj.top || []).reduce((m, t) => Math.min(m, t.priority || 99), 99);
+    const dotClass = topPri <= 2 ? 'project-dot p-high' : 'project-dot';
+
+    const header = document.createElement('div');
+    header.className = 'project-card-header';
+    header.innerHTML =
+      '<span class="' + dotClass + '"></span>' +
+      '<span class="project-name">' + escHtml(proj.project_name || proj.project_id) + '</span>' +
+      '<span class="project-count">' + (proj.task_count || 0) + ' PENDING</span>' +
+      '<span class="project-expand">›</span>';
+    if (proj.project_id !== '_manual') {
+      header.onclick = () => openProjectDrawer(proj.project_id);
     }
-    container.appendChild(div);
+    card.appendChild(header);
+
+    const tasksWrap = document.createElement('div');
+    tasksWrap.className = 'project-tasks';
+
+    const rows = proj.top || [];
+    if (rows.length === 0) {
+      tasksWrap.innerHTML = '<div class="empty-row">// empty</div>';
+    } else {
+      rows.forEach(t => {
+        const row = buildTaskRow(t, proj);
+        tasksWrap.appendChild(row);
+      });
+    }
+    card.appendChild(tasksWrap);
+    container.appendChild(card);
   });
 
   const nextTask = getNextIncompleteTask();
   const btn = document.getElementById('startBtn');
-  if (nextTask) {
-    btn.disabled = false;
-    btn.textContent = 'EXECUTE';
-  } else if (allTasks.length > 0) {
-    btn.disabled = true;
-    btn.textContent = 'ALL CLEAR';
+  if (btn) {
+    if (nextTask) {
+      btn.disabled = false;
+      btn.textContent = 'EXECUTE';
+    } else {
+      btn.disabled = true;
+      btn.textContent = 'ALL CLEAR';
+    }
   }
+}
+
+function buildTaskRow(t, proj) {
+  const today = todayISO();
+  const doneToday = t.recurring === 'daily' && t.last_completed === today;
+  const isCompletedLocal = completedTaskIds.has(t.id);
+  const pri = Math.max(1, Math.min(5, parseInt(t.priority, 10) || 3));
+
+  const row = document.createElement('div');
+  row.className = 'task-row' + (doneToday || isCompletedLocal ? ' done-today' : '');
+  row.dataset.taskId = t.id;
+  row.dataset.projectId = proj.project_id;
+
+  row.innerHTML =
+    '<span class="p-badge p' + pri + '" title="Tap to change priority">P' + pri + '</span>' +
+    '<span class="task-row-text">' + escHtml(t.text || '') + '</span>' +
+    '<span class="task-row-actions">' +
+      '<button class="row-btn attach" title="Attach photo">◐</button>' +
+      '<button class="row-btn launch" title="Launch Pomodoro">▶</button>' +
+      '<button class="row-btn done" title="Mark done">' + (doneToday ? '✓' : '○') + '</button>' +
+    '</span>';
+
+  const pBadge = row.querySelector('.p-badge');
+  const attachBtn = row.querySelector('.row-btn.attach');
+  const launchBtn = row.querySelector('.row-btn.launch');
+  const doneBtn = row.querySelector('.row-btn.done');
+
+  attachBtn.onclick = (e) => {
+    e.stopPropagation();
+    openPhotoPicker({ kind: 'task', id: t.id, label: t.text });
+  };
+
+  if (proj.project_id !== '_manual') {
+    pBadge.onclick = (e) => {
+      e.stopPropagation();
+      cycleTaskPriority(proj.project_id, t.id, pri);
+    };
+  } else {
+    pBadge.style.cursor = 'default';
+  }
+
+  launchBtn.onclick = (e) => {
+    e.stopPropagation();
+    launchTask({
+      id: t.id,
+      text: t.text,
+      project_id: proj.project_id,
+      project_name: proj.project_name,
+      estimated_pomodoros: t.estimated_pomodoros || 1,
+      type: t.type || 'pomodoro',
+      manual: proj.project_id === '_manual'
+    });
+  };
+
+  doneBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (proj.project_id === '_manual') {
+      completedTaskIds.add(t.id);
+      saveState();
+      renderProjectBoard();
+      renderScoreboard();
+    } else {
+      completeBacklogTask(proj.project_id, t.id);
+    }
+  };
+
+  return row;
+}
+
+async function completeBacklogTask(projectId, taskId) {
+  try {
+    const res = await fetch('/api/backlog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify({ op: 'complete', project_id: projectId, task_id: taskId })
+    });
+    if (!res.ok) throw new Error('complete failed: ' + res.status);
+    if (typeof playTaskComplete === 'function') playTaskComplete();
+  } catch (e) {
+    console.error('complete failed', e);
+  }
+  await loadBoardData();
+}
+
+async function cycleTaskPriority(projectId, taskId, currentPri) {
+  const next = currentPri >= 5 ? 1 : currentPri + 1;
+  try {
+    const res = await fetch('/api/backlog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify({ op: 'set_priority', project_id: projectId, task_id: taskId, priority: next })
+    });
+    if (!res.ok) throw new Error('set_priority failed: ' + res.status);
+  } catch (e) {
+    console.error('priority cycle failed', e);
+  }
+  await loadBoardData();
+}
+
+let _photoInput = null;
+function ensurePhotoInput() {
+  if (_photoInput) return _photoInput;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/jpeg,image/png,image/webp';
+  input.style.display = 'none';
+  document.body.appendChild(input);
+  _photoInput = input;
+  return input;
+}
+
+function openPhotoPicker(attachedTo) {
+  const input = ensurePhotoInput();
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    input.value = '';
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Photo exceeds 5MB limit');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result || '';
+      const base64 = String(dataUrl).split(',')[1] || '';
+      if (!base64) return;
+      try {
+        showToast('Uploading…');
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+          body: JSON.stringify({
+            image: base64,
+            mimeType: file.type,
+            attached_to: { kind: attachedTo.kind, id: attachedTo.id }
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
+          showToast('Photo attached');
+        } else {
+          showToast('Upload failed: ' + (data.error || res.status));
+        }
+      } catch (e) {
+        showToast('Upload failed: ' + (e.message || 'network'));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function showToast(text) {
+  let t = document.getElementById('miniToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'miniToast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--cyan);font-family:"Share Tech Mono",monospace;font-size:0.75rem;letter-spacing:1.5px;padding:8px 14px;border:1px solid var(--cyan);border-radius:2px;z-index:1100;pointer-events:none;transition:opacity 0.2s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = text;
+  t.style.opacity = '1';
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => { t.style.opacity = '0'; }, 2400);
+}
+
+function openVoiceDump() {
+  const panel = document.getElementById('reentryPanel');
+  if (panel) panel.style.display = 'block';
+  const mic = document.getElementById('reentryMicBtn');
+  if (mic) mic.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function attachVoiceDumpPhoto() {
+  openPhotoPicker({ kind: 'wrap', id: todayISO() });
+}
+
+// Per-project drawer
+let currentDrawerProject = null;
+async function openProjectDrawer(projectId) {
+  currentDrawerProject = projectId;
+  let drawer = document.getElementById('projectDrawer');
+  let backdrop = document.getElementById('drawerBackdrop');
+  if (!drawer) {
+    drawer = document.createElement('div');
+    drawer.id = 'projectDrawer';
+    drawer.className = 'project-drawer';
+    document.body.appendChild(drawer);
+  }
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'drawerBackdrop';
+    backdrop.className = 'drawer-backdrop';
+    backdrop.onclick = closeProjectDrawer;
+    document.body.appendChild(backdrop);
+  }
+  drawer.innerHTML =
+    '<div class="project-drawer-header">' +
+      '<span class="project-drawer-title">LOADING…</span>' +
+      '<button class="project-drawer-close" onclick="closeProjectDrawer()">✕</button>' +
+    '</div>' +
+    '<div id="projectDrawerBody" style="padding:8px 0 24px;"></div>';
+  requestAnimationFrame(() => {
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+  });
+  try {
+    const res = await fetch('/api/backlog?project_id=' + encodeURIComponent(projectId) + '&_=' + Date.now(), {
+      headers: { 'X-Chief-Token': CHIEF_TOKEN }
+    });
+    if (!res.ok) throw new Error('drawer fetch: ' + res.status);
+    const data = await res.json();
+    renderProjectDrawer(data.backlog);
+  } catch (e) {
+    const body = document.getElementById('projectDrawerBody');
+    if (body) body.innerHTML = '<div class="board-empty">// FAILED TO LOAD</div>';
+  }
+}
+
+function renderProjectDrawer(backlog) {
+  if (!backlog) return;
+  const title = document.querySelector('#projectDrawer .project-drawer-title');
+  if (title) title.textContent = (backlog.project_name || backlog.project_id || '').toUpperCase();
+  const body = document.getElementById('projectDrawerBody');
+  if (!body) return;
+  const tasks = (backlog.tasks || []).slice().sort((a, b) => (a.priority || 99) - (b.priority || 99));
+  if (tasks.length === 0) {
+    body.innerHTML = '<div class="board-empty">// NO TASKS</div>';
+    return;
+  }
+  body.innerHTML = '';
+  tasks.forEach(t => {
+    const projProxy = { project_id: backlog.project_id, project_name: backlog.project_name };
+    const row = buildTaskRow(t, projProxy);
+    if (t.status === 'done') row.classList.add('done-today');
+    body.appendChild(row);
+  });
+}
+
+function closeProjectDrawer() {
+  const drawer = document.getElementById('projectDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (drawer) drawer.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+  currentDrawerProject = null;
 }
 
 function renderNeedsYou() {
@@ -2561,10 +3035,11 @@ async function submitReEntry() {
   submitBtn.textContent = 'THINKING...';
   hint.textContent = '// Muse is thinking...';
   try {
-    const res = await fetch('/api/re-entry', {
+    // /api/re-entry retired. Route dumps through /api/chief instead.
+    const res = await fetch('/api/chief', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
-      body: JSON.stringify({ dump })
+      body: JSON.stringify({ message: dump, conversation: [], appState: { date: getTodayDate() } })
     });
     if (!res.ok) {
       submitBtn.disabled = false;
@@ -3299,75 +3774,15 @@ function buildResultsPayload() {
   };
 }
 
-async function syncResults() {
-  if (syncInFlight) return;
-  syncInFlight = true;
-  try {
-    const payload = buildResultsPayload();
-    const chiefToken = CHIEF_TOKEN;
-    const headers = { 'Content-Type': 'application/json' };
-    if (chiefToken) headers['X-Chief-Token'] = chiefToken;
-    const res = await fetch('/api/sync', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ type: 'results', payload, sha: lastTodaySha })
-    });
-    if (!res.ok) throw new Error('sync failed');
-    const data = await res.json();
-    if (data.sha) lastTodaySha = data.sha;
-    localStorage.removeItem('the-grind-sync-queue');
-  } catch (e) {
-    queueOfflineSync(buildResultsPayload());
-  } finally {
-    syncInFlight = false;
-  }
-}
-
-function queueOfflineSync(payload) {
-  localStorage.setItem('the-grind-sync-queue', JSON.stringify({
-    payload, queued_at: new Date().toISOString()
-  }));
-}
-
-async function drainOfflineQueue() {
-  const raw = localStorage.getItem('the-grind-sync-queue');
-  if (!raw) return;
-  try {
-    const { payload } = JSON.parse(raw);
-    const res = await fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'results', payload, sha: lastTodaySha })
-    });
-    if (res.ok) {
-      localStorage.removeItem('the-grind-sync-queue');
-      const data = await res.json();
-      if (data.sha) lastTodaySha = data.sha;
-    }
-  } catch (e) { /* retry later */ }
-}
-
-function debouncedSync() {
-  if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(syncResults, SYNC_DEBOUNCE);
-}
-
-// ==================== TODAY POLLING ====================
-function startPolling() {
-  pollInterval = setInterval(async () => {
-    try {
-      const res = await fetch('/api/check-update');
-      if (!res.ok) return;
-      const { sha } = await res.json();
-      if (lastTodaySha && sha !== lastTodaySha) {
-        lastTodaySha = sha;
-        await loadTodayData();
-      } else if (!lastTodaySha) {
-        lastTodaySha = sha;
-      }
-    } catch(e) {}
-  }, 120000);
-}
+// ==================== RETIRED: results sync + today polling ====================
+// Post-PR4: /api/sync only accepts conversation_append. /api/check-update and
+// /api/today are deleted. These stubs exist so any stragglers calling them
+// are no-ops and don't throw.
+async function syncResults() { /* retired */ }
+function queueOfflineSync() { /* retired */ }
+async function drainOfflineQueue() { /* retired */ }
+function debouncedSync() { /* retired */ }
+function startPolling() { /* retired */ }
 
 // ==================== CHIEF CHAT ====================
 let chiefVerified = false;
@@ -3460,6 +3875,28 @@ function renderChiefMessages() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
+function isFirstTurnToday() {
+  try {
+    const key = 'the-grind-first-turn';
+    const today = new Date().toISOString().slice(0, 10);
+    return localStorage.getItem(key) !== today;
+  } catch { return false; }
+}
+function markFirstTurnUsed() {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem('the-grind-first-turn', today);
+  } catch {}
+}
+function showReviewBanner() {
+  const b = document.getElementById('reviewBanner');
+  if (b) b.classList.add('show');
+}
+function dismissReviewBanner() {
+  const b = document.getElementById('reviewBanner');
+  if (b) b.classList.remove('show');
+}
+
 async function sendChiefMessage() {
   const input = document.getElementById('chiefInput');
   const text = input.value.trim();
@@ -3500,7 +3937,8 @@ async function sendChiefMessage() {
       body: JSON.stringify({
         message: text,
         conversation: chiefConversation.filter(m => m.role === 'user' || m.role === 'assistant').slice(0, -1),
-        appState
+        appState,
+        firstTurnToday: isFirstTurnToday()
       })
     });
 
@@ -3531,6 +3969,8 @@ async function sendChiefMessage() {
     chiefVerified = true;
     updateChiefStatus();
     localStorage.setItem(CHIEF_STORAGE, JSON.stringify({ date: getTodayDate(), messages: chiefConversation.slice(-30) }));
+    markFirstTurnUsed();
+    if (data && data.priority_review) showReviewBanner();
     messagesEl.scrollTop = messagesEl.scrollHeight;
   } catch(e) {
     if (typingEl.parentNode) typingEl.remove();
@@ -3575,210 +4015,185 @@ function appendActionMsg(text) {
 
 function executeChiefActions(actions) {
   if (!Array.isArray(actions)) return;
-  const messagesEl = document.getElementById('chiefMessages');
+
+  const backlogOps = [];
+  let touchedBacklog = false;
+  let touchedRegistry = false;
 
   actions.forEach(rawAction => {
-    // Normalize: extract action type and payload fields
     const actionType = rawAction.type;
     let fields = {};
-
     if (rawAction.payload && typeof rawAction.payload === 'object') {
       fields = { ...rawAction.payload };
     } else {
-      // Handle {complete_task: {task_id}} format
-      const keys = Object.keys(rawAction);
-      const actionKey = keys.find(k => ['add_task','remove_task','reorder_tasks','skip_task','complete_task','update_finance','launch_task'].includes(k));
-      if (actionKey && typeof rawAction[actionKey] === 'object') {
-        fields = { ...rawAction[actionKey] };
-        if (!actionType) rawAction.type = actionKey;
-      } else {
-        fields = { ...rawAction };
-      }
+      fields = { ...rawAction };
     }
-    // Build normalized action — preserve actionType, rename payload's "type" to "task_type"
     const action = { ...fields };
     action.type = actionType || rawAction.type;
-    if (fields.type && fields.type !== actionType) action.task_type = fields.type;
-    // Normalize task_id → id
     if (action.task_id && !action.id) action.id = action.task_id;
 
-    switch(action.type) {
-      case 'add_task': {
-        const taskType = action.task_type || 'pomodoro';
-        const newTask = {
-          id: 'chief-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-          text: action.text,
-          type: ['quick','pomodoro'].includes(taskType) ? taskType : 'pomodoro',
-          estimated_pomodoros: action.estimated_pomodoros || 1,
-          priority: action.priority || queueTasks.length + 1,
-          health: action.health || 'gray',
-          category: action.category || null,
-          project_name: action.project_name || null
-        };
-        queueTasks.push(newTask);
-        queueTasks.sort((a,b) => a.priority - b.priority);
-        const actionMsg = document.createElement('div');
-        actionMsg.className = 'chief-msg action';
-        actionMsg.textContent = `+ Added: ${newTask.text}`;
-        messagesEl.appendChild(actionMsg);
-        chiefConversation.push({ role: 'action', content: `+ Added: ${newTask.text}` });
-        break;
-      }
-      case 'remove_task': {
-        const idx = queueTasks.findIndex(t => t.id === action.id);
-        if (idx >= 0) {
-          const removed = queueTasks.splice(idx, 1)[0];
-          const actionMsg = document.createElement('div');
-          actionMsg.className = 'chief-msg action';
-          actionMsg.textContent = `- Removed: ${removed.text || removed.name}`;
-          messagesEl.appendChild(actionMsg);
-          chiefConversation.push({ role: 'action', content: `- Removed: ${removed.text || removed.name}` });
-        }
-        break;
-      }
-      case 'reorder_tasks': {
-        if (Array.isArray(action.order)) {
-          const taskMap = {};
-          queueTasks.forEach(t => taskMap[t.id] = t);
-          const reordered = [];
-          action.order.forEach((id, i) => {
-            if (taskMap[id]) {
-              taskMap[id].priority = i + 1;
-              reordered.push(taskMap[id]);
-            }
-          });
-          queueTasks.forEach(t => { if (!action.order.includes(t.id)) reordered.push(t); });
-          queueTasks.length = 0;
-          queueTasks.push(...reordered);
-          const actionMsg = document.createElement('div');
-          actionMsg.className = 'chief-msg action';
-          actionMsg.textContent = '~ Reordered queue';
-          messagesEl.appendChild(actionMsg);
-          chiefConversation.push({ role: 'action', content: '~ Reordered queue' });
-        }
-        break;
-      }
-      case 'skip_task': {
-        const task = queueTasks.find(t => t.id === action.id);
-        if (task) {
-          completedTaskIds.add(task.id);
-          const actionMsg = document.createElement('div');
-          actionMsg.className = 'chief-msg action';
-          actionMsg.textContent = `~ Skipped: ${task.text || task.name}`;
-          messagesEl.appendChild(actionMsg);
-          chiefConversation.push({ role: 'action', content: `~ Skipped: ${task.text || task.name}` });
-        }
-        break;
-      }
-      case 'complete_task': {
-        const task = queueTasks.find(t => t.id === action.id);
-        if (task && !completedTaskIds.has(task.id)) {
-          completedTaskIds.add(task.id);
-          tasksCompleted++;
-          taskPomosDone[task.id] = task.estimated_pomodoros || 1;
-          if (task.category) categoriesTouched.add(task.category);
-          const actionMsg = document.createElement('div');
-          actionMsg.className = 'chief-msg action';
-          actionMsg.textContent = `\u2713 Completed: ${task.text || task.name}`;
-          messagesEl.appendChild(actionMsg);
-          chiefConversation.push({ role: 'action', content: `\u2713 Completed: ${task.text || task.name}` });
-        }
-        break;
-      }
-      case 'update_finance': {
-        if (todayData && todayData.finances && action.month_income !== undefined) {
-          todayData.finances.month_income = action.month_income;
-          renderFinanceBar();
-          const actionMsg = document.createElement('div');
-          actionMsg.className = 'chief-msg action';
-          actionMsg.textContent = `$ Updated finances`;
-          messagesEl.appendChild(actionMsg);
-          chiefConversation.push({ role: 'action', content: '$ Updated finances' });
-        }
-        break;
-      }
-      case 'launch_task': {
-        const task = queueTasks.find(t => t.id === action.id);
-        if (task) {
-          launchTask(task);
-          if (chiefOpen) toggleChief();
-        }
-        break;
-      }
+    switch (action.type) {
       case 'add_to_backlog': {
-        callBacklogApi({
+        if (!action.project_id || !action.text) break;
+        const pri = Math.max(1, Math.min(5, parseInt(action.priority, 10) || 3));
+        backlogOps.push(callBacklogApi({
           op: 'add',
           project_id: action.project_id,
           task: {
             text: action.text,
+            priority: pri,
             done_condition: action.done_condition || null,
             category: action.category || null,
             estimated_pomodoros: action.estimated_pomodoros || null
           }
         }).then(r => {
-          const label = r?.task?.id ? `${action.project_id}:${r.task.id}` : action.project_id;
-          const msg = r?.ok
-            ? `+ Backlog [${label}]: ${action.text}`
-            : `! Backlog add failed: ${r?.error || 'unknown'}`;
+          const msg = r && r.ok
+            ? '+ Backlog [' + action.project_id + ']: ' + action.text + ' (P' + pri + ')'
+            : '! Backlog add failed: ' + (r && r.error ? r.error : 'unknown');
           appendActionMsg(msg);
-        });
+        }));
+        touchedBacklog = true;
+        break;
+      }
+      case 'set_task_priority': {
+        if (!action.project_id || !action.id) break;
+        const pri = Math.max(1, Math.min(5, parseInt(action.priority, 10) || 3));
+        backlogOps.push(callBacklogApi({
+          op: 'set_priority',
+          project_id: action.project_id,
+          task_id: action.id,
+          priority: pri
+        }).then(r => {
+          const msg = r && r.ok
+            ? '~ [' + action.project_id + '] ' + action.id + ' → P' + pri
+            : '! set_priority failed: ' + (r && r.error ? r.error : 'unknown');
+          appendActionMsg(msg);
+        }));
+        touchedBacklog = true;
+        break;
+      }
+      case 'complete_backlog_task':
+      case 'complete_task': {
+        if (!action.project_id || !action.id) break;
+        backlogOps.push(callBacklogApi({
+          op: 'complete',
+          project_id: action.project_id,
+          task_id: action.id
+        }).then(r => {
+          const msg = r && r.ok
+            ? '✓ Completed [' + action.project_id + '] ' + action.id
+            : '! complete failed: ' + (r && r.error ? r.error : 'unknown');
+          appendActionMsg(msg);
+        }));
+        touchedBacklog = true;
         break;
       }
       case 'remove_from_backlog': {
-        callBacklogApi({
+        if (!action.project_id || !action.id) break;
+        backlogOps.push(callBacklogApi({
           op: 'remove',
           project_id: action.project_id,
-          task_id: action.task_id
+          task_id: action.id
         }).then(r => {
-          const msg = r?.ok
-            ? `- Backlog [${action.project_id}]: removed ${action.task_id}`
-            : `! Backlog remove failed: ${r?.error || 'unknown'}`;
+          const msg = r && r.ok
+            ? '- Removed [' + action.project_id + '] ' + action.id
+            : '! remove failed: ' + (r && r.error ? r.error : 'unknown');
           appendActionMsg(msg);
-        });
+        }));
+        touchedBacklog = true;
         break;
       }
-      case 'load_more': {
-        callBacklogApi({
-          op: 'load',
+      case 'reorder_backlog': {
+        if (!action.project_id || !Array.isArray(action.order)) break;
+        backlogOps.push(callBacklogApi({
+          op: 'reorder',
           project_id: action.project_id,
-          count: action.count || 3
+          order: action.order
         }).then(r => {
-          if (!r?.ok || !Array.isArray(r.tasks)) {
-            appendActionMsg(`! Load failed: ${r?.error || 'unknown'}`);
-            return;
-          }
-          const basePriority = queueTasks.length
-            ? Math.max(...queueTasks.map(t => t.priority || 0))
-            : 0;
-          r.tasks.forEach((t, i) => {
-            queueTasks.push({
-              id: t.id,
-              text: t.text,
-              type: 'pomodoro',
-              estimated_pomodoros: t.estimated_pomodoros || 2,
-              priority: basePriority + i + 1,
-              health: 'gray',
-              category: t.category || null,
-              project_name: r.project_name || action.project_id
-            });
-          });
-          appendActionMsg(`+ Loaded ${r.tasks.length} from ${r.project_name || action.project_id}`);
-          renderQueue();
-          renderScoreboard();
-          saveState();
-          syncTodayJson();
-        });
+          const msg = r && r.ok
+            ? '~ Reordered [' + action.project_id + ']'
+            : '! reorder failed: ' + (r && r.error ? r.error : 'unknown');
+          appendActionMsg(msg);
+        }));
+        touchedBacklog = true;
         break;
+      }
+      case 'add_project': {
+        if (!action.id || !action.name) break;
+        backlogOps.push(callProjectApi({
+          op: 'add',
+          project: {
+            id: action.id,
+            name: action.name,
+            priority: action.priority || 10,
+            aliases: Array.isArray(action.aliases) ? action.aliases : []
+          }
+        }).then(r => {
+          const msg = r && r.ok
+            ? '+ Project: ' + action.name + ' [' + action.id + ']'
+            : '! add_project failed: ' + (r && r.error ? r.error : 'unknown');
+          appendActionMsg(msg);
+        }));
+        touchedRegistry = true;
+        break;
+      }
+      case 'archive_project': {
+        if (!action.project_id) break;
+        backlogOps.push(callProjectApi({
+          op: 'archive',
+          project_id: action.project_id
+        }).then(r => {
+          const msg = r && r.ok
+            ? '~ Archived: ' + action.project_id
+            : '! archive failed: ' + (r && r.error ? r.error : 'unknown');
+          appendActionMsg(msg);
+        }));
+        touchedRegistry = true;
+        break;
+      }
+      case 'activate_project': {
+        if (!action.project_id) break;
+        backlogOps.push(callProjectApi({
+          op: 'activate',
+          project_id: action.project_id
+        }).then(r => {
+          const msg = r && r.ok
+            ? '~ Activated: ' + action.project_id
+            : '! activate failed: ' + (r && r.error ? r.error : 'unknown');
+          appendActionMsg(msg);
+        }));
+        touchedRegistry = true;
+        break;
+      }
+      default: {
+        // Unknown / retired action type — quietly skip.
+        console.warn('Unknown Muse action type:', action.type, action);
       }
     }
   });
 
-  renderQueue();
-  renderScoreboard();
-  saveState();
-  debouncedSync();
-  syncTodayJson();
-  debouncedSync();
+  if (backlogOps.length) {
+    Promise.all(backlogOps).then(() => {
+      if (touchedBacklog || touchedRegistry) {
+        loadBoardData();
+      }
+    });
+  }
+}
+
+async function callProjectApi(body) {
+  try {
+    const res = await fetch('/api/project', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: (data && data.error) || ('HTTP ' + res.status) };
+    return data;
+  } catch (e) {
+    return { ok: false, error: e.message || 'network error' };
+  }
 }
 
 function buildAppState() {

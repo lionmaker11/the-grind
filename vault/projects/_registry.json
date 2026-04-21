@@ -11,6 +11,15 @@
       "aliases": ["Pallister"]
     },
     {
+      "id": "fitness",
+      "name": "Fitness",
+      "status": "active",
+      "priority": 2,
+      "folder": "vault/projects/fitness",
+      "aliases": ["workout", "gym", "training"],
+      "note": "Recurring daily workout task (P1) lives here. Add any other movement/fitness tasks to this backlog."
+    },
+    {
       "id": "fast-track-uig",
       "name": "FastTrack UIG",
       "status": "active",

@@ -20,7 +20,8 @@ export const ID_PREFIX = {
   'marcus': 'mrc',
   'mcd-agent-org': 'mao',
   'biggerspreads': 'bs',
-  'lionmaker': 'lm'
+  'lionmaker': 'lm',
+  'fitness': 'fit'
 };
 
 export function readRegistry() {

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "project_id": "fitness",
+  "project_name": "Fitness",
+  "tasks": [
+    {
+      "id": "fit-001",
+      "text": "30 minute minimum workout",
+      "done_condition": "30 minutes of movement logged",
+      "category": "Health",
+      "priority": 1,
+      "status": "pending",
+      "recurring": "daily",
+      "created": "2026-04-21"
+    }
+  ]
+}
