@@ -47,7 +47,7 @@
 
   --text:         #e0e6f0;
   --text-dim:     rgba(200, 210, 230, 0.55);
-  --text-muted:   rgba(200, 210, 230, 0.30);
+  --text-muted:   rgba(200, 210, 230, 0.60);
 
   /* ---------- PRIORITY MAP ---------- */
   --p1: var(--cyan);
