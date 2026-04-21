@@ -3516,17 +3516,11 @@ async function sendChiefMessage() {
 
     const data = await res.json();
     typingEl.remove();
-    const fullText = data.text || '';
+    const displayText = (data.text || '').trim();
 
-    // Parse actions
-    const actionsIdx = fullText.indexOf('---ACTIONS---');
-    if (actionsIdx >= 0) {
-      const actionsRaw = fullText.substring(actionsIdx + 13).trim();
-      if (actionsRaw) {
-        try { executeChiefActions(JSON.parse(actionsRaw)); } catch(e) { console.error('Chief action error:', e, actionsRaw); }
-      }
+    if (Array.isArray(data.actions) && data.actions.length) {
+      try { executeChiefActions(data.actions); } catch(e) { console.error('Chief action error:', e, data.actions); }
     }
-    const displayText = (actionsIdx >= 0 ? fullText.substring(0, actionsIdx) : fullText).trim();
 
     const chiefMsgEl = document.createElement('div');
     chiefMsgEl.className = 'chief-msg chief';
