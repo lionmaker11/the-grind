@@ -2054,52 +2054,57 @@ function getTodayDate() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-// ==================== DATA LOADING ====================
-async function loadTodayData() {
+// ==================== DATA LOADING (Project Board) ====================
+// Shape from GET /api/backlog:
+//   { summary: [{ project_id, project_name, priority, task_count, top:[{id,text,priority,recurring?,last_completed?}] }] }
+let boardSummary = [];
+
+async function loadTodayData() { return loadBoardData(); }
+
+async function loadBoardData() {
   try {
-    const res = await fetch('/api/today?_=' + Date.now());
-    if (!res.ok) throw new Error('fetch failed');
+    const res = await fetch('/api/backlog?_=' + Date.now(), {
+      headers: { 'X-Chief-Token': CHIEF_TOKEN }
+    });
+    if (!res.ok) throw new Error('backlog fetch failed: ' + res.status);
     const data = await res.json();
-
-    todayData = data;
-    // Normalize task fields — Chief queue uses 'task'/'project'/'pomodoros', app expects 'text'/'project_name'/'estimated_pomodoros'
-    queueTasks = (data.tasks || []).map(t => ({
-      ...t,
-      text: t.text || t.task || t.name || '',
-      project_name: t.project_name || t.project || '',
-      estimated_pomodoros: t.estimated_pomodoros || t.pomodoros || 1
-    })).sort((a,b) => a.priority - b.priority);
-
-    // Check if stale
-    if (data.date && data.date !== getTodayDate()) {
-      document.getElementById('staleBanner').style.display = 'block';
-      document.getElementById('staleBanner').textContent = `// Queue from ${data.date} \u2014 Muse hasn't updated yet`;
-    }
-
-    renderFinanceBar();
-    renderQueue();
-    renderNeedsYou();
-    renderCracks();
-    renderScoreboard();
-  } catch(e) {
-    todayData = null;
+    boardSummary = Array.isArray(data.summary) ? data.summary : [];
     queueTasks = [];
-    showReEntry();
-    document.getElementById('financeRow').style.display = 'none';
-    renderQueue();
+    boardSummary.forEach(proj => {
+      (proj.top || []).forEach(t => {
+        queueTasks.push({
+          ...t,
+          project_id: proj.project_id,
+          project_name: proj.project_name,
+          estimated_pomodoros: t.estimated_pomodoros || 1,
+          text: t.text || ''
+        });
+      });
+    });
+    renderProjectBoard();
+    renderScoreboard();
+  } catch (e) {
+    boardSummary = [];
+    queueTasks = [];
+    renderProjectBoard();
     renderScoreboard();
   }
 }
 
-function showReEntry() {
-  if (manualTasks && manualTasks.length > 0) {
-    document.getElementById('reentryPanel').style.display = 'none';
-    document.getElementById('manualFallback').style.display = 'none';
-    return;
-  }
-  document.getElementById('reentryPanel').style.display = 'block';
-  document.getElementById('manualFallback').style.display = 'none';
+// Legacy finance/needs/cracks surfaces: data source retired. No-op stubs.
+function renderFinanceBar() {
+  const el = document.getElementById('financeRow');
+  if (el) el.style.display = 'none';
 }
+function renderNeedsYou() {
+  const el = document.getElementById('needsYouSection');
+  if (el) el.style.display = 'none';
+}
+function renderCracks() {
+  const el = document.getElementById('cracksSection');
+  if (el) el.style.display = 'none';
+}
+function showReEntry() { /* retired post-PR4 */ }
 
 // ==================== FINANCE BAR ====================
 function renderFinanceBar() {
@@ -2561,10 +2566,11 @@ async function submitReEntry() {
   submitBtn.textContent = 'THINKING...';
   hint.textContent = '// Muse is thinking...';
   try {
-    const res = await fetch('/api/re-entry', {
+    // /api/re-entry retired. Route dumps through /api/chief instead.
+    const res = await fetch('/api/chief', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
-      body: JSON.stringify({ dump })
+      body: JSON.stringify({ message: dump, conversation: [], appState: { date: getTodayDate() } })
     });
     if (!res.ok) {
       submitBtn.disabled = false;
@@ -3299,75 +3305,15 @@ function buildResultsPayload() {
   };
 }
 
-async function syncResults() {
-  if (syncInFlight) return;
-  syncInFlight = true;
-  try {
-    const payload = buildResultsPayload();
-    const chiefToken = CHIEF_TOKEN;
-    const headers = { 'Content-Type': 'application/json' };
-    if (chiefToken) headers['X-Chief-Token'] = chiefToken;
-    const res = await fetch('/api/sync', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ type: 'results', payload, sha: lastTodaySha })
-    });
-    if (!res.ok) throw new Error('sync failed');
-    const data = await res.json();
-    if (data.sha) lastTodaySha = data.sha;
-    localStorage.removeItem('the-grind-sync-queue');
-  } catch (e) {
-    queueOfflineSync(buildResultsPayload());
-  } finally {
-    syncInFlight = false;
-  }
-}
-
-function queueOfflineSync(payload) {
-  localStorage.setItem('the-grind-sync-queue', JSON.stringify({
-    payload, queued_at: new Date().toISOString()
-  }));
-}
-
-async function drainOfflineQueue() {
-  const raw = localStorage.getItem('the-grind-sync-queue');
-  if (!raw) return;
-  try {
-    const { payload } = JSON.parse(raw);
-    const res = await fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'results', payload, sha: lastTodaySha })
-    });
-    if (res.ok) {
-      localStorage.removeItem('the-grind-sync-queue');
-      const data = await res.json();
-      if (data.sha) lastTodaySha = data.sha;
-    }
-  } catch (e) { /* retry later */ }
-}
-
-function debouncedSync() {
-  if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(syncResults, SYNC_DEBOUNCE);
-}
-
-// ==================== TODAY POLLING ====================
-function startPolling() {
-  pollInterval = setInterval(async () => {
-    try {
-      const res = await fetch('/api/check-update');
-      if (!res.ok) return;
-      const { sha } = await res.json();
-      if (lastTodaySha && sha !== lastTodaySha) {
-        lastTodaySha = sha;
-        await loadTodayData();
-      } else if (!lastTodaySha) {
-        lastTodaySha = sha;
-      }
-    } catch(e) {}
-  }, 120000);
-}
+// ==================== RETIRED: results sync + today polling ====================
+// Post-PR4: /api/sync only accepts conversation_append. /api/check-update and
+// /api/today are deleted. These stubs exist so any stragglers calling them
+// are no-ops and don't throw.
+async function syncResults() { /* retired */ }
+function queueOfflineSync() { /* retired */ }
+async function drainOfflineQueue() { /* retired */ }
+function debouncedSync() { /* retired */ }
+function startPolling() { /* retired */ }
 
 // ==================== CHIEF CHAT ====================
 let chiefVerified = false;
