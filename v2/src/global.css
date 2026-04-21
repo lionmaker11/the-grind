@@ -186,7 +186,8 @@ body::after {
 /* ---- Buttons ---- */
 .btn-primary {
   padding: 14px 40px;
-  background: linear-gradient(135deg, var(--cyan), color-mix(in srgb, var(--cyan) 82%, var(--bg)));
+  /* one-off: consider tokenizing if reused — mockup 01 EXECUTE button gradient endpoint */
+  background: linear-gradient(135deg, var(--cyan), #00c8ff);
   color: var(--bg);
   font-family: var(--font-display);
   font-size: 0.82rem;
