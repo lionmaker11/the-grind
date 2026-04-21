@@ -3032,14 +3032,18 @@ async function submitReEntry() {
   const submitBtn = document.querySelector('.reentry-submit');
   const hint = document.getElementById('reentryHint');
   submitBtn.disabled = true;
-  submitBtn.textContent = 'THINKING...';
-  hint.textContent = '// Muse is thinking...';
+  submitBtn.textContent = 'SENDING...';
+  hint.textContent = '// Muse is filing...';
   try {
-    // /api/re-entry retired. Route dumps through /api/chief instead.
     const res = await fetch('/api/chief', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Chief-Token': CHIEF_TOKEN },
-      body: JSON.stringify({ message: dump, conversation: [], appState: { date: getTodayDate() } })
+      body: JSON.stringify({
+        message: dump,
+        conversation: [],
+        appState: buildAppState(),
+        firstTurnToday: isFirstTurnToday()
+      })
     });
     if (!res.ok) {
       submitBtn.disabled = false;
@@ -3048,8 +3052,35 @@ async function submitReEntry() {
       return;
     }
     const data = await res.json();
-    renderReEntryProposed(data.tasks || []);
-  } catch {
+    markFirstTurnUsed();
+    if (data && data.priority_review) showReviewBanner();
+
+    // Log the exchange into the chief conversation so it shows up if the user
+    // opens the Muse chat drawer.
+    chiefConversation.push({ role: 'user', content: dump });
+    const reply = (data && data.text ? String(data.text) : '').trim();
+    if (reply) chiefConversation.push({ role: 'assistant', content: reply });
+    try {
+      localStorage.setItem(CHIEF_STORAGE, JSON.stringify({
+        date: getTodayDate(),
+        messages: chiefConversation.slice(-30)
+      }));
+    } catch {}
+
+    // Execute any actions Muse returned (add_to_backlog etc.)
+    if (Array.isArray(data.actions) && data.actions.length) {
+      try { executeChiefActions(data.actions); } catch (e) { console.error(e); }
+    }
+
+    resetReEntry();
+    document.getElementById('reentryPanel').style.display = 'none';
+    if (reply) showToast(reply.length > 80 ? reply.slice(0, 77) + '...' : reply);
+    else showToast('Filed');
+
+    // Chief badge pip so user sees there is a new message waiting
+    const badge = document.getElementById('chiefBadge');
+    if (badge && !chiefOpen) badge.classList.add('show');
+  } catch (e) {
     submitBtn.disabled = false;
     submitBtn.textContent = 'TRY AGAIN';
     hint.textContent = '// connection failed — try again';
