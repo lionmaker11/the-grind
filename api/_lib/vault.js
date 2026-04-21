@@ -125,3 +125,51 @@ export function detroitDayOfWeek(date = new Date()) {
   const wd = parts.find(p => p.type === 'weekday')?.value;
   return { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[wd] ?? -1;
 }
+
+// ─── GitHub live reads ────────────────────────────────────────────────
+// GET handlers must read from the same source the POST path writes to,
+// otherwise read-after-write consistency is bounded by the Vercel deploy
+// cycle (the bundled /vault/ is frozen at build time). Matches the
+// ghRequest pattern in api/backlog.js and api/project.js write paths.
+
+const GH_REPO = 'lionmaker11/the-grind';
+
+async function ghGet(path) {
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
+    headers: {
+      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'the-grind-vault'
+    }
+  });
+  if (!resp.ok) return null;
+  const data = await resp.json();
+  try { return JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8')); }
+  catch { return null; }
+}
+
+export async function fetchRegistryLive() {
+  return ghGet('vault/projects/_registry.json');
+}
+
+export async function fetchBacklogLive(projectId) {
+  return ghGet(`vault/projects/${projectId}/backlog.json`);
+}
+
+export async function getBacklogSummaryLive({ topN = 3 } = {}) {
+  const registry = await fetchRegistryLive();
+  const active = getActiveProjects(registry);
+  const rows = await Promise.all(active.map(async (p) => {
+    const bl = await fetchBacklogLive(p.id);
+    if (!bl) return null;
+    const pending = sortByPriority((bl.tasks || []).filter(t => t.status !== 'done'));
+    return {
+      project_id: p.id,
+      project_name: bl.project_name || p.name,
+      project_priority: p.priority || 999,
+      task_count: pending.length,
+      tasks: pending.slice(0, topN)
+    };
+  }));
+  return rows.filter(Boolean);
+}

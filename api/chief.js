@@ -1,9 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import {
-  readRegistry,
   readMuseSystem,
   getAllProjectIds,
-  getBacklogSummary,
+  fetchRegistryLive,
+  getBacklogSummaryLive,
   renderBacklogsText,
   detroitDayOfWeek
 } from './_lib/vault.js';
@@ -181,8 +181,8 @@ function buildTools(registry) {
   ];
 }
 
-function buildContext() {
-  const backlogs = getBacklogSummary({ topN: 5 });
+async function buildContext() {
+  const backlogs = await getBacklogSummaryLive({ topN: 5 });
   return renderBacklogsText(backlogs) || '### Project Backlogs\n(no active projects with backlogs)';
 }
 
@@ -210,7 +210,13 @@ export default async function handler(req, res) {
 
   const stableHead = buildStableSystemHead();
   const dayContext = buildDayContext(Boolean(firstTurnToday));
-  const stateContext = buildContext();
+  // Registry + backlog summary read live from GitHub in parallel so the
+  // tool manifest and "Current State" block reflect the latest vault
+  // writes — including ones Muse herself made earlier this session.
+  const [registry, stateContext] = await Promise.all([
+    fetchRegistryLive(),
+    buildContext()
+  ]);
   const dynamicTail = `${dayContext}\n\n## Current State\n${stateContext}`;
 
   // System as an array of content blocks. The stable head carries
@@ -241,7 +247,7 @@ export default async function handler(req, res) {
       max_tokens: 1024,
       system,
       messages,
-      tools: buildTools(readRegistry())
+      tools: buildTools(registry)
     });
 
     let text = '';
