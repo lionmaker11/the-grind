@@ -147,6 +147,7 @@ export default async function handler(req, res) {
         project_name: bl.project_name || p.name,
         priority: p.priority,
         task_count: (bl.tasks || []).length,
+        last_touched: p.last_touched || null,
         top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority }))
       });
     }
@@ -166,6 +167,7 @@ export default async function handler(req, res) {
           project_name: bl.project_name || folder,
           priority: 999,
           task_count: (bl.tasks || []).length,
+          last_touched: null,
           top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority })),
           unregistered: true
         });
