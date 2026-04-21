@@ -103,6 +103,11 @@
   --touch-min:     44px;
   --sheet-h:       55vh;
   --ring-size:     250px;
+
+  /* ---------- SEMANTIC OFFLINE ---------- */
+  --offline-accent:     #ff003c;             /* saturated red — // OFFLINE text, cached border */
+  --offline-accent-dim: rgba(255, 0, 60, 0.55);  /* 55% — dimmed offline labels */
+  --offline-tint:       rgba(255, 0, 60, 0.08);  /* 8% — offline panel bg tint */
 }
 
 /* ============================================================
