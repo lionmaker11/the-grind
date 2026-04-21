@@ -1,5 +1,5 @@
-// sw.js v16 — bumped with Muse/voice-dump/attachment endpoints. See CLAUDE.md.
-const CACHE_NAME = 'the-grind-v16';
+// sw.js v17 — Project Board era. Retire /api/today + today.json; cache /api/backlog.
+const CACHE_NAME = 'the-grind-v17';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -28,8 +28,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // Network-first with cache fallback for readable API routes
-  if (url.pathname === '/api/today' || url.pathname === '/api/check-update') {
+  // Network-first with cache fallback for the Project Board (GET /api/backlog
+  // with no query params). Lets the user open the PWA offline and still see a
+  // stale board rather than an empty screen.
+  if (url.pathname === '/api/backlog' && e.request.method === 'GET' && !url.search.includes('project_id=')) {
     e.respondWith(
       fetch(e.request).then(res => {
         const clone = res.clone();
@@ -62,22 +64,6 @@ self.addEventListener('fetch', e => {
         new Response(JSON.stringify({ offline: true, error: 'No connection' }),
           { status: 503, headers: { 'Content-Type': 'application/json' } })
       )
-    );
-    return;
-  }
-
-  // Network-first for today.json, vault/daily/, and chief-briefing.md
-  if (
-    url.pathname === '/today.json' ||
-    url.pathname === '/chief-briefing.md' ||
-    url.pathname.startsWith('/vault/daily/')
-  ) {
-    e.respondWith(
-      fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(new Request(url.pathname), clone));
-        return res;
-      }).catch(() => caches.match(new Request(url.pathname)))
     );
     return;
   }
