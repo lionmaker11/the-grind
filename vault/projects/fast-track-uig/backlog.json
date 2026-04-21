@@ -1,0 +1,42 @@
+{
+  "project_id": "fast-track-uig",
+  "project_name": "UIL Fast Track",
+  "tasks": [
+    {
+      "id": "uig-001",
+      "text": "Complete current module/lesson in Fast Track",
+      "done_condition": null,
+      "category": "Learning",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "uig-002",
+      "text": "Set up liquidity providing wallet",
+      "done_condition": null,
+      "category": "Finances",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "uig-003",
+      "text": "Integrate UIL calendar with Muse awareness",
+      "done_condition": null,
+      "category": "Learning",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "uig-004",
+      "text": "Join next Discord strategy call",
+      "done_condition": null,
+      "category": "Learning",
+      "priority": 4,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "project_id": "the-grind",
+  "project_name": "TheGrind",
+  "tasks": [
+    {
+      "id": "tg-001",
+      "text": "Rebuild app to match new workflow (3 tasks/project, voice interaction, EOD check-in)",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "tg-002",
+      "text": "Integrate agent context so in-app Muse matches Telegram Muse awareness",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "tg-003",
+      "text": "Add \"load more\" feature for going deep on one project",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "tg-004",
+      "text": "Add voice input for task check-ins (STT)",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 4,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "tg-005",
+      "text": "Add workout display integration (from PDF plan)",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 5,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "tg-006",
+      "text": "Remove time-slot assignments — just priority-ordered list",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 6,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
+}

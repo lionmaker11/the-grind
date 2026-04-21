@@ -1,4 +1,18 @@
-# Action Items — Active Tracker
+# Action Items — Active Tracker (ARCHIVED)
+
+> **ARCHIVED 2026-04-21** — Source of truth moved to `vault/projects/<id>/backlog.json`.
+> This file is kept for history. Do not edit. New tasks go into the per-project backlog via Muse (EOD conversation) or directly in the JSON files.
+>
+> Migration map:
+> - TheGrind → `vault/projects/the-grind/backlog.json`
+> - Lionmaker Systems → `vault/projects/lionmaker-systems/backlog.json`
+> - Alex Buildium Bot → `vault/projects/alex-buildium/backlog.json`
+> - UIL Fast Track → `vault/projects/fast-track-uig/backlog.json`
+> - Lionmaker Kettlebell App → `vault/projects/lionmaker-kettlebell/backlog.json`
+> - 708 Pallister → `vault/projects/708-pallister/backlog.json`
+> - Motor City Deals → `vault/projects/motor-city-deals/backlog.json`
+> - GrillaHQ → `vault/projects/grillahq/backlog.json` (empty seed)
+> - VA Disability Appeal → `vault/projects/va-disability/backlog.json` (empty seed)
 
 > Updated: 2026-04-20 — RESTRUCTURED. New workflow: 3 tasks/project/day via TheGrind. Kill stale items.
 

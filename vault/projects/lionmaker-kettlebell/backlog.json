@@ -1,0 +1,42 @@
+{
+  "project_id": "lionmaker-kettlebell",
+  "project_name": "Lionmaker Kettlebell App",
+  "tasks": [
+    {
+      "id": "kb-001",
+      "text": "Finish remaining screens/features (nearly done)",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "kb-002",
+      "text": "App Store submission prep (screenshots, description, metadata)",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "kb-003",
+      "text": "Integrate workout plan from PDF",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "kb-004",
+      "text": "Beta test on device",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 4,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
+}

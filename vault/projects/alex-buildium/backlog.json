@@ -1,0 +1,33 @@
+{
+  "project_id": "alex-buildium",
+  "project_name": "Alex / Buildium Bot",
+  "tasks": [
+    {
+      "id": "ab-001",
+      "text": "Set up Buildium integration for Alex's property management",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "ab-002",
+      "text": "Configure workflow automation",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "ab-003",
+      "text": "Test and deploy",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
+}
