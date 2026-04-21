@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-04-20",
+  "updated": "2026-04-21",
   "note": "v0 — confirm active/inactive split with T.J. before Muse uses this as source of truth.",
   "projects": [
     {
@@ -17,8 +17,7 @@
       "status": "active",
       "priority": 2,
       "folder": "vault/projects/fast-track-uig",
-      "aliases": ["FastTrack", "UIG"],
-      "note": "folder not yet created"
+      "aliases": ["FastTrack", "UIG"]
     },
     {
       "id": "lionmaker-kettlebell",
@@ -26,8 +25,7 @@
       "status": "active",
       "priority": 3,
       "folder": "vault/projects/lionmaker-kettlebell",
-      "aliases": ["Kettlebell app"],
-      "note": "folder not yet created"
+      "aliases": ["Kettlebell app"]
     },
     {
       "id": "lionmaker-systems",
@@ -50,8 +48,7 @@
       "name": "GrillaHQ",
       "status": "active",
       "priority": 6,
-      "folder": "vault/projects/grillahq",
-      "note": "folder not yet created"
+      "folder": "vault/projects/grillahq"
     },
     {
       "id": "alex-buildium",
@@ -59,8 +56,7 @@
       "status": "active",
       "priority": 7,
       "folder": "vault/projects/alex-buildium",
-      "aliases": ["Buildium"],
-      "note": "folder not yet created"
+      "aliases": ["Buildium"]
     },
     {
       "id": "motor-city-deals",

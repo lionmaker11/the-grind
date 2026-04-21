@@ -8,3 +8,4 @@ THE_GRIND_CLAUDE_CODE_PROMPT.md
 .vercel
 .env*
 .env*.local
+.obsidian/

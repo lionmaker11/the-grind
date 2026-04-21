@@ -10,14 +10,16 @@ Claude Code routines are configured in claude.ai/code, but the **prompt bodies**
 
 The cron + model + name are configured in the Claude Code web UI. This directory holds only the prompt source.
 
-## Active routines (scaffolded — not yet wired)
+## Active routines
 
-| File | Model | Cron | Purpose |
-|---|---|---|---|
-| `morning.md` | Sonnet 4.6 | 06:00 Mon-Sat | Read EOD from yesterday, write today's queue |
-| `midday.md` | Haiku 4.5 | 12:00 Mon-Sat | Quick progress check, nudge if stalled |
-| `eod.md` | Sonnet 4.6 | 17:30 Mon-Sat | EOD rollup — what got done, what didn't, blockers |
-| `sunday-review.md` | Opus 4.7 | 07:00 Sun | Weekly review across all projects, set priorities |
+| File | Model | Cron | Status | Purpose |
+|---|---|---|---|---|
+| `morning.md` | Sonnet 4.6 | 06:00 Mon-Sat | **drafted** | Read EOD from yesterday, write today's queue |
+| `midday.md` | Haiku 4.5 | 12:00 Mon-Sat | scaffold-only | Quick progress check, nudge if stalled |
+| `eod.md` | Sonnet 4.6 | 17:30 Mon-Sat | **drafted** | EOD rollup — what got done, what didn't, blockers |
+| `sunday-review.md` | Opus 4.7 | 07:00 Sun | scaffold-only | Weekly review across all projects, set priorities |
+
+"drafted" = prompt body exists in this directory but is **not yet wired** in the Claude Code web UI. See wiring timeline below.
 
 ## Wiring timeline
 - **Day 1 (now):** Re-Entry Mode only. No routines yet.
