@@ -1,0 +1,23 @@
+# CLAUDE.md — Repo AI Agent Instructions
+
+Repository: `lionmaker11/the-grind`. Currently in V2 rebuild. Production `/` is intentionally down during build — V1 has been deleted and V2 is under construction at `/v2/`.
+
+## Authoritative sources (read in this order)
+
+1. `/DESIGN.md` — V2 architectural spec. The contract.
+2. `/design/mockups/` — V2 visual reference
+3. `/vault/systems/muse-system.md` — Muse's character, voice, and tool manifest
+
+## Active infrastructure — do not modify without explicit instruction
+
+- `/api/**` — backend serverless functions (Anthropic, Groq, GitHub vault writes)
+- `/vault/**` — source-of-truth data layer
+- `/vercel.json` — routing config, touched only at V2 production flip
+
+## V2 build lives in /v2/
+
+Stack is locked per DESIGN.md: Preact + Vite + nanostores + vanilla CSS. No React, no TypeScript, no Tailwind, no component libraries, no additional state libraries. If tempted to reach for any, stop and ask.
+
+## Owner
+
+T.J. Typinski. Solo operator, one-user product, single-tenant.
