@@ -83,18 +83,6 @@ body::after {
     calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
 }
 
-/* Phase-1 raw JSON dump styling. Removed in Phase 2. */
-pre {
-  font-family: var(--font-mono);
-  font-size: var(--t-sm);
-  line-height: 1.45;
-  color: var(--text);
-  white-space: pre-wrap;
-  word-break: break-word;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  padding: var(--s-3);
-  overflow-x: auto;
-  backdrop-filter: blur(12px);
-}
+/* Shared-primitive rules land here in commit 2 (CSS fan-out):
+   .panel / .corner / .section-title / .section-sub / .p-badge / .btn-primary
+   / .btn-icon / .execute-wrap / .muse-fab / .add-project-ghost / .bg-gradient */
