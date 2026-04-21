@@ -14,6 +14,16 @@ const FALLBACK_PERSONA = `You are Muse, T.J.'s operator inside The Grind. Femini
 
 const CATEGORIES = ['In Business', 'On Business', 'Health', 'Family', 'Finances', 'Personal', 'Learning'];
 
+// Model routing by intent. Frontend sends `mode`; handler picks the model.
+// Anything unknown falls through to `default`. Keep current prod (Sonnet 4.6)
+// as the muse/default; Opus 4.7 reserved for onboarding + weekly recap.
+const MODELS = {
+  muse:    'claude-sonnet-4-6',
+  onboard: 'claude-opus-4-7',
+  recap:   'claude-opus-4-7',
+  default: 'claude-sonnet-4-6'
+};
+
 const APP_CONTEXT_PROMPT = `## What You Know Here
 You see the current project backlogs below. That is your source of truth for what exists. There is no daily queue, no briefing, no EOD narrative — those are retired surfaces. T.J. picks tasks himself off the board the app renders; your job is to keep the backlogs correct.
 
@@ -39,9 +49,12 @@ Every action you take is a tool call. The frontend executes them against the bac
 - Never exceed 100 words unless T.J. asks you to elaborate.
 - If a request is ambiguous, ask ONE clarifying question. Wait. File. Stop.`;
 
-function buildSystemPrompt(dayContext) {
+// Stable head: persona + APP_CONTEXT_PROMPT. Does not change between
+// requests within a day (vault/systems/muse-system.md is immutable at runtime).
+// This is the portion we mark with cache_control for Anthropic prompt caching.
+function buildStableSystemHead() {
   const persona = readMuseSystem() || FALLBACK_PERSONA;
-  return `${persona}\n\n${APP_CONTEXT_PROMPT}\n\n${dayContext}`;
+  return `${persona}\n\n${APP_CONTEXT_PROMPT}`;
 }
 
 function buildDayContext(firstTurnToday) {
@@ -187,15 +200,27 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { message, conversation, firstTurnToday } = req.body || {};
+  const { message, conversation, firstTurnToday, mode } = req.body || {};
   if (!message || typeof message !== 'string' || message.length > 2000) {
     return res.status(400).json({ error: 'Invalid message' });
   }
 
+  const resolvedMode = typeof mode === 'string' && MODELS[mode] ? mode : 'default';
+  const model = MODELS[resolvedMode];
+
+  const stableHead = buildStableSystemHead();
   const dayContext = buildDayContext(Boolean(firstTurnToday));
-  const systemPrompt = buildSystemPrompt(dayContext);
   const stateContext = buildContext();
-  const system = `${systemPrompt}\n\n## Current State\n${stateContext}`;
+  const dynamicTail = `${dayContext}\n\n## Current State\n${stateContext}`;
+
+  // System as an array of content blocks. The stable head carries
+  // cache_control: ephemeral so Anthropic caches [tools + head] as the
+  // prefix. The dynamic tail (day + state) sits uncached, so day-roll
+  // and vault mutations don't invalidate the cache prefix.
+  const system = [
+    { type: 'text', text: stableHead, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: dynamicTail }
+  ];
 
   const messages = [];
   if (conversation && Array.isArray(conversation)) {
@@ -208,10 +233,11 @@ export default async function handler(req, res) {
   messages.push({ role: 'user', content: message });
 
   const client = new Anthropic();
+  const startedAt = Date.now();
 
   try {
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model,
       max_tokens: 1024,
       system,
       messages,
@@ -228,9 +254,29 @@ export default async function handler(req, res) {
       }
     }
 
+    const usage = response.usage || {};
+    console.log(JSON.stringify({
+      event: 'chief_request',
+      mode: resolvedMode,
+      model,
+      latency_ms: Date.now() - startedAt,
+      input_tokens: usage.input_tokens || 0,
+      output_tokens: usage.output_tokens || 0,
+      tool_calls_count: actions.length,
+      cache_read_tokens: usage.cache_read_input_tokens || 0,
+      cache_creation_tokens: usage.cache_creation_input_tokens || 0
+    }));
+
     res.setHeader('Cache-Control', 'no-cache, no-store');
     return res.status(200).json({ text: text.trim(), actions });
   } catch (err) {
+    console.log(JSON.stringify({
+      event: 'chief_error',
+      mode: resolvedMode,
+      model,
+      latency_ms: Date.now() - startedAt,
+      error: err?.message || 'unknown'
+    }));
     return res.status(500).json({ error: err.message || 'Muse connection failed' });
   }
 }
