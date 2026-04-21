@@ -1,0 +1,34 @@
+/* ============================================================
+   Board.css — root scrolling container + offline variants
+   Board-private only. Shared primitives live in global.css.
+   ============================================================ */
+
+/* Root board container — scrollable column */
+.board {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-4) var(--s-4) calc(var(--s-16) + var(--s-12));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 100%;
+}
+
+/* Offline subtitle variant (red-accented per mockup 05) */
+.section-sub--offline {
+  color: color-mix(in srgb, var(--red) 45%, transparent);
+  letter-spacing: 1.5px;
+}
+
+/* Offline footer note */
+.muse-offline-note {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 1.5px;
+  color: color-mix(in srgb, var(--red) 50%, transparent);
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: var(--s-3);
+  padding: var(--s-2) var(--s-2);
+  border: 1px dashed color-mix(in srgb, var(--red) 30%, transparent);
+  border-radius: var(--r-sm);
+}

@@ -1,0 +1,42 @@
+/* ============================================================
+   HeartbeatDot.css — 8px status indicator dot + color variants
+   @keyframes pulse-red lives here (Board-private animation).
+   ============================================================ */
+
+/* Base dot geometry */
+.heartbeat {
+  width: var(--s-2);
+  height: var(--s-2);
+  border-radius: var(--r-round);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+/* Gray — no activity data */
+.heartbeat.gray {
+  background: color-mix(in srgb, var(--text-muted) 40%, transparent);
+}
+
+/* Green — healthy, touched recently */
+.heartbeat.green {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green-glow);
+}
+
+/* Yellow — 3-day stale */
+.heartbeat.yellow {
+  background: var(--yellow);
+  box-shadow: 0 0 6px var(--yellow-glow);
+}
+
+/* Red — 7-day overdue, pulses */
+.heartbeat.red {
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red-glow);
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 4px var(--red-glow); }
+  50%       { box-shadow: 0 0 14px var(--red-glow); }
+}

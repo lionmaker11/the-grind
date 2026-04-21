@@ -373,7 +373,18 @@ A single 8px circle next to the project name.
 }
 ```
 
-**Logic** (`lib/heartbeat.js`): compare `project.last_touched` to today. 0–2 days → green. 3–6 days → yellow. 7+ days → red. Pull `last_touched` from the registry, which the backend already updates on every backlog mutation.
+**Logic** (`lib/heartbeat.js`): compare `project.last_touched` to today. Pull `last_touched` from the registry, which the backend already updates on every backlog mutation.
+
+**Heartbeat null-state:** Projects with `last_touched === null` render dim gray (`var(--text-muted)`, 40% opacity). This covers cold projects that have not mutated since the `last_touched` field was introduced.
+
+**Thresholds:**
+
+| Age | Color | Animation |
+|---|---|---|
+| `null` | dim gray | none |
+| 0–3 days | green | none |
+| 3–7 days | yellow | none |
+| 7+ days | red | 2s ease-in-out pulse |
 
 ### Button patterns
 

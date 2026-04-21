@@ -78,23 +78,205 @@ body::after {
   max-width: var(--container-max);
   margin: 0 auto;
   padding:
-    calc(var(--s-4) + env(safe-area-inset-top, 0px))
+    calc(var(--top-bar-h) + env(safe-area-inset-top, 0px) + var(--s-4))
     var(--s-4)
     calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
 }
 
-/* Phase-1 raw JSON dump styling. Removed in Phase 2. */
-pre {
-  font-family: var(--font-mono);
-  font-size: var(--t-sm);
-  line-height: 1.45;
-  color: var(--text);
-  white-space: pre-wrap;
-  word-break: break-word;
+/* ============================================================
+   SHARED PRIMITIVES — phase 2 commit 2
+   ============================================================ */
+
+/* ---- Background gradient ---- */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(0, 240, 255, 0.05), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(255, 0, 222, 0.04), transparent 50%),
+    var(--bg);
+}
+
+/* ---- Panel ---- */
+.panel {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  padding: var(--s-3);
-  overflow-x: auto;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+}
+
+/* ---- Corner accents ---- */
+.corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--cyan);
+  border-style: solid;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.corner.tl { top: -1px;    left: -1px;  border-width: 1px 0 0 1px; }
+.corner.tr { top: -1px;    right: -1px; border-width: 1px 1px 0 0; }
+.corner.bl { bottom: -1px; left: -1px;  border-width: 0 0 1px 1px; }
+.corner.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+/* ---- Section typography ---- */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: var(--s-2) 0 var(--s-1);
+}
+
+.section-title::before {
+  content: '> ';
+  color: var(--magenta);
+}
+
+.section-sub {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: var(--s-4);
+}
+
+/* ---- Priority badges ---- */
+.p-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-sm);
+  border: 1px solid;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  text-align: center;
+  flex-shrink: 0;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-badge.p1 { color: var(--cyan);    border-color: var(--cyan);    background: rgba(0, 240, 255, 0.08); }
+.p-badge.p2 { color: var(--green);   border-color: var(--green);   background: rgba(57, 255, 20, 0.06); }
+.p-badge.p3 { color: var(--yellow);  border-color: var(--yellow);  background: rgba(255, 230, 0, 0.06); }
+.p-badge.p4 { color: var(--indigo);  border-color: var(--indigo);  background: rgba(123, 92, 255, 0.06); }
+.p-badge.p5 { color: var(--text-dim); border-color: var(--text-dim); background: transparent; }
+
+/* ---- Buttons ---- */
+.btn-primary {
+  padding: 14px 40px;
+  /* one-off: consider tokenizing if reused — mockup 01 EXECUTE button gradient endpoint */
+  background: linear-gradient(135deg, var(--cyan), #00c8ff);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--r-sm);
+  box-shadow: 0 0 30px var(--cyan-dim);
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  min-height: var(--touch-min);
+  cursor: pointer;
+}
+
+.btn-icon {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.btn-icon.launch { color: var(--cyan);  border-color: var(--border-bright); }
+.btn-icon.check  { color: var(--green); border-color: rgba(57, 255, 20, 0.25); }
+
+/* ---- Execute wrap ---- */
+.execute-wrap {
+  position: fixed;
+  bottom: calc(var(--s-8) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+}
+
+/* ---- Muse FAB ---- */
+.muse-fab {
+  position: fixed;
+  bottom: calc(var(--s-6) + env(safe-area-inset-bottom, 0px));
+  right: max(20px, calc(50% - var(--container-max) / 2 + 20px));
+  width: var(--fab-size);
+  height: var(--fab-size);
+  border-radius: var(--r-round);
+  background: radial-gradient(circle at 35% 35%, rgba(255, 0, 222, 0.45), rgba(255, 0, 222, 0.9));
+  border: 1px solid var(--magenta);
+  box-shadow: 0 0 24px var(--magenta-dim), inset 0 0 12px rgba(0, 0, 0, 0.3);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.muse-fab.dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.5);
+  box-shadow: none;
+}
+
+/* ---- Ghost row ---- */
+.add-project-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--s-3);
+  min-height: var(--touch-min);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  margin: var(--s-2) 0 var(--s-3);
+  cursor: pointer;
+  width: 100%;
 }
