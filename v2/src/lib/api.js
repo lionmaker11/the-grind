@@ -37,14 +37,17 @@ async function postJson(url, payload) {
     body: JSON.stringify(payload)
   });
   if (!res.ok) {
-    let detail = '';
+    let msg = '';
     try {
       const j = await res.json();
-      detail = j.error || j.details || '';
+      // Concatenate error + details so the Muse error bubble carries the
+      // upstream provider message (e.g. Groq's rejection reason on Safari).
+      if (j.error && j.details) msg = `${j.error}: ${j.details}`;
+      else msg = j.error || j.details || '';
     } catch {
       // body not JSON — ignore
     }
-    throw new Error(detail || `HTTP ${res.status}`);
+    throw new Error(msg || `HTTP ${res.status}`);
   }
   return res.json();
 }
@@ -72,6 +75,12 @@ async function blobToBase64(blob) {
 }
 
 export async function postTranscribe(blob) {
+  // Safari can produce a zero- or near-zero-byte blob if the user taps
+  // stop within a few hundred ms. Surface a clear error instead of paying
+  // a round-trip that Groq will reject with a cryptic message.
+  if (!blob || blob.size < 200) {
+    throw new Error('recording too short — hold the mic and speak');
+  }
   const audio = await blobToBase64(blob);
   const res = await postJson('/api/transcribe', { audio, mimeType: blob.type || 'audio/webm' });
   return res.text || '';

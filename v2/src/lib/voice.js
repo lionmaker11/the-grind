@@ -49,6 +49,15 @@ export async function startRecording() {
     throw err;
   }
 
+  // Phase 3 iOS diagnostic — logs the mime we asked for vs. what the
+  // browser actually produced. Keep until Groq Whisper path is confirmed
+  // stable on Safari.
+  // eslint-disable-next-line no-console
+  console.log('[voice] recorder started', {
+    requestedMime: mimeType || '(browser default)',
+    actualMime: rec.mimeType || '(unknown until stop)'
+  });
+
   const chunks = [];
   rec.ondataavailable = (e) => {
     if (e && e.data && e.data.size > 0) chunks.push(e.data);
@@ -63,7 +72,16 @@ export async function startRecording() {
 
   rec.onstop = () => {
     stream.getTracks().forEach((t) => { try { t.stop(); } catch (_e) { /* track already stopped */ } });
-    const blob = new Blob(chunks, { type: mimeType || 'audio/webm' });
+    // Prefer the recorder's own mimeType — on Safari this is the canonical
+    // string (may include codec params) that actually reflects the bytes.
+    const blobType = rec.mimeType || mimeType || 'audio/webm';
+    const blob = new Blob(chunks, { type: blobType });
+    // eslint-disable-next-line no-console
+    console.log('[voice] recorder stopped', {
+      blobType: blob.type,
+      blobSize: blob.size,
+      chunkCount: chunks.length
+    });
     resolveStop(blob);
   };
   rec.onerror = (e) => {

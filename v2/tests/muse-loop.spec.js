@@ -76,7 +76,11 @@ test.beforeEach(async ({ page }) => {
       start() { this.state = 'recording'; }
       stop() {
         this.state = 'inactive';
-        const bytes = new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]);
+        // Synthetic ≥200B payload so the client-side empty-blob guard
+        // (postTranscribe) doesn't short-circuit before the /api/transcribe
+        // mock gets a chance to respond.
+        const bytes = new Uint8Array(512);
+        bytes[0] = 0x1a; bytes[1] = 0x45; bytes[2] = 0xdf; bytes[3] = 0xa3;
         const blob = new Blob([bytes], { type: 'audio/webm' });
         queueMicrotask(() => {
           if (this.ondataavailable) this.ondataavailable({ data: blob });
