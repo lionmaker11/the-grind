@@ -1,6 +1,7 @@
-import { useEffect } from 'preact/hooks';
+import { useEffect, useRef } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import { boardStore, fetchBoard } from '../../state/board.js';
+import { museStore, open as museOpen } from '../../state/muse.js';
 import { ProjectCard } from './ProjectCard.jsx';
 import { EmptyState } from './EmptyState.jsx';
 import './Board.css';
@@ -12,8 +13,18 @@ function formatTime(ts) {
 
 export function Board() {
   const { summary, loading, error, lastFetchAt } = useStore(boardStore);
+  const { lastActionAt } = useStore(museStore);
+  const lastSeenActionAt = useRef(0);
 
   useEffect(() => { fetchBoard(); }, []);
+
+  // Re-fetch board after Muse dispatches any vault mutation.
+  useEffect(() => {
+    if (lastActionAt && lastActionAt !== lastSeenActionAt.current) {
+      lastSeenActionAt.current = lastActionAt;
+      fetchBoard();
+    }
+  }, [lastActionAt]);
 
   if (loading && !error && summary.length === 0) return null;
 
@@ -31,7 +42,6 @@ export function Board() {
         {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}
         <div class="muse-offline-note">// MUSE OFFLINE — voice filing paused</div>
         <div class="execute-wrap"><button class="btn-primary" type="button"><span aria-hidden="true">▶ </span>EXECUTE</button></div>
-        <div class="muse-fab dimmed" aria-hidden="true" tabindex="-1">●</div>
       </main>
     );
   }
@@ -42,7 +52,6 @@ export function Board() {
         <div class="section-title">IN CONTEXT</div>
         <div class="section-sub">0 PENDING · BOARD CLEAR</div>
         <EmptyState />
-        <div class="muse-fab" aria-hidden="true" tabindex="-1">●</div>
       </main>
     );
   }
@@ -54,9 +63,14 @@ export function Board() {
       <div class="section-title">IN CONTEXT</div>
       <div class="section-sub">{summary.length} PROJECTS · {totalPending} PENDING</div>
       {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}
-      <button class="add-project-ghost" type="button"><span aria-hidden="true">+ </span>NEW PROJECT</button>
+      <button
+        class="add-project-ghost"
+        type="button"
+        onClick={() => museOpen({ prefill: 'new project: ' })}
+      >
+        <span aria-hidden="true">+ </span>NEW PROJECT
+      </button>
       <div class="execute-wrap"><button class="btn-primary" type="button"><span aria-hidden="true">▶ </span>EXECUTE</button></div>
-      <div class="muse-fab" aria-hidden="true" tabindex="-1">●</div>
     </main>
   );
 }

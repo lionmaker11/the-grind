@@ -58,3 +58,11 @@
 .topbar-status.offline {
   color: var(--offline-accent-dim);
 }
+
+.topbar-status.action {
+  color: var(--yellow);
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
