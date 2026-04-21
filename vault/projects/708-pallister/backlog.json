@@ -18,9 +18,10 @@
       "done_condition": null,
       "category": "In Business",
       "priority": 2,
-      "status": "pending",
+      "status": "done",
       "created": "2026-04-21",
-      "recurring": true
+      "recurring": true,
+      "completed": "2026-04-21"
     }
   ]
 }
