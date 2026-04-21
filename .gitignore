@@ -8,4 +8,10 @@ THE_GRIND_CLAUDE_CODE_PROMPT.md
 .vercel
 .env*
 .env*.local
+!.env.local.example
+!.env.example
 .obsidian/
+
+# /v2/ build artifacts (source is committed; build output is not)
+/v2/dist/
+/v2/.eslintcache
