@@ -7,6 +7,8 @@ session before touching code.
 ## Current state
 
 - **Main HEAD:** check `git log main --oneline -1`
+- **Latest merged phase:** Phase 3 — Voice loop (commits 7b3b850 through 4f4012b
+  on v2-phase3, pending merge to main as of 21 Apr 2026)
 - **Production:** `the-grind-gold.vercel.app` — single Vercel project
 - **Architecture:** V2 served at `/` via Vite build at `v2/dist/`, `/api/*`
   same-origin, all Vercel serverless functions
@@ -116,13 +118,30 @@ Lighthouse a11y 87 → 100. aria-labels, landmarks, focus-visible rings,
 text-muted alpha 30 → 60%, text-dim alpha 55 → 60%, maximum-scale=1 removed,
 pseudo-element focus ring on clipped EXECUTE button.
 
-### Phase 3 — Voice loop (in progress, close to merge)
+### Phase 3 — Voice loop (merged 2026-04-21)
 Muse FAB → sheet → mic → transcribe → chief → tool call → vault write →
 Board re-fetch. Validated on iPhone: voice → task on Board in <10s, Muse
-in character, Sonnet 4.6 handling intent mapping correctly. Commits:
-- Commit 1: `/api/chief.js` mode routing + prompt caching + logging
-- Commit 2: full frontend voice loop with Playwright E2E
-- Commit 3: `/api/*` GET handlers read from GitHub (read-path consistency)
+in character, Sonnet 4.6 handling intent mapping correctly.
+
+**Final commits (main..v2-phase3, oldest first):**
+- `7b3b850` — chief.js mode routing + prompt caching + per-request logging
+- `38f81ac` — voice loop frontend (muse store, voice.js, Muse components, Board
+  FAB, TopBar lastAction); Playwright E2E
+- `66832cc` — iOS Safari Groq Whisper compatibility (mp4 → m4a filename rename)
+- `b5f7968` — redeploy after re-scoping GROQ/ANTHROPIC/GITHUB/CHIEF env vars
+  off stale `v2-prep` branch onto all-previews
+- `a25cd2d` — redeploy after stripping literal `\n` from ANTHROPIC_API_KEY
+- `9ec8f31` — /api/* GET handlers read from GitHub (read-path consistency fix)
+- `4f4012b` — PHASES.md build log + scripts/verify-env.js utility
+
+**Validation record:** Validated end-to-end on iPhone Safari 21 Apr 2026 —
+voice → Muse response → task on Board in <10s.
+
+**Bundle metrics (after `38f81ac`):** JS 30.21 KB (11.38 KB gz), CSS 18.21 KB
+(4.26 KB gz). Well under 50 KB JS / 20 KB CSS budget.
+
+**Latency (after `9ec8f31`):** ~360ms median for 12-project summary fetch
+(13 parallel GitHub Contents GETs vs. previous bundled-read snapshot).
 
 ## Phase roadmap
 
