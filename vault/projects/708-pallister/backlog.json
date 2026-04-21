@@ -33,6 +33,16 @@
       "created": "2026-04-21",
       "recurring": true,
       "completed": "2026-04-21"
+    },
+    {
+      "id": "pal-004",
+      "text": "Verify windows are installed properly",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
     }
   ]
 }
