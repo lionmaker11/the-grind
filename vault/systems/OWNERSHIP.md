@@ -1,33 +1,33 @@
 # Vault Ownership Contract
 
-Two agents write to this vault. To prevent conflicts and drift, each path has exactly one owner. Do not cross the line without a migration note.
+Muse is the sole operator of this vault. Hermes is retired.
 
-## Muse (operator, lives in The Grind app)
+## Muse (operator, lives behind /api/chief)
+
 Owns:
-- `vault/daily/YYYY-MM-DD.json` — today's queue (source of truth once written)
-- `vault/daily-briefs/grind/YYYY-MM-DD.md` — Muse's EOD narrative brief
-- `vault/projects/{id}/backlog.json` — per-project backlog (Muse adds, T.J. edits via voice)
-- `vault/conversations/YYYY-MM-DD.jsonl` — rolling chat transcript
-- `vault/projects/_registry.json` — updates `last_touched`, never `status` without T.J. approval
+- `vault/projects/{id}/backlog.json` — per-project backlog (add, remove, reorder, set_priority, complete)
+- `vault/projects/_registry.json` — project registry (add, archive, activate, `last_touched`)
+- `vault/conversations/YYYY-MM-DD.jsonl` — rolling chat transcript (appended by the frontend after every Muse turn)
 
 Reads everything. Writes only the above.
 
-## Hermes (strategist, lives on T.J.'s laptop)
-Owns:
-- `chief-briefing.md` — legacy daily brief (being sunset; Muse takes over by Week 4)
-- `vault/projects/{id}/STATUS.md` / `{id}-status.md` — long-form project notes
-- `vault/MEMORY.md` / `vault/NORTH_STAR.md` — identity + priorities
-- `vault/systems/*.md` — specs, including this file
-- `vault/projects/_registry.json` — owns `status` field (active/inactive classification)
+## Read-only for Muse
 
-Reads Muse's daily + briefs. Writes everything above.
-
-## Shared read-only
-- `vault/projects/{id}/STATUS.md` — Muse reads for project context but never writes
-- `vault/MEMORY.md`, `vault/NORTH_STAR.md` — Muse reads every turn but never writes
-
-## Conflict rule
-If both write the same path, the last write wins locally and the loser opens a PR with the diff. No silent overwrites.
+- `vault/MEMORY.md`, `vault/NORTH_STAR.md` — identity + priorities (T.J. edits by hand)
+- `vault/systems/*.md` — specs, including this file (T.J. edits by hand)
+- `vault/projects/{id}/STATUS.md` — long-form project notes (T.J. edits by hand)
+- `vault/people/*.md` — contacts / context
+- `vault/projects/_archive/` — archived project folders (preserved, not touched)
 
 ## Schema versioning
+
 Every JSON file under `vault/` carries `schema_version: <int>`. Bump on breaking change. Muse refuses to write against an unknown version.
+
+## Retired surfaces (do not recreate)
+
+- `chief-briefing.md` — deleted. No morning brief.
+- `today.json` — deleted. No daily queue.
+- `vault/daily/` — deleted. No daily files.
+- `vault/daily-briefs/` — deleted. No narrative briefs.
+- `results/YYYY-MM-DD.json` — unused; EOD snapshots are gone.
+- `.claude/routines/` — deleted. No scheduled jobs; all intelligence is reactive via chat.

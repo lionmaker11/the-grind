@@ -1,4 +1,4 @@
-const CACHE_NAME = 'the-grind-v14';
+const CACHE_NAME = 'the-grind-v15';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -34,18 +34,6 @@ self.addEventListener('fetch', e => {
         new Response(JSON.stringify({ offline: true, error: 'No connection' }),
           { status: 503, headers: { 'Content-Type': 'application/json' } })
       )
-    );
-    return;
-  }
-
-  // Network-first for today.json and chief-briefing.md
-  if (url.pathname === '/today.json' || url.pathname === '/chief-briefing.md') {
-    e.respondWith(
-      fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(new Request(url.pathname), clone));
-        return res;
-      }).catch(() => caches.match(new Request(url.pathname)))
     );
     return;
   }
