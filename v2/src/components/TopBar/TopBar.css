@@ -1,1 +1,60 @@
-/* Phase 2 commit 1 placeholder. Full styles land in commit 2 (CSS fan-out). */
+/* TopBar.css — fixed top bar: logo, wordmark, clock/offline status */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--top-bar-h);
+  background: rgba(10, 10, 18, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--s-4);
+  gap: var(--s-3);
+}
+
+.logo-mark {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px var(--cyan-glow));
+  animation: eyes-pulse 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes eyes-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px var(--cyan-glow)) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--cyan-glow)) brightness(1.15);
+  }
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 5px;
+  color: var(--text);
+}
+
+.topbar-status {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.topbar-status.offline {
+  color: var(--offline-accent-dim);
+}
