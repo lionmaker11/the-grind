@@ -1,0 +1,100 @@
+/* global.css — body, typography, and the always-on ambient layer.
+   DESIGN.md §3 calls out scanlines + CRT vignette + grid overlay as
+   non-negotiable brand. They apply once at the body level and every
+   surface inherits them. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font: var(--body);
+}
+
+/* Ambient layer — scanlines (DESIGN.md §3) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+/* Ambient layer — CRT vignette (DESIGN.md §3) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 60%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* Ambient layer — grid overlay (DESIGN.md §3).
+   Applied via a <div class="grid-overlay"> so it can be toggled per-surface
+   if ever needed, and so it sits BEHIND app content (z-index: 0) while the
+   scanlines/vignette above sit ABOVE (z-index: 999/1000). */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding:
+    calc(var(--s-4) + env(safe-area-inset-top, 0px))
+    var(--s-4)
+    calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Phase-1 raw JSON dump styling. Removed in Phase 2. */
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s-3);
+  overflow-x: auto;
+  backdrop-filter: blur(12px);
+}
