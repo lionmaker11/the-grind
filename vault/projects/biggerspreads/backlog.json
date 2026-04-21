@@ -2,5 +2,42 @@
   "schema_version": 1,
   "project_id": "biggerspreads",
   "project_name": "BiggerSpreads",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "bs-001",
+      "text": "Verify who is paying for biggerspreads.com hosting + Mux demo video",
+      "done_condition": "Billing owner identified; access confirmed or documented",
+      "category": "On Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "bs-002",
+      "text": "Check Vercel react-server-components CVE branch — merged or still exposing prod?",
+      "done_condition": "Branch status confirmed; CVE patched on main if needed",
+      "category": "Ops",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "bs-003",
+      "text": "Trace where free-trial signup leads are being captured",
+      "done_condition": "Signup destination (inbox, CRM, Supabase table) identified",
+      "category": "On Business",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "bs-004",
+      "text": "June 2026 AI-obsolete decision: kill, pivot, or restart",
+      "done_condition": "Decision made and logged in biggerspreads-status.md",
+      "category": "On Business",
+      "priority": 4,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
 }

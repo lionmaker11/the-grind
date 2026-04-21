@@ -2,6 +2,24 @@
   "schema_version": 1,
   "project_id": "grillahq",
   "project_name": "GrillaHQ",
-  "tasks": [],
-  "notes": "Seeded empty 2026-04-21. A2P approval pending. Tasks to be captured via EOD conversation."
+  "tasks": [
+    {
+      "id": "gh-001",
+      "text": "Check A2P / 10DLC registration status",
+      "done_condition": "Carrier registration confirmed approved OR blocker identified",
+      "category": "Ops",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "gh-002",
+      "text": "Decide: restart GrillaHQ or archive (14+ days silent)",
+      "done_condition": "Decision logged in STATUS.md or project archived",
+      "category": "On Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
 }
