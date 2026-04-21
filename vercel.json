@@ -1,4 +1,6 @@
 {
+  "buildCommand": "cd v2 && npm install && npm run build",
+  "outputDirectory": "v2/dist",
   "headers": [
     {
       "source": "/sw.js",
