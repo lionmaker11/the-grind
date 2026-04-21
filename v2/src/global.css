@@ -207,6 +207,12 @@ body::after {
   cursor: pointer;
 }
 
+/* clip-path clips outline — use layered box-shadow for focus ring on clipped buttons */
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--cyan), 0 0 0 4px var(--bg);
+}
+
 .btn-icon {
   width: var(--touch-min);
   height: var(--touch-min);
