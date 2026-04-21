@@ -1,1 +1,41 @@
-/* Phase 2 commit 1 placeholder. Full styles land in commit 2 (CSS fan-out). */
+/* ============================================================
+   TaskRow.css — single task row layout + text truncation
+   .p-badge, .btn-icon, .task-actions are Sonnet B primitives.
+   ============================================================ */
+
+/* Task row — flex layout, 44px min touch target */
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  min-height: var(--touch-min);
+}
+
+/* Flex body that holds text (and optional meta line) */
+.task-body {
+  flex: 1;
+  min-width: 0; /* allow ellipsis to work */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Primary task text — ellipsis on overflow */
+.task-text {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--t-base);
+  color: var(--text);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Action button group — keep together, no shrink */
+.task-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}

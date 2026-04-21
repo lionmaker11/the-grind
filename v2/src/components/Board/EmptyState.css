@@ -1,1 +1,93 @@
-/* Phase 2 commit 1 placeholder. Full styles land in commit 2 (CSS fan-out). */
+/* ============================================================
+   EmptyState.css — board-clear / zero-task empty state
+   .empty-cta button and .dot are scoped here (Board-private).
+   ============================================================ */
+
+/* Outer container — centered column */
+.empty-state {
+  padding: var(--s-8) var(--s-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  align-items: center;
+  margin-top: var(--s-6);
+}
+
+/* Headline */
+.empty-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 4px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.empty-title::before {
+  content: '// ';
+  color: var(--cyan);
+}
+
+/* Body copy */
+.empty-body {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  max-width: 240px;
+  line-height: 1.6;
+}
+
+/* CTA button — magenta-bordered, 44px min height */
+.empty-cta {
+  margin-top: var(--s-2);
+  padding: var(--s-5) var(--s-6);
+  background: color-mix(in srgb, var(--magenta) 8%, transparent);
+  border: 1px solid var(--magenta);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--magenta) 18%, transparent);
+  min-height: var(--touch-min);
+  cursor: pointer;
+}
+
+/* Magenta dot inside CTA */
+.empty-cta .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--r-round);
+  background: var(--magenta);
+  box-shadow: 0 0 10px var(--magenta-glow);
+  flex-shrink: 0;
+}
+
+/* Secondary hint text below CTA */
+.empty-hint {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Footer — "// NEW PROJECT? JUST TELL MUSE." */
+.empty-footer {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: var(--s-2);
+  margin-top: auto;
+}
