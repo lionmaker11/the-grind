@@ -1,0 +1,33 @@
+{
+  "project_id": "motor-city-deals",
+  "project_name": "Motor City Deals",
+  "tasks": [
+    {
+      "id": "mcd-001",
+      "text": "Check in with Ali on current closings",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "mcd-002",
+      "text": "10DLC/A2P resubmission — waiting for approval",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "mcd-003",
+      "text": "Email outreach to agents (revenue task)",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
+}

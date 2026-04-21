@@ -1,0 +1,25 @@
+{
+  "project_id": "708-pallister",
+  "project_name": "708 Pallister",
+  "tasks": [
+    {
+      "id": "pal-001",
+      "text": "Sam: countertop installer follow-up (14+ days overdue)",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "pal-002",
+      "text": "Daily contractor check-in with Sam",
+      "done_condition": null,
+      "category": "In Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21",
+      "recurring": true
+    }
+  ]
+}

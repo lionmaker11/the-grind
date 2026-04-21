@@ -24,39 +24,120 @@ You can ONLY reference data in the Current State section below:
 If T.J. asks about something not in context, say "I don't have that yet" — never invent.
 
 ## Actions
-You can modify T.J.'s queue. Only do this when T.J. explicitly asks or clearly implies it.
+You have tools to modify T.J.'s queue and finances. Use them when T.J. explicitly asks or clearly implies it.
 
-To take an action, end your message with ---ACTIONS--- on its own line, then a JSON array. Each action object MUST have "type" and "payload" keys. Use the exact task IDs from the queue data (e.g., "task-001", "task-004").
-
-Example — completing a task:
----ACTIONS---
-[{"type": "complete_task", "payload": {"task_id": "task-004"}}]
-
-Example — adding a task:
----ACTIONS---
-[{"type": "add_task", "payload": {"text": "Call Rick about budget", "type": "quick", "estimated_pomodoros": 1, "category": "In Business"}}]
-
-Action types and when to use them:
 - add_task — "add a task", "I need to do X", "put X on my queue"
-- remove_task — "remove this", "take this off", "move to backlog", "push to tomorrow", "I'll do this another day"
+- remove_task — "remove this", "take this off", "push to tomorrow", "move to backlog", "I'll do this another day"
 - reorder_tasks — "move this up", "do this first", "swap X and Y"
-- skip_task — "I already did this", "mark done", "skip this"
+- skip_task — "I already did this outside the app", "just mark it done without counting pomos"
 - complete_task — "done", "finished", "check this off"
 - update_finance — "income is now X", "I closed a deal for X"
 - launch_task — "start this", "let's do this one"
 
-When T.J. says "push to tomorrow", "move to backlog", "not today", or "skip" — use remove_task. Chief on Hermes will see it was removed and can reschedule it.
-
-CRITICAL: Use "type" and "payload" keys. Use exact task IDs from the queue. Do NOT invent formats. If T.J. asks you to do something and there's an action for it — DO IT. Don't say you can't.
+Use exact task IDs from the queue data (e.g., "task-001", "task-004") when a tool needs one.
+If T.J. asks you to do something and there's a tool for it — DO IT. Don't say you can't.
+You can use multiple tools in a single response. Speak briefly in text AND call the tools.
 
 ## Rules
 1. NEVER exceed 100 words unless asked to elaborate.
 2. NEVER hallucinate data. Only reference what's in your context.
-3. NEVER say "I can't do that" — if there's an action type that fits, use it. If there truly isn't, say what you CAN do.
+3. NEVER say "I can't do that" — if there's a tool that fits, use it. If there truly isn't, say what you CAN do.
 4. When T.J. says "what should I do" — recommend task #1 by priority.
 5. When a project is red or silent — call it out by name.
 6. ALWAYS take action when asked. Don't describe — do.
 7. Never flirt. Never soften. Magnetic is authority, not intimacy.`;
+
+const TOOLS = [
+  {
+    name: 'add_task',
+    description: "Add a new task to today's queue.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Short imperative task text.' },
+        task_type: { type: 'string', enum: ['pomodoro', 'quick'], description: 'pomodoro = timed focus block; quick = <15min.' },
+        estimated_pomodoros: { type: 'integer', minimum: 1, maximum: 8 },
+        priority: { type: 'integer', minimum: 1 },
+        category: {
+          type: 'string',
+          enum: ['In Business', 'On Business', 'Health', 'Family', 'Finances', 'Personal', 'Learning']
+        },
+        project_name: { type: 'string' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'remove_task',
+    description: "Remove a task from today's queue. Use this when T.J. says push to tomorrow, move to backlog, or not today.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        task_id: { type: 'string', description: 'Exact task id from the queue (e.g., task-004).' }
+      },
+      required: ['task_id']
+    }
+  },
+  {
+    name: 'reorder_tasks',
+    description: "Reorder today's queue. Provide the full ordered list of task ids.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        order: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Task ids in the new priority order.'
+        }
+      },
+      required: ['order']
+    }
+  },
+  {
+    name: 'skip_task',
+    description: 'Mark a task as skipped (done outside the app, no pomodoro credit).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        task_id: { type: 'string' }
+      },
+      required: ['task_id']
+    }
+  },
+  {
+    name: 'complete_task',
+    description: 'Mark a task complete. Awards pomodoro credit.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        task_id: { type: 'string' }
+      },
+      required: ['task_id']
+    }
+  },
+  {
+    name: 'update_finance',
+    description: "Update this month's income.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        month_income: { type: 'number', description: 'New total month-to-date income in dollars.' }
+      },
+      required: ['month_income']
+    }
+  },
+  {
+    name: 'launch_task',
+    description: 'Start the pomodoro timer on a specific task.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        task_id: { type: 'string' }
+      },
+      required: ['task_id']
+    }
+  }
+];
 
 function buildContext(appState, briefing) {
   if (!appState) return `### Briefing\n${briefing}`;
@@ -73,7 +154,7 @@ function buildContext(appState, briefing) {
       else if (active && appState.timerRunning) prefix += ` [ACTIVE ${appState.timeRemaining || ''}]`;
       const pd = appState.taskPomosDone?.[t.id] || 0;
       const pe = t.estimated_pomodoros || 1;
-      lines.push(`${prefix} ${t.text} (${t.project_name || '-'}, ${t.category || '-'}, ${t.type}, ${done ? 'done' : pd+'/'+pe}) [${t.health || 'gray'}]`);
+      lines.push(`${prefix} ${t.text} (id=${t.id}, ${t.project_name || '-'}, ${t.category || '-'}, ${t.type}, ${done ? 'done' : pd+'/'+pe}) [${t.health || 'gray'}]`);
     });
   }
 
@@ -144,15 +225,25 @@ export default async function handler(req, res) {
 
   try {
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1024,
-      system: system,
-      messages: messages,
+      system,
+      messages,
+      tools: TOOLS,
     });
 
-    const text = response.content?.[0]?.text || '';
+    let text = '';
+    const actions = [];
+    for (const block of response.content || []) {
+      if (block.type === 'text') {
+        text += block.text;
+      } else if (block.type === 'tool_use') {
+        actions.push({ type: block.name, ...block.input });
+      }
+    }
+
     res.setHeader('Cache-Control', 'no-cache, no-store');
-    return res.status(200).json({ text });
+    return res.status(200).json({ text: text.trim(), actions });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Chief connection failed' });
   }

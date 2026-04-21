@@ -1,0 +1,42 @@
+{
+  "project_id": "lionmaker-systems",
+  "project_name": "Lionmaker Systems",
+  "tasks": [
+    {
+      "id": "ls-001",
+      "text": "Follow execution checklist Task 1 (T.J. to provide checklist)",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "ls-002",
+      "text": "Follow execution checklist Task 2",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 2,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "ls-003",
+      "text": "Follow execution checklist Task 3",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 3,
+      "status": "pending",
+      "created": "2026-04-21"
+    },
+    {
+      "id": "ls-004",
+      "text": "Continue consulting page polish",
+      "done_condition": null,
+      "category": "On Business",
+      "priority": 4,
+      "status": "pending",
+      "created": "2026-04-21"
+    }
+  ]
+}
