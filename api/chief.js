@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const SYSTEM_PROMPT = `You are Muse, T.J.'s operator inside The Grind. Feminine. Commanding. Magnetic. You do not coddle and you do not flirt. You run his day.
@@ -24,17 +24,26 @@ You can ONLY reference data in the Current State section below:
 If T.J. asks about something not in context, say "I don't have that yet" — never invent.
 
 ## Actions
-You have tools to modify T.J.'s queue and finances. Use them when T.J. explicitly asks or clearly implies it.
+You have tools to modify T.J.'s queue, the per-project backlogs, and finances. Use them when T.J. explicitly asks or clearly implies it.
 
-- add_task — "add a task", "I need to do X", "put X on my queue"
-- remove_task — "remove this", "take this off", "push to tomorrow", "move to backlog", "I'll do this another day"
+Today's queue:
+- add_task — put a new task into today's queue
+- remove_task — take a task off today's queue (doesn't touch any backlog)
 - reorder_tasks — "move this up", "do this first", "swap X and Y"
 - skip_task — "I already did this outside the app", "just mark it done without counting pomos"
 - complete_task — "done", "finished", "check this off"
-- update_finance — "income is now X", "I closed a deal for X"
 - launch_task — "start this", "let's do this one"
 
-Use exact task IDs from the queue data (e.g., "task-001", "task-004") when a tool needs one.
+Project backlogs (the ongoing lists each project pulls from):
+- add_to_backlog — "add to Pallister's list", "on the Lionmaker Systems backlog...", EOD captures
+- remove_from_backlog — "kill that one from the backlog", "drop it"
+- load_more — "load more on TheGrind", "give me 3 more from Kettlebell"
+
+Finances:
+- update_finance — "income is now X", "I closed a deal for X"
+
+Task IDs: queue tasks use ids from the queue data (e.g., "task-001"). Backlog tasks use project-prefixed ids (e.g., "ls-004", "tg-002") — see the Project Backlogs section.
+Project IDs must match the registry exactly: the-grind, lionmaker-systems, alex-buildium, fast-track-uig, lionmaker-kettlebell, grillahq, 708-pallister, motor-city-deals, va-disability.
 If T.J. asks you to do something and there's a tool for it — DO IT. Don't say you can't.
 You can use multiple tools in a single response. Speak briefly in text AND call the tools.
 
@@ -136,11 +145,85 @@ const TOOLS = [
       },
       required: ['task_id']
     }
+  },
+  {
+    name: 'add_to_backlog',
+    description: "Append a task to a project's backlog (the long-running list, not today's queue). Use during EOD capture and whenever T.J. says 'add to <project>'s list' or 'put it on the backlog'.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        project_id: {
+          type: 'string',
+          enum: ['the-grind', 'lionmaker-systems', 'alex-buildium', 'fast-track-uig', 'lionmaker-kettlebell', 'grillahq', '708-pallister', 'motor-city-deals', 'va-disability']
+        },
+        text: { type: 'string', description: 'Short imperative task text.' },
+        done_condition: { type: 'string', description: 'What "done" looks like. Optional.' },
+        category: {
+          type: 'string',
+          enum: ['In Business', 'On Business', 'Health', 'Family', 'Finances', 'Personal', 'Learning']
+        },
+        estimated_pomodoros: { type: 'integer', minimum: 1, maximum: 8 }
+      },
+      required: ['project_id', 'text']
+    }
+  },
+  {
+    name: 'remove_from_backlog',
+    description: "Delete a task from a project's backlog.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        project_id: { type: 'string' },
+        task_id: { type: 'string', description: 'Project-prefixed id (e.g., ls-004).' }
+      },
+      required: ['project_id', 'task_id']
+    }
+  },
+  {
+    name: 'load_more',
+    description: "Pull the next N tasks from a project's backlog into today's queue. Default 3.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        project_id: { type: 'string' },
+        count: { type: 'integer', minimum: 1, maximum: 10 }
+      },
+      required: ['project_id']
+    }
   }
 ];
 
+function loadBacklogSummary() {
+  const registryPath = join(process.cwd(), 'vault', 'projects', '_registry.json');
+  const projectsDir = join(process.cwd(), 'vault', 'projects');
+  let registry = null;
+  try { registry = JSON.parse(readFileSync(registryPath, 'utf-8')); } catch { return []; }
+  const active = (registry.projects || []).filter(p => p.status === 'active' || p.status === 'lightweight');
+  const out = [];
+  for (const p of active) {
+    const blPath = join(projectsDir, p.id, 'backlog.json');
+    if (!existsSync(blPath)) continue;
+    try {
+      const bl = JSON.parse(readFileSync(blPath, 'utf-8'));
+      out.push({
+        project_id: p.id,
+        project_name: bl.project_name || p.name,
+        priority: p.priority || 999,
+        tasks: (bl.tasks || []).filter(t => t.status !== 'done').slice(0, 5)
+      });
+    } catch {}
+  }
+  out.sort((a, b) => a.priority - b.priority);
+  return out;
+}
+
 function buildContext(appState, briefing) {
-  if (!appState) return `### Briefing\n${briefing}`;
+  const backlogs = loadBacklogSummary();
+  if (!appState) {
+    const parts = [`### Briefing\n${briefing}`];
+    if (backlogs.length) parts.push(renderBacklogs(backlogs));
+    return parts.join('\n\n');
+  }
   const lines = [];
   lines.push(`### Today: ${appState.date || new Date().toISOString().slice(0,10)}`);
 
@@ -181,7 +264,24 @@ function buildContext(appState, briefing) {
     appState.fallingThroughCracks.forEach(c => lines.push(`- ${c.name}: ${c.days_silent}d silent`));
   }
 
+  if (backlogs.length) {
+    lines.push('\n' + renderBacklogs(backlogs));
+  }
+
   lines.push(`\n### Briefing\n${briefing}`);
+  return lines.join('\n');
+}
+
+function renderBacklogs(backlogs) {
+  const lines = ['### Project Backlogs (top 5 each)'];
+  for (const b of backlogs) {
+    if (!b.tasks.length) {
+      lines.push(`- ${b.project_name} [${b.project_id}] — empty`);
+      continue;
+    }
+    lines.push(`- ${b.project_name} [${b.project_id}] (${b.tasks.length} shown):`);
+    b.tasks.forEach(t => lines.push(`    ${t.id}: ${t.text}`));
+  }
   return lines.join('\n');
 }
 
