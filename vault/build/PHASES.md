@@ -7,8 +7,9 @@ session before touching code.
 ## Current state
 
 - **Main HEAD:** check `git log main --oneline -1`
-- **Latest merged phase:** Phase 3 — Voice loop (commits 7b3b850 through 4f4012b
-  on v2-phase3, pending merge to main as of 21 Apr 2026)
+- **Latest merged phase:** Phase 3 — Voice loop (merged to main via PR #12,
+  merge commit `73c7dd2`, 2026-04-21)
+- **Active branch:** `v2-phase4` — Phase 4 onboarding, pending phone test + PR #13
 - **Production:** `the-grind-gold.vercel.app` — single Vercel project
 - **Architecture:** V2 served at `/` via Vite build at `v2/dist/`, `/api/*`
   same-origin, all Vercel serverless functions

@@ -42,6 +42,19 @@ export function App() {
   const { isActive } = useStore(onboardStore);
   useAutoOnboard();
 
+  // Dev-only override: `?force-onboard=1` opens onboarding regardless of
+  // registry state. Lets phase-4 phone testing exercise the full flow on an
+  // account with existing projects without wiping the live vault. Remove
+  // after Phase 4 merges and dedicated empty-vault testing is feasible.
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('force-onboard') === '1' && !onboardStore.get().isActive) {
+        openOnboard();
+      }
+    } catch (_e) { /* URL parse failures are harmless */ }
+  }, []);
+
   return (
     <>
       <div class="bg-gradient" />
