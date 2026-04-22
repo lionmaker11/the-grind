@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import { boardStore, fetchBoard } from '../../state/board.js';
-import { museStore, open as museOpen } from '../../state/muse.js';
+import { museStore } from '../../state/muse.js';
+import { openOnboard } from '../../state/onboard.js';
 import { ProjectCard } from './ProjectCard.jsx';
 import { EmptyState } from './EmptyState.jsx';
 import './Board.css';
@@ -66,7 +67,7 @@ export function Board() {
       <button
         class="add-project-ghost"
         type="button"
-        onClick={() => museOpen({ prefill: 'new project: ' })}
+        onClick={() => openOnboard()}
       >
         <span aria-hidden="true">+ </span>NEW PROJECT
       </button>

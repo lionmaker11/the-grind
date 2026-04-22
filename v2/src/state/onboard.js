@@ -6,6 +6,7 @@
 // are no-ops so mis-ordered dispatches can't crash the surface.
 
 import { map } from 'nanostores';
+import { projectOp, backlogOp } from '../lib/api.js';
 
 export const onboardStore = map({
   step: 'idle',
@@ -419,4 +420,90 @@ export function recoverToIntro() {
   const wasActive = cur.isActive;
   reset();
   patch({ isActive: wasActive, step: 'intro' });
+}
+
+// ─── Commit orchestrator ──────────────────────────────────────────────
+// Sequentially creates each project via /api/project op:add, then each
+// task under that project via /api/backlog op:add. Updates
+// commitProgress after every API call so the review surface can render a
+// live "N of M" indicator. Failures are collected into commitProgress.failed
+// with enough detail to retry (project name + task text). Does NOT throw;
+// returns when all items have been attempted. Caller invokes finishCommit()
+// which inspects commitProgress.failed to route to 'done' or 'error'.
+
+export async function commitOnboardingResults() {
+  const cur = onboardStore.get();
+  if (cur.step !== 'committing') return;
+  const projects = cur.extracted?.projects || [];
+  let completed = 0;
+  const failed = [];
+
+  const bumpProgress = () => {
+    updateCommitProgress(completed, [...failed]);
+  };
+
+  for (const p of projects) {
+    const name = (p.name || '').trim();
+    if (!name) {
+      failed.push({ kind: 'project', name: '(unnamed)', reason: 'empty name' });
+      const skipped = 1 + (p.tasks?.length || 0);
+      for (let i = 0; i < skipped; i++) {
+        completed++;
+        bumpProgress();
+      }
+      continue;
+    }
+
+    let projectId = null;
+    try {
+      const res = await projectOp({
+        op: 'add',
+        name,
+        priority: p.priority,
+        ...(p.note ? { note: p.note } : {})
+      });
+      projectId = res?.project?.id || null;
+      if (!projectId) throw new Error('no project id returned');
+      completed++;
+      bumpProgress();
+    } catch (err) {
+      failed.push({ kind: 'project', name, reason: err?.message || 'unknown' });
+      const skipped = 1 + (p.tasks?.length || 0);
+      for (let i = 0; i < skipped; i++) {
+        completed++;
+        bumpProgress();
+      }
+      continue;
+    }
+
+    for (const t of (p.tasks || [])) {
+      const text = (t.text || '').trim();
+      if (!text) {
+        failed.push({ kind: 'task', project: name, text: '(empty)', reason: 'empty text' });
+        completed++;
+        bumpProgress();
+        continue;
+      }
+      try {
+        await backlogOp({
+          op: 'add',
+          project_id: projectId,
+          task: {
+            text,
+            priority: t.priority,
+            ...(t.category ? { category: t.category } : {})
+          }
+        });
+        completed++;
+        bumpProgress();
+      } catch (err) {
+        failed.push({ kind: 'task', project: name, text, reason: err?.message || 'unknown' });
+        completed++;
+        bumpProgress();
+      }
+    }
+  }
+
+  updateCommitProgress(completed, failed);
+  finishCommit();
 }

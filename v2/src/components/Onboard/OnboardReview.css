@@ -1,0 +1,179 @@
+/* Review surface lives under the TopBar, not inside the onboard-root
+   padding-top. Override positioning locally. */
+.onboard-root[data-step='review'],
+.onboard-root[data-step='committing'] {
+  padding: 0;
+  background: var(--bg);
+}
+
+.or-viewport {
+  position: absolute;
+  top: 103px; /* status bar 47 + topbar 56 */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  padding: 16px 16px calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
+.review-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: var(--magenta);
+  text-transform: uppercase;
+  line-height: 1.4;
+  padding: 4px 2px 18px;
+}
+
+.or-empty {
+  padding: 24px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-md);
+  margin-bottom: 12px;
+}
+
+/* Project panel — neutral gray header (category colors deferred to Phase 5) */
+.or-panel {
+  padding: 14px 14px 12px;
+  margin-bottom: 14px;
+}
+.or-heartbeat {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+}
+.or-project-name {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  outline: none;
+  min-height: 36px;
+}
+.or-project-name:focus {
+  border-color: var(--cyan);
+  background: rgba(0, 240, 255, 0.04);
+}
+
+.or-task-text {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  outline: none;
+  min-height: 36px;
+}
+.or-task-text:focus {
+  border-color: var(--cyan);
+  background: rgba(0, 240, 255, 0.04);
+}
+
+/* Priority picker — chevrons flanking the P# badge */
+.or-pri {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.or-pri .p-badge {
+  min-width: 36px;
+  min-height: 28px;
+  padding: 0 6px;
+}
+.or-pri-step {
+  width: 20px;
+  height: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+.or-pri-step:active {
+  color: var(--cyan);
+}
+
+.btn-icon.delete {
+  color: var(--text-dim);
+}
+.btn-icon.delete:active {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.or-partial-warn {
+  padding: 12px 14px;
+  margin-top: 12px;
+  background: rgba(255, 0, 60, 0.08);
+  border: 1px solid rgba(255, 0, 60, 0.3);
+  border-radius: var(--r-sm);
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+}
+
+/* Pinned CTA dock */
+.lock-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 18, 0) 0%,
+    rgba(10, 10, 18, 0.85) 40%,
+    rgba(10, 10, 18, 0.98) 100%
+  );
+}
+.review-lock {
+  pointer-events: auto;
+  width: 100%;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--cyan), #00c8ff);
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.95rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--r-sm);
+  box-shadow: 0 0 40px var(--cyan-dim);
+  clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
+  min-height: 56px;
+}
+.review-lock:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
