@@ -187,7 +187,7 @@ export default async function handler(req, res) {
   // ── POST ─────────────────────────────────────────────────────────────────
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { op, project_id, task, task_id, priority, order, count } = req.body || {};
+  const { op, project_id, task, task_id, priority, order, count, urgent } = req.body || {};
 
   if (!op || !project_id) return res.status(400).json({ error: 'Missing op or project_id' });
 
@@ -267,6 +267,26 @@ export default async function handler(req, res) {
     taskObj.priority = pri;
     backlog.tasks = sortByPriority(backlog.tasks);
     const msg = `backlog: ${task_id} priority → P${pri}`;
+    const [result] = await Promise.all([
+      writeBacklog(project_id, backlog, sha, msg),
+      touchRegistry(project_id)
+    ]);
+    if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
+    return res.status(200).json({ ok: true, task: taskObj });
+  }
+
+  // ── toggle_urgent ────────────────────────────────────────────────────────
+  // Flip the binary urgent flag on a single task. Frontend passes the
+  // desired state explicitly (not a flip-current), so retries are idempotent.
+  // Pre-rebuild tasks without an `urgent` field are treated as urgent:false
+  // on read; this op writes the field explicitly. No backfill required.
+  if (op === 'toggle_urgent') {
+    if (!task_id) return res.status(400).json({ error: 'Missing task_id' });
+    if (typeof urgent !== 'boolean') return res.status(400).json({ error: 'urgent must be a boolean' });
+    const taskObj = backlog.tasks.find(t => t.id === task_id);
+    if (!taskObj) return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
+    taskObj.urgent = urgent;
+    const msg = `backlog: ${task_id} urgent → ${urgent ? 'on' : 'off'}`;
     const [result] = await Promise.all([
       writeBacklog(project_id, backlog, sha, msg),
       touchRegistry(project_id)
