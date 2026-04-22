@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-04-21",
+  "updated": "2026-04-22",
   "projects": [
     {
       "id": "708-pallister",
@@ -8,7 +8,9 @@
       "status": "active",
       "priority": 1,
       "folder": "vault/projects/708-pallister",
-      "aliases": ["Pallister"]
+      "aliases": [
+        "Pallister"
+      ]
     },
     {
       "id": "fitness",
@@ -16,7 +18,11 @@
       "status": "active",
       "priority": 2,
       "folder": "vault/projects/fitness",
-      "aliases": ["workout", "gym", "training"],
+      "aliases": [
+        "workout",
+        "gym",
+        "training"
+      ],
       "note": "Recurring daily workout task (P1) lives here. Add any other movement/fitness tasks to this backlog."
     },
     {
@@ -25,7 +31,10 @@
       "status": "active",
       "priority": 2,
       "folder": "vault/projects/fast-track-uig",
-      "aliases": ["FastTrack", "UIG"]
+      "aliases": [
+        "FastTrack",
+        "UIG"
+      ]
     },
     {
       "id": "lionmaker-kettlebell",
@@ -33,7 +42,9 @@
       "status": "active",
       "priority": 3,
       "folder": "vault/projects/lionmaker-kettlebell",
-      "aliases": ["Kettlebell app"]
+      "aliases": [
+        "Kettlebell app"
+      ]
     },
     {
       "id": "lionmaker-systems",
@@ -41,7 +52,10 @@
       "status": "active",
       "priority": 4,
       "folder": "vault/projects/lionmaker-systems",
-      "aliases": ["Lionmaker brand", "lionmaker11"]
+      "aliases": [
+        "Lionmaker brand",
+        "lionmaker11"
+      ]
     },
     {
       "id": "va-disability",
@@ -49,7 +63,10 @@
       "status": "active",
       "priority": 5,
       "folder": "vault/projects/va-disability",
-      "aliases": ["VA Appeal", "VA"]
+      "aliases": [
+        "VA Appeal",
+        "VA"
+      ]
     },
     {
       "id": "grillahq",
@@ -64,7 +81,9 @@
       "status": "active",
       "priority": 7,
       "folder": "vault/projects/alex-buildium",
-      "aliases": ["Buildium"]
+      "aliases": [
+        "Buildium"
+      ]
     },
     {
       "id": "the-grind",
@@ -72,7 +91,10 @@
       "status": "lightweight",
       "priority": 8,
       "folder": "vault/projects/the-grind",
-      "aliases": ["TheGrind", "grind app"],
+      "aliases": [
+        "TheGrind",
+        "grind app"
+      ],
       "note": "Self-improvement backlog for the app itself. Lightweight = not in daily queue rotation; Muse pulls from it only when T.J. asks."
     },
     {
@@ -81,7 +103,10 @@
       "status": "active",
       "priority": 9,
       "folder": "vault/projects/biggerspreads",
-      "aliases": ["BiggerSpreads", "Bigger Spreads"],
+      "aliases": [
+        "BiggerSpreads",
+        "Bigger Spreads"
+      ],
       "note": "SaaS. On hold pending June 2026 AI-obsolete decision."
     },
     {
@@ -90,7 +115,9 @@
       "status": "active",
       "priority": 10,
       "folder": "vault/projects/lionmaker",
-      "aliases": ["Lionmaker brand"],
+      "aliases": [
+        "Lionmaker brand"
+      ],
       "note": "Distinct from lionmaker-systems. Confirm scope with T.J."
     },
     {
@@ -98,7 +125,10 @@
       "name": "Motor City Deals",
       "status": "inactive",
       "folder": "vault/projects/motor-city-deals",
-      "aliases": ["MCD", "MCDCommand"]
+      "aliases": [
+        "MCD",
+        "MCDCommand"
+      ]
     },
     {
       "id": "marcus",
@@ -112,6 +142,14 @@
       "status": "inactive",
       "folder": "vault/projects/mcd-agent-org",
       "note": "Python companion to MCDCommand, stalled since 2026-03-17"
+    },
+    {
+      "id": "personal",
+      "name": "Personal",
+      "status": "active",
+      "priority": 3,
+      "folder": "vault/projects/personal",
+      "aliases": []
     }
   ]
 }
