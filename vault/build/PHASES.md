@@ -4,16 +4,37 @@ Authoritative record of phase-by-phase state, approved exceptions, and patterns
 observed during the rebuild. Read this file first in any new Claude Code
 session before touching code.
 
-## Current state
+## Current state (22 April 2026)
 
-- **Main HEAD:** check `git log main --oneline -1`
-- **Latest merged phase:** Phase 3 — Voice loop (merged to main via PR #12,
-  merge commit `73c7dd2`, 2026-04-21)
-- **Active branch:** `v2-phase4` — Phase 4 onboarding, pending phone test + PR #13
-- **Production:** `the-grind-gold.vercel.app` — single Vercel project
-- **Architecture:** V2 served at `/` via Vite build at `v2/dist/`, `/api/*`
-  same-origin, all Vercel serverless functions
-- **Lighthouse accessibility:** 100/100 (Phase 2 close)
+- Production: the-grind-gold.vercel.app (main branch, HEAD 73c7dd2)
+- Active branch: v2-phase4 (continues, not merged — mid-rebuild)
+- Architecture: V2 served at `/` via Vite build at `v2/dist/`, `/api/*` same-origin, all Vercel serverless functions
+- Lighthouse accessibility baseline: 100/100 (Phase 2 close, holds)
+
+Phase 4 onboarding is mid-rebuild. The initial 3-question implementation (commits f4fc3ba through c928abf) was phone-tested on 22 April 2026 and surfaced blocking issues: 4× POST /api/project returned 409 on LOCK IT IN (slug collisions between Opus-extracted project names and the existing vault registry); weak question phrasing producing poor extraction quality; broken project-task coupling across Q1/Q2/Q3 turns.
+
+A design council (Council 1: David_Allen_Methodologist, Julie_Zhuo_Designer, Ryan_Singer_Scope, Tobi_Lütke_Operator, Voice_UX_Researcher) redesigned the flow: single capture question + optional clarify + extended review with MATCH indicators and orphan handling. Concurrent with the redesign, a simplification pass removed P1/P2/P3 priority badges app-wide, removed aspirational due-date/overdue meta chips, and replaced the 1-5 priority scale with a binary urgent flag + universal drag-to-reorder ordering.
+
+Canonical rebuild spec: /vault/build/phase4-redesign-spec.md (landed in 03fe71a).
+Design asset set: /design/mockups/ (full replacement in f56f5e0 — 30 active screens + shared.css + tokens.css + 3 assets, reflecting the simplification pass).
+
+Next step: rebuild onboarding implementation on v2-phase4 per spec. Commits 5448a95, 05ceba8, 285b1c9, c928abf will be superseded but remain as branch archaeology. No force-push, no history rewrite.
+
+## April 2026 simplification pass
+
+Concurrent with the Phase 4 redesign, a product-level simplification removed three layers of decoration and elevated a single interaction to universal status:
+
+- **P1/P2/P3 priority badges removed app-wide.** Priority becomes implicit: position in a sorted list IS priority. Data model keeps an integer sort field but becomes invisible to the user.
+- **Due-date/overdue meta chips removed.** "14+ DAYS OVERDUE", "DUE FRI", "N DAYS QUIET" — these never existed in the backend data model. Aspirational design, cut until the feature lands (deferred to Phase 9 or 10).
+- **Binary urgent flag** replaces 1-5 priority granularity. `urgent: boolean` per task. Amber left-rail accent on urgent rows. "N URGENT / TOTAL" count in project head. Long-press 500ms gesture to toggle. Opus initializes `urgent` from language cues at extraction; Muse can toggle via voice ("make X urgent", "clear urgent from Y").
+- **Drag-to-reorder elevated to universal priority mechanism.** Used across onboard review and Phase 5b Backlog detail. Implemented once, reused everywhere tasks appear in an ordered list.
+
+Impact on phase scopes:
+- Phase 5b scope tightens: drag-to-reorder moves from Phase 8 polish into Phase 5b primary work. Phase 8 loses drag-and-drop (shifted forward). Net zero total work, resequenced.
+- Phase 4 review screen loses P-badges and up/down priority arrows.
+- All Focus/Muse/TopBar surfaces updated to speak binary urgent instead of priority integers.
+
+Data model changes captured in phase4-redesign-spec.md: task schema adds `urgent: boolean`, adds `order: integer`, removes `priority: 1-5`. `/api/backlog.js` gets new op `toggle_urgent`.
 
 ## Stack lock (non-negotiable)
 
@@ -44,6 +65,13 @@ user approval and a "show me the diff" review before any commit.
    where GET handlers read from the bundled vault snapshot (frozen at deploy)
    while POST handlers wrote to GitHub directly. Muse-filed tasks were
    invisible until next deploy. See Pattern 1.
+
+Pending Phase 4 rebuild exceptions (not yet committed):
+
+- **Exception 5** (anticipated): `api/chief.js` onboard-mode prompt assembly now injects the user's existing project registry into the system prompt so Opus can detect matches. Minor logic change within the existing mode-routing scope (Exception 3) but flagged separately because it changes prompt composition, not just routing.
+- **Exception 6** (anticipated): `api/backlog.js` gets new op `toggle_urgent`. Single-field mutation handler, same endpoint as existing op=add. Likely covered by the existing `op` routing pattern (Phase 1 endpoint scope) rather than a true exception, but review the diff when the rebuild lands to confirm.
+
+Each /api/* edit during the rebuild requires explicit diff review before commit. Four approved to date.
 
 ## Model routing (locked)
 
@@ -146,10 +174,9 @@ voice → Muse response → task on Board in <10s.
 
 ## Phase roadmap
 
-- **Phase 4 — Onboarding.** 3-question voice flow → Opus 4.7 extraction →
-  Review → LOCK IT IN. Uses `mode: 'onboard'`.
-- **Phase 5 — Board interactions.** Check-off, priority cycle, launch to
-  Focus, ghost-row wiring.
+- **Phase 4 — Onboarding rebuild.** Mid-rebuild after phone test revealed blocking issues in the original 3-question implementation. Redesigned flow per Council 1 output (22 April 2026): single capture + optional clarify + extended review with MATCH/orphan handling. Binary urgent flag replaces P-badges. Canonical spec: /vault/build/phase4-redesign-spec.md. Original commits on v2-phase4 (5448a95, 05ceba8, 285b1c9, c928abf) preserved as archaeology; rebuild will supersede them without force-push.
+- **Phase 5a — Board interactions.** Check-off, launch to Focus stub, ghost-row wiring. Priority changes happen via drag (simplification pass made drag universal) — Board top-3 derives from backlog order. Pending.
+- **Phase 5b — Backlog detail + pom glyphs.** Modal overlay launched from Board project tap. Full task list with URGENT/NORMAL grouping, drag-to-reorder primary priority mechanism, inline pomodoro estimate glyphs, aggregate pom counter in header. Mockups 23 (detail), 24 (glyph study), 33 (reorder + urgent storyboard) in /design/mockups/. Scope tightened by simplification pass: drag-to-reorder (previously Phase 8 polish) now primary Phase 5b work. Depends on Phase 4 rebuild merging first and Phase 5a shipping the basic interaction primitives.
 - **Phase 6 — Focus surface + Ring timer.** Port sacred SVG from mockup 06.
 - **Phase 7 — PWA manifest + service worker + iOS install.** Killswitch SW
   to clean up V1 ghost.
@@ -160,10 +187,7 @@ voice → Muse response → task on Board in <10s.
 
 ### Pattern 1 — `/api/*` frozen rule keeps surfacing pre-existing bugs
 
-Four approved exceptions so far (see list above). None are scope creep; all
-are V1 bugs that had been silently broken. The frozen rule did its job by
-forcing explicit review of each backend touch, which surfaced the bugs
-instead of letting them compound.
+Four approved to date; the Phase 4 rebuild is expected to add two more (api/chief.js registry-injection, api/backlog.js toggle_urgent op). Review each diff before commit. None are scope creep; all are V1 bugs that had been silently broken. The frozen rule did its job by forcing explicit review of each backend touch, which surfaced the bugs instead of letting them compound.
 
 **Implication:** Expect more of these in Phases 4-7 as new surfaces exercise
 the backend. Budget 1-2 small `/api/*` exception commits per phase.
@@ -205,8 +229,7 @@ Known polish items from Phase 3 phone test:
   (fix: `font-variant-emoji: text` or inline SVG)
 - Muse FAB is hard to reach with left-hand thumb at 56px
   (consider 64-72px or pull-up gesture)
-- Task text truncation too aggressive — user can't read full task on single
-  line. Needs wrap or expand-on-long-press in Phase 5 UX polish.
+- Task text truncation → handled by two-line wrap treatment (design/mockups/35-board-task-wrap.html), lands in Phase 5a
 - Long project names truncate (e.g. LIONMAKER KETTLEBELL APP → KETTLEBEL...).
   Lower severity — project name is identifier, full text is in individual
   tasks.
