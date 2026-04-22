@@ -158,6 +158,15 @@
       "priority": 3,
       "folder": "vault/projects/financial",
       "aliases": []
+    },
+    {
+      "id": "motor-city-deals-command-center",
+      "name": "Motor City Deals Command Center",
+      "status": "active",
+      "priority": 1,
+      "folder": "vault/projects/motor-city-deals-command-center",
+      "aliases": [],
+      "note": "Overdue; waiting on A2P."
     }
   ]
 }
