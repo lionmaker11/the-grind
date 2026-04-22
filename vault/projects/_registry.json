@@ -150,6 +150,14 @@
       "priority": 3,
       "folder": "vault/projects/personal",
       "aliases": []
+    },
+    {
+      "id": "financial",
+      "name": "Financial",
+      "status": "active",
+      "priority": 3,
+      "folder": "vault/projects/financial",
+      "aliases": []
     }
   ]
 }
