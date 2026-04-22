@@ -3,6 +3,7 @@ import {
   readMuseSystem,
   readOnboardSystem,
   getAllProjectIds,
+  getActiveProjects,
   fetchRegistryLive,
   getBacklogSummaryLive,
   renderBacklogsText,
@@ -190,44 +191,69 @@ async function buildContext() {
 // Onboarding extraction tool. Single tool, single call per request.
 // Schema mirrors add_to_backlog's category enum (CATEGORIES) so the LOCK
 // IT IN commit can forward extracted rows to /api/project + /api/backlog
-// without field-name translation.
+// without field-name translation. Binary urgent replaces the 1-5 priority
+// scale used in the deprecated 3-question flow (see phase4-redesign-spec.md).
 const ONBOARD_EXTRACT_TOOL = {
   name: 'extract_onboarding',
-  description: 'Extract a clean list of projects and tasks from the raw three-answer onboarding transcript. Call exactly once per request.',
+  description: 'Extract projects, tasks, and orphan tasks from a single capture answer (plus optional clarify answer). Match extracted projects against existing vault entries via matched_existing_id + match_confidence so the review UI can offer merge instead of creating duplicates. Call exactly once per request.',
   input_schema: {
     type: 'object',
-    required: ['projects'],
+    required: ['projects', 'orphan_tasks', 'clarification_needed'],
     properties: {
       projects: {
         type: 'array',
         items: {
           type: 'object',
-          required: ['name', 'priority', 'tasks'],
+          required: ['name', 'urgent', 'matched_existing_id', 'match_confidence', 'tasks'],
           properties: {
             name: { type: 'string', description: 'Clean project name. Title Case. 1-3 words ideal.' },
             category: { type: 'string', enum: CATEGORIES, description: 'Best-fit category. Omit if unclear rather than guess.' },
-            priority: { type: 'integer', minimum: 1, maximum: 5, description: '1 = on fire / this-week urgent. 5 = parked.' },
+            urgent: { type: 'boolean', description: 'True if ANY task is urgent OR user flagged the whole project as urgent. Binary — be conservative.' },
+            matched_existing_id: { type: ['string', 'null'], description: 'Existing registry slug if this project matches one in the vault. Null if new.' },
+            match_confidence: { type: 'number', minimum: 0, maximum: 1, description: '0.85+ = clear match (merge default on review). 0.3-0.8 = possible match (UI shows both options, no default). <0.3 = treat as new.' },
             note: { type: 'string', description: 'Optional one-sentence context.' },
             tasks: {
               type: 'array',
               items: {
                 type: 'object',
-                required: ['text', 'priority'],
+                required: ['text', 'urgent'],
                 properties: {
                   text: { type: 'string', description: 'Action-first task. Starts with a verb.' },
-                  priority: { type: 'integer', minimum: 1, maximum: 5 },
+                  urgent: { type: 'boolean', description: 'True if language contains urgency cues ("on fire", "overdue", "ASAP", explicit overdue dates, strong emotional framing). Default false. Be conservative.' },
                   category: { type: 'string', enum: CATEGORIES, description: 'Override parent project category only when cross-cutting.' }
                 }
               }
             }
           }
         }
+      },
+      orphan_tasks: {
+        type: 'array',
+        description: 'Tasks that do not clearly belong to any project (neither named in transcript nor existing vault). User assigns on review. Empty array if none.',
+        items: {
+          type: 'object',
+          required: ['text', 'urgent'],
+          properties: {
+            text: { type: 'string', description: 'Action-first task.' },
+            urgent: { type: 'boolean' },
+            category: { type: 'string', enum: CATEGORIES },
+            suggested_new_project_name: { type: 'string', description: 'Short name suggestion if the orphan implies a category-level project (e.g. "Health" for a gym task). Omit if no clean suggestion.' }
+          }
+        }
+      },
+      clarification_needed: {
+        type: ['object', 'null'],
+        description: 'Single follow-up question if orphan_tasks is non-empty OR any project has match_confidence in 0.3-0.7. Null otherwise.',
+        properties: {
+          question: { type: 'string', description: 'One conversational sentence, concrete reference to the ambiguity.' }
+        },
+        required: ['question']
       }
     }
   }
 };
 
-const ONBOARD_FALLBACK_SYSTEM = `You are an extraction tool. The user message is a raw transcript of three voice answers. Call extract_onboarding exactly once with a projects array. Each project has name, optional category from [In Business, On Business, Health, Family, Finances, Personal, Learning], priority 1-5, optional note, and a tasks array. Return { projects: [] } on empty input. No prose.`;
+const ONBOARD_FALLBACK_SYSTEM = `You are an extraction tool. The user message is a raw transcript of a single capture answer (optionally followed by a clarify answer). Call extract_onboarding exactly once with { projects, orphan_tasks, clarification_needed }. Per project: name, optional category from [In Business, On Business, Health, Family, Finances, Personal, Learning], urgent:boolean, matched_existing_id (string|null), match_confidence (0-1), optional note, tasks array. Per task: text, urgent:boolean, optional category. Orphan tasks: tasks not belonging to any project. clarification_needed: {question} if ambiguous (orphans present or match_confidence 0.3-0.7), null otherwise. Return { projects: [], orphan_tasks: [], clarification_needed: null } on empty input. No prose.`;
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -267,8 +293,19 @@ export default async function handler(req, res) {
 
   if (resolvedMode === 'onboard') {
     const onboardHead = readOnboardSystem() || ONBOARD_FALLBACK_SYSTEM;
+    // Registry injection: read the live vault so Opus can detect matches
+    // between extracted names and existing projects. Same read-path pattern
+    // Muse uses below (fetchRegistryLive → getActiveProjects). Cached head
+    // stays stable across onboarding sessions; the registry line sits
+    // uncached so vault writes don't invalidate the cache prefix.
+    const registry = await fetchRegistryLive();
+    const activeNames = getActiveProjects(registry).map(p => p.name).filter(Boolean);
+    const registryTail = activeNames.length
+      ? `## Existing projects in T.J.'s vault\n${activeNames.join(', ')}\n\nIf the transcript mentions any of these or a clear alias, set matched_existing_id + match_confidence rather than creating a new project.`
+      : `## Existing projects in T.J.'s vault\n(none — first-time onboarding)`;
     system = [
-      { type: 'text', text: onboardHead, cache_control: { type: 'ephemeral' } }
+      { type: 'text', text: onboardHead, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: registryTail }
     ];
     tools = [ONBOARD_EXTRACT_TOOL];
     messages = [{ role: 'user', content: message }];
