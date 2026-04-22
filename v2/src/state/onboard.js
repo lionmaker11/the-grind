@@ -216,12 +216,15 @@ export function receiveExtraction(projects) {
     category: p.category || null,
     priority: typeof p.priority === 'number' ? p.priority : 3,
     note: p.note || '',
+    committed: false,
+    backendId: null,
     tasks: Array.isArray(p.tasks)
       ? p.tasks.map((t, j) => ({
           tempId: `t-${Date.now()}-${i}-${j}`,
           text: t.text || '',
           priority: typeof t.priority === 'number' ? t.priority : 3,
-          category: t.category || null
+          category: t.category || null,
+          committed: false
         }))
       : []
   }));
@@ -287,6 +290,8 @@ export function addProject() {
       category: null,
       priority: 3,
       note: '',
+      committed: false,
+      backendId: null,
       tasks: []
     });
     return projects;
@@ -330,7 +335,8 @@ export function addTask(projectIdx) {
       tempId: `t-${Date.now()}-${projectIdx}-${p.tasks.length}`,
       text: '',
       priority: 3,
-      category: null
+      category: null,
+      committed: false
     });
     return projects;
   });
@@ -338,13 +344,45 @@ export function addTask(projectIdx) {
 
 // ─── Commit lifecycle ─────────────────────────────────────────────────
 
+function markProjectCommitted(idx, backendId) {
+  const cur = onboardStore.get();
+  if (!cur.extracted) return;
+  const projects = cur.extracted.projects.map((p, i) =>
+    i === idx
+      ? { ...p, committed: true, backendId, tasks: p.tasks.map(t => ({ ...t })) }
+      : { ...p, tasks: p.tasks.map(t => ({ ...t })) }
+  );
+  patch({ extracted: { ...cur.extracted, projects } });
+}
+
+function markTaskCommitted(projectIdx, taskIdx) {
+  const cur = onboardStore.get();
+  if (!cur.extracted) return;
+  const projects = cur.extracted.projects.map((p, i) => {
+    if (i !== projectIdx) return { ...p, tasks: p.tasks.map(t => ({ ...t })) };
+    return {
+      ...p,
+      tasks: p.tasks.map((t, j) =>
+        j === taskIdx ? { ...t, committed: true } : { ...t }
+      )
+    };
+  });
+  patch({ extracted: { ...cur.extracted, projects } });
+}
+
 export function startCommit() {
   const cur = onboardStore.get();
   if (!tryStep('committing')) return;
-  const total = cur.extracted?.projects?.reduce((sum, p) => sum + 1 + p.tasks.length, 0) || 0;
+  const projects = cur.extracted?.projects || [];
+  const total = projects.reduce((sum, p) => sum + 1 + p.tasks.length, 0);
+  const alreadyCommitted = projects.reduce((sum, p) => {
+    const pDone = p.committed ? 1 : 0;
+    const tDone = p.tasks.filter(t => t.committed).length;
+    return sum + pDone + tDone;
+  }, 0);
   patch({
     committing: true,
-    commitProgress: { total, completed: 0, failed: [] }
+    commitProgress: { total, completed: alreadyCommitted, failed: [] }
   });
 }
 
@@ -435,52 +473,72 @@ export async function commitOnboardingResults() {
   const cur = onboardStore.get();
   if (cur.step !== 'committing') return;
   const projects = cur.extracted?.projects || [];
-  let completed = 0;
+
+  let completed = cur.commitProgress.completed;
   const failed = [];
 
   const bumpProgress = () => {
     updateCommitProgress(completed, [...failed]);
   };
 
-  for (const p of projects) {
-    const name = (p.name || '').trim();
-    if (!name) {
-      failed.push({ kind: 'project', name: '(unnamed)', reason: 'empty name' });
-      const skipped = 1 + (p.tasks?.length || 0);
-      for (let i = 0; i < skipped; i++) {
+  for (let pIdx = 0; pIdx < projects.length; pIdx++) {
+    const p = onboardStore.get().extracted.projects[pIdx];
+
+    let projectId = p.backendId;
+    if (!p.committed) {
+      const name = (p.name || '').trim();
+      if (!name) {
+        failed.push({ kind: 'project', name: '(unnamed)', reason: 'empty name' });
+        for (const t of (p.tasks || [])) {
+          if (!t.committed) {
+            failed.push({
+              kind: 'task',
+              project: '(unnamed)',
+              text: t.text || '(empty)',
+              reason: 'parent project failed'
+            });
+          }
+        }
+        bumpProgress();
+        continue;
+      }
+      try {
+        const res = await projectOp({
+          op: 'add',
+          name,
+          priority: p.priority,
+          ...(p.note ? { note: p.note } : {})
+        });
+        projectId = res?.project?.id || null;
+        if (!projectId) throw new Error('no project id returned');
+        markProjectCommitted(pIdx, projectId);
         completed++;
         bumpProgress();
-      }
-      continue;
-    }
-
-    let projectId = null;
-    try {
-      const res = await projectOp({
-        op: 'add',
-        name,
-        priority: p.priority,
-        ...(p.note ? { note: p.note } : {})
-      });
-      projectId = res?.project?.id || null;
-      if (!projectId) throw new Error('no project id returned');
-      completed++;
-      bumpProgress();
-    } catch (err) {
-      failed.push({ kind: 'project', name, reason: err?.message || 'unknown' });
-      const skipped = 1 + (p.tasks?.length || 0);
-      for (let i = 0; i < skipped; i++) {
-        completed++;
+      } catch (err) {
+        failed.push({ kind: 'project', name, reason: err?.message || 'unknown' });
+        for (const t of (p.tasks || [])) {
+          if (!t.committed) {
+            failed.push({
+              kind: 'task',
+              project: name,
+              text: t.text || '(empty)',
+              reason: 'parent project failed'
+            });
+          }
+        }
         bumpProgress();
+        continue;
       }
-      continue;
     }
 
-    for (const t of (p.tasks || [])) {
+    const refreshed = onboardStore.get().extracted.projects[pIdx];
+    for (let tIdx = 0; tIdx < refreshed.tasks.length; tIdx++) {
+      const t = refreshed.tasks[tIdx];
+      if (t.committed) continue;
+
       const text = (t.text || '').trim();
       if (!text) {
-        failed.push({ kind: 'task', project: name, text: '(empty)', reason: 'empty text' });
-        completed++;
+        failed.push({ kind: 'task', project: refreshed.name, text: '(empty)', reason: 'empty text' });
         bumpProgress();
         continue;
       }
@@ -494,11 +552,11 @@ export async function commitOnboardingResults() {
             ...(t.category ? { category: t.category } : {})
           }
         });
+        markTaskCommitted(pIdx, tIdx);
         completed++;
         bumpProgress();
       } catch (err) {
-        failed.push({ kind: 'task', project: name, text, reason: err?.message || 'unknown' });
-        completed++;
+        failed.push({ kind: 'task', project: refreshed.name, text, reason: err?.message || 'unknown' });
         bumpProgress();
       }
     }
