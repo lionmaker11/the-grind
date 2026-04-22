@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import {
   readMuseSystem,
+  readOnboardSystem,
   getAllProjectIds,
   fetchRegistryLive,
   getBacklogSummaryLive,
@@ -186,6 +187,48 @@ async function buildContext() {
   return renderBacklogsText(backlogs) || '### Project Backlogs\n(no active projects with backlogs)';
 }
 
+// Onboarding extraction tool. Single tool, single call per request.
+// Schema mirrors add_to_backlog's category enum (CATEGORIES) so the LOCK
+// IT IN commit can forward extracted rows to /api/project + /api/backlog
+// without field-name translation.
+const ONBOARD_EXTRACT_TOOL = {
+  name: 'extract_onboarding',
+  description: 'Extract a clean list of projects and tasks from the raw three-answer onboarding transcript. Call exactly once per request.',
+  input_schema: {
+    type: 'object',
+    required: ['projects'],
+    properties: {
+      projects: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['name', 'priority', 'tasks'],
+          properties: {
+            name: { type: 'string', description: 'Clean project name. Title Case. 1-3 words ideal.' },
+            category: { type: 'string', enum: CATEGORIES, description: 'Best-fit category. Omit if unclear rather than guess.' },
+            priority: { type: 'integer', minimum: 1, maximum: 5, description: '1 = on fire / this-week urgent. 5 = parked.' },
+            note: { type: 'string', description: 'Optional one-sentence context.' },
+            tasks: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['text', 'priority'],
+                properties: {
+                  text: { type: 'string', description: 'Action-first task. Starts with a verb.' },
+                  priority: { type: 'integer', minimum: 1, maximum: 5 },
+                  category: { type: 'string', enum: CATEGORIES, description: 'Override parent project category only when cross-cutting.' }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+const ONBOARD_FALLBACK_SYSTEM = `You are an extraction tool. The user message is a raw transcript of three voice answers. Call extract_onboarding exactly once with a projects array. Each project has name, optional category from [In Business, On Business, Health, Family, Finances, Personal, Learning], priority 1-5, optional note, and a tasks array. Return { projects: [] } on empty input. No prose.`;
+
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -201,42 +244,67 @@ export default async function handler(req, res) {
   }
 
   const { message, conversation, firstTurnToday, mode } = req.body || {};
-  if (!message || typeof message !== 'string' || message.length > 2000) {
-    return res.status(400).json({ error: 'Invalid message' });
-  }
-
   const resolvedMode = typeof mode === 'string' && MODELS[mode] ? mode : 'default';
   const model = MODELS[resolvedMode];
 
-  const stableHead = buildStableSystemHead();
-  const dayContext = buildDayContext(Boolean(firstTurnToday));
-  // Registry + backlog summary read live from GitHub in parallel so the
-  // tool manifest and "Current State" block reflect the latest vault
-  // writes — including ones Muse herself made earlier this session.
-  const [registry, stateContext] = await Promise.all([
-    fetchRegistryLive(),
-    buildContext()
-  ]);
-  const dynamicTail = `${dayContext}\n\n## Current State\n${stateContext}`;
-
-  // System as an array of content blocks. The stable head carries
-  // cache_control: ephemeral so Anthropic caches [tools + head] as the
-  // prefix. The dynamic tail (day + state) sits uncached, so day-roll
-  // and vault mutations don't invalidate the cache prefix.
-  const system = [
-    { type: 'text', text: stableHead, cache_control: { type: 'ephemeral' } },
-    { type: 'text', text: dynamicTail }
-  ];
-
-  const messages = [];
-  if (conversation && Array.isArray(conversation)) {
-    conversation.slice(-20).forEach(m => {
-      if ((m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string') {
-        messages.push({ role: m.role, content: m.content });
-      }
-    });
+  // Onboarding sends a three-answer transcript in a single user message,
+  // which easily exceeds the Muse 2000-char ceiling. Allow more headroom
+  // when mode=onboard.
+  const maxMessageLen = resolvedMode === 'onboard' ? 8000 : 2000;
+  if (!message || typeof message !== 'string' || message.length > maxMessageLen) {
+    return res.status(400).json({ error: 'Invalid message' });
   }
-  messages.push({ role: 'user', content: message });
+
+  // Per-mode request shape. Muse loads live registry + backlog state,
+  // day context, prior conversation, and the full tool manifest. Onboard
+  // is a single-shot extraction: static system prompt, one tool, no
+  // registry, no conversation, no day context — transcript lives in the
+  // sole user message.
+  let system;
+  let tools;
+  let messages;
+  let maxTokens;
+
+  if (resolvedMode === 'onboard') {
+    const onboardHead = readOnboardSystem() || ONBOARD_FALLBACK_SYSTEM;
+    system = [
+      { type: 'text', text: onboardHead, cache_control: { type: 'ephemeral' } }
+    ];
+    tools = [ONBOARD_EXTRACT_TOOL];
+    messages = [{ role: 'user', content: message }];
+    maxTokens = 4096;
+  } else {
+    const stableHead = buildStableSystemHead();
+    const dayContext = buildDayContext(Boolean(firstTurnToday));
+    // Registry + backlog summary read live from GitHub in parallel so the
+    // tool manifest and "Current State" block reflect the latest vault
+    // writes — including ones Muse herself made earlier this session.
+    const [registry, stateContext] = await Promise.all([
+      fetchRegistryLive(),
+      buildContext()
+    ]);
+    const dynamicTail = `${dayContext}\n\n## Current State\n${stateContext}`;
+
+    // System as an array of content blocks. The stable head carries
+    // cache_control: ephemeral so Anthropic caches [tools + head] as the
+    // prefix. The dynamic tail (day + state) sits uncached, so day-roll
+    // and vault mutations don't invalidate the cache prefix.
+    system = [
+      { type: 'text', text: stableHead, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: dynamicTail }
+    ];
+    tools = buildTools(registry);
+    messages = [];
+    if (conversation && Array.isArray(conversation)) {
+      conversation.slice(-20).forEach(m => {
+        if ((m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string') {
+          messages.push({ role: m.role, content: m.content });
+        }
+      });
+    }
+    messages.push({ role: 'user', content: message });
+    maxTokens = 1024;
+  }
 
   const client = new Anthropic();
   const startedAt = Date.now();
@@ -244,10 +312,10 @@ export default async function handler(req, res) {
   try {
     const response = await client.messages.create({
       model,
-      max_tokens: 1024,
+      max_tokens: maxTokens,
       system,
       messages,
-      tools: buildTools(registry)
+      tools
     });
 
     let text = '';

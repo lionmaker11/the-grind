@@ -6,6 +6,7 @@ import { join } from 'path';
 
 const REGISTRY_REL = join('vault', 'projects', '_registry.json');
 const MUSE_SYSTEM_REL = join('vault', 'systems', 'muse-system.md');
+const ONBOARD_SYSTEM_REL = join('vault', 'systems', 'onboard-system.md');
 
 export const ID_PREFIX = {
   'the-grind': 'tg',
@@ -40,6 +41,13 @@ export function readBacklog(projectId) {
 
 export function readMuseSystem() {
   const path = join(process.cwd(), MUSE_SYSTEM_REL);
+  if (!existsSync(path)) return null;
+  try { return readFileSync(path, 'utf-8'); }
+  catch { return null; }
+}
+
+export function readOnboardSystem() {
+  const path = join(process.cwd(), ONBOARD_SYSTEM_REL);
   if (!existsSync(path)) return null;
   try { return readFileSync(path, 'utf-8'); }
   catch { return null; }
