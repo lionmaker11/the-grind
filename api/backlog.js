@@ -213,22 +213,57 @@ export default async function handler(req, res) {
   // ── add ──────────────────────────────────────────────────────────────────
   if (op === 'add') {
     if (!task || !task.text) return res.status(400).json({ error: 'Missing task.text' });
-    if (!task.priority) return res.status(400).json({ error: 'Missing task.priority' });
-    const pri = parseInt(task.priority, 10);
-    if (!Number.isInteger(pri) || pri < 1 || pri > 5) {
-      return res.status(400).json({ error: 'priority must be an integer 1–5' });
+
+    // Optional fields — validate shape if present, otherwise skip. Per R2.5:
+    // store only what the client sends; do not synthesize priority from
+    // urgent. Old-flow callers still send priority; new-flow callers send
+    // urgent + order and skip priority entirely.
+    let pri = null;
+    if (task.priority !== undefined && task.priority !== null) {
+      pri = parseInt(task.priority, 10);
+      if (!Number.isInteger(pri) || pri < 1 || pri > 5) {
+        return res.status(400).json({ error: 'priority must be an integer 1–5' });
+      }
     }
+    let urgentFlag = null;
+    if (task.urgent !== undefined) {
+      if (typeof task.urgent !== 'boolean') {
+        return res.status(400).json({ error: 'task.urgent must be a boolean' });
+      }
+      urgentFlag = task.urgent;
+    }
+    let explicitOrder = null;
+    if (task.order !== undefined) {
+      if (!Number.isInteger(task.order) || task.order < 0) {
+        return res.status(400).json({ error: 'task.order must be a non-negative integer' });
+      }
+      explicitOrder = task.order;
+    }
+
     const newTask = {
       id: nextTaskId(project_id, backlog.tasks),
       text: String(task.text).slice(0, 200),
       done_condition: task.done_condition || null,
       category: task.category || null,
       estimated_pomodoros: task.estimated_pomodoros != null ? task.estimated_pomodoros : null,
-      priority: pri,
       status: 'pending',
-      created: today()
+      created: today(),
+      ...(pri !== null ? { priority: pri } : {}),
+      ...(urgentFlag !== null ? { urgent: urgentFlag } : {}),
+      ...(explicitOrder !== null ? { order: explicitOrder } : {})
     };
-    backlog.tasks = insertSorted(backlog.tasks, newTask);
+
+    // Explicit `order` short-circuits priority-bucketed insertion: splice
+    // at the requested position (clamped to array length; out-of-range
+    // values append). Old-flow callers without `order` still go through
+    // insertSorted via task.priority.
+    if (explicitOrder !== null) {
+      const pos = Math.min(explicitOrder, backlog.tasks.length);
+      backlog.tasks.splice(pos, 0, newTask);
+    } else {
+      backlog.tasks = insertSorted(backlog.tasks, newTask);
+    }
+
     const msg = `backlog: add "${newTask.text.slice(0, 60)}" to ${project_id}`;
     const [result] = await Promise.all([
       writeBacklog(project_id, backlog, sha, msg),
