@@ -34,6 +34,10 @@
   --indigo:       #7b5cff;   /* break mode, secondary */
   --indigo-glow:  rgba(123, 92, 255, 0.5);
 
+  --amber:        #ffa726;   /* urgent flag — warning family, distinct from yellow (heartbeat) and red (overdue) */
+  --amber-dim:    rgba(255, 167, 38, 0.35);
+  --amber-glow:   rgba(255, 167, 38, 0.55);
+
   /* ---------- NEUTRALS ---------- */
   --bg:           #0a0a12;
   --bg-panel:     rgba(10, 15, 30, 0.85);

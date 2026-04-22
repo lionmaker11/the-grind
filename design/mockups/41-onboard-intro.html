@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>41 — Onboard: Intro (V2 copy)</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  .onboard.intro {
+    padding: 56px 20px 32px;
+    padding-top: calc(44px + env(safe-area-inset-top, 0px) + 12px);
+    padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+  }
+  .intro-top    { flex: 40; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; padding-bottom: 12px; width: 100%; }
+  .intro-mid    { flex: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; width: 100%; }
+  .intro-bottom { flex: 30; width: 100%; }
+  .intro-top .onboard-hero-logo { margin-bottom: 4px; }
+  .intro-mid .onboard-welcome   { margin: 0 !important; width: 100%; max-width: 100%; font-size: 1.3rem; line-height: 1.4; padding: 0; }
+
+  .btn-primary.glyph-only {
+    padding: 0;
+    width: 120px; height: 64px;
+    font-size: 1.6rem; letter-spacing: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="41 Onboard Intro V2">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="onboard intro">
+      <div class="intro-top">
+        <img src="assets/lionmaker-logo.png" class="onboard-hero-logo" alt="Lionmaker">
+        <div class="onboard-wordmark">THEGRIND</div>
+        <div class="onboard-tagline">// A LIONMAKER SYSTEM</div>
+      </div>
+
+      <div class="intro-mid">
+        <div class="onboard-welcome">Dump what's on your plate.<br>Out loud. Take your time.</div>
+        <button class="btn-primary glyph-only" aria-label="Begin">▶</button>
+      </div>
+
+      <div class="intro-bottom"></div>
+    </div>
+
+  </div>
+  <div class="caption">41 / 42 — INTRO · V2 COPY</div>
+</div>
+</body>
+</html>

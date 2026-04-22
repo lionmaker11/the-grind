@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>22 — Board: Tap Affordance</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  .tap-hint {
+    font-family: var(--font-mono);
+    font-size: .65rem;
+    letter-spacing: 2.5px;
+    color: var(--magenta);
+    text-transform: uppercase;
+    margin: 6px 0 14px;
+    opacity: .85;
+    animation: tap-pulse 2.2s var(--ease-out) infinite;
+  }
+  @keyframes tap-pulse {
+    0%, 100% { opacity: .35; }
+    50%      { opacity: .95; }
+  }
+  .project-card.hinted {
+    position: relative;
+    border-color: rgba(255, 0, 212, .28) !important;
+    box-shadow: 0 0 0 1px rgba(255, 0, 212, .18), 0 0 24px -8px rgba(255, 0, 212, .35);
+  }
+  .project-card.hinted::after {
+    content: '›';
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--magenta);
+    opacity: .6;
+    animation: chevron-slide 1.8s var(--ease-out) infinite;
+    pointer-events: none;
+  }
+  @keyframes chevron-slide {
+    0%, 100% { transform: translate(0, -50%); opacity: .3; }
+    50%      { transform: translate(4px, -50%); opacity: .8; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="22 Board Tap Affordance">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="topbar">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status">TUE · 09:41</span>
+    </div>
+
+    <div class="viewport">
+      <div class="section-title">IN CONTEXT</div>
+      <div class="section-sub">3 PROJECTS · 4 URGENT / 10</div>
+      <div class="tap-hint">// TAP ANY PROJECT →</div>
+
+      <!-- Pallister (yellow, hinted) -->
+      <div class="panel project-card hinted">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat yellow"></span>
+          <span class="project-name">708 PALLISTER</span>
+          <span class="urgent-count"><span class="n-urgent">2 URGENT</span><span class="slash">/</span>3</span>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Call Sam re: countertop installer</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Finalize easement SNDA provisions</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row">
+          <span class="drag-handle"></span>
+          <div class="task-text">Review Rick's budget spreadsheet</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+      </div>
+
+      <!-- Lionmaker -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat green"></span>
+          <span class="project-name">LIONMAKER SYSTEMS</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Ship V2 DESIGN.md to repo</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row">
+          <span class="drag-handle"></span>
+          <div class="task-text">Port V1 components to Preact</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row">
+          <span class="drag-handle"></span>
+          <div class="task-text">Wire up Muse FAB overlay</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+      </div>
+
+      <!-- Marcus -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat red"></span>
+          <span class="project-name">MARCUS</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>2</span>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Verify trading resumed after MDD lockout</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row">
+          <span class="drag-handle"></span>
+          <div class="task-text">Review funding rate arb logs</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+      </div>
+
+      <button class="add-project-ghost" style="width:100%">+ NEW PROJECT</button>
+    </div>
+
+    <div class="execute-wrap">
+      <button class="btn-primary">▶ EXECUTE</button>
+    </div>
+
+    <div class="muse-fab">●</div>
+  </div>
+</div>
+</body>
+</html>

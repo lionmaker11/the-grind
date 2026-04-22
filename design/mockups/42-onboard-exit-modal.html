@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>42 — Onboard: Exit Modal (v2)</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  /* Backdrop — slightly less aggressive blur, matches v2 onboard tone */
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5,5,9,.82);
+    backdrop-filter: blur(8px);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+  }
+
+  /* Modal card — flatter, terminal-style; panel echoes project-card corners */
+  .modal-card {
+    width: 100%;
+    max-width: 330px;
+    background: var(--bg-panel);
+    border: 1px solid var(--magenta);
+    border-radius: var(--r-md);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      0 0 0 1px rgba(255,0,222,.12),
+      0 0 40px -10px var(--magenta-glow),
+      0 24px 60px rgba(0,0,0,.7);
+    padding: 24px 22px 20px;
+    position: relative;
+  }
+  .modal-card::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 16px; right: 16px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--magenta), transparent);
+  }
+  .modal-card .corner {
+    position:absolute; width:10px; height:10px;
+    border-color: var(--magenta); border-style:solid; opacity:.55;
+    pointer-events:none;
+  }
+  .modal-card .corner.tl { top:-1px; left:-1px; border-width:1px 0 0 1px; }
+  .modal-card .corner.tr { top:-1px; right:-1px; border-width:1px 1px 0 0; }
+  .modal-card .corner.bl { bottom:-1px; left:-1px; border-width:0 0 1px 1px; }
+  .modal-card .corner.br { bottom:-1px; right:-1px; border-width:0 1px 1px 0; }
+
+  .modal-eyebrow {
+    font-family: var(--font-mono);
+    font-size: .58rem;
+    letter-spacing: 2.5px;
+    color: var(--magenta);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    opacity: .9;
+  }
+  .modal-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.35rem;
+    letter-spacing: 1.5px;
+    color: var(--text);
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+  .modal-sub {
+    font-family: var(--font-body);
+    font-size: .88rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+    margin-bottom: 22px;
+    text-wrap: pretty;
+  }
+  .modal-sub .progress-line {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: .62rem;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .modal-sub .progress-line .n { color: var(--magenta); }
+
+  .modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-btn {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 18px;
+    font-family: var(--font-display);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform var(--dur-micro) var(--ease-out);
+  }
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--cyan), #00c8ff);
+    color: #000;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    box-shadow: 0 0 28px -4px var(--cyan-glow);
+    font-weight: 900;
+  }
+  .modal-btn.secondary {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+  }
+  .modal-btn.secondary:hover {
+    color: var(--magenta);
+    border-color: var(--magenta);
+  }
+
+  /* Dimmed onboarding context underneath — Capture/Clarify state */
+  .onboard-under {
+    filter: blur(3px) brightness(.4) saturate(.8);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="42 Onboard Exit Modal">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <!-- Underlying context — blurred, dimmed. Matches Clarify (38) pattern. -->
+    <div class="onboard onboard-under">
+      <div class="onboard-musehead">
+        <span class="muse-dot listening"></span>
+        <img src="assets/muse-portrait.png" class="muse-avatar" alt="Muse">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span class="muse-title">MUSE</span>
+          <span class="muse-status">// ONBOARDING · CLARIFY</span>
+        </div>
+      </div>
+      <div class="onboard-convo">
+        <div class="capture-compressed">
+          <span class="tag">YOU SAID</span>
+          I've got Pallister — the commercial deal with Rick. Need to call Sam about countertops, finalize the SNDA provisions, review Rick's budget...
+        </div>
+        <div class="capture-question" style="margin-top:12px">
+          Which of these is most urgent?
+        </div>
+      </div>
+      <div class="big-mic-wrap" style="margin-top:auto">
+        <div class="big-mic small armed">●</div>
+      </div>
+    </div>
+
+    <!-- Modal overlay -->
+    <div class="modal-backdrop">
+      <div class="modal-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+
+        <div class="modal-eyebrow">➤ // CONFIRM</div>
+        <div class="modal-title">LEAVE<br>ONBOARDING?</div>
+        <div class="modal-sub">
+          You'll lose what you've told Muse so far.
+          <span class="progress-line">// <span class="n">1 PROJECT · 4 TASKS</span> CAPTURED</span>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn primary">▶ KEEP GOING</button>
+          <button class="modal-btn secondary">× LEAVE ANYWAY</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="caption">42 — EXIT CONFIRMATION · v2</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>40 — Onboard: Review (MATCH + Orphans + Urgent)</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  .btn-icon.edit:hover   { color: var(--cyan); border-color: var(--cyan); }
+  .btn-icon.delete:hover { color: var(--red);  border-color: var(--red); }
+  .review-viewport { padding-bottom: 88px; }
+
+  /* 40-specific eyebrow variant w/ two-line instruction */
+  .review-eyebrow .line2 {
+    display: block;
+    color: var(--text-dim);
+    margin-top: 6px;
+    letter-spacing: 1.8px;
+  }
+
+  /* ========= REVIEW TASK CARDS =========
+     In review context each task is a discrete card with a flush drag rail on the left.
+     Overrides the flat task-row used on the live Board. */
+  .task-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px 10px 0;
+    margin: 8px 0;
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    min-height: 56px;
+  }
+  /* Drag rail — flush-left inside the card, dashed separator */
+  .task-row .drag-handle {
+    grid-column: 1;
+    width: 32px;
+    height: 100%;
+    min-height: 100%;
+    align-self: stretch;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px dashed var(--border);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: grab;
+  }
+  .task-row .task-text {
+    grid-column: 2;
+    font-family: var(--font-body);
+    font-size: .92rem;
+    line-height: 1.35;
+    color: var(--text);
+    text-wrap: pretty;
+  }
+  .task-row .task-actions {
+    grid-column: 3;
+    display: flex;
+    gap: 4px;
+    padding-right: 2px;
+  }
+  .task-row .task-actions .btn-icon {
+    width: 36px; height: 36px;
+    min-width: 36px; min-height: 36px;
+    font-size: .82rem;
+  }
+
+  /* Urgent — amber left rail sits IN the drag column, replacing the dashed rule */
+  .task-row.urgent {
+    border-color: var(--amber-dim);
+    background: linear-gradient(90deg, rgba(255,167,38,.05), rgba(255,255,255,.02) 30%);
+  }
+  .task-row.urgent .drag-handle {
+    border-right: 1px solid var(--amber-dim);
+    color: var(--amber);
+  }
+  .task-row.urgent::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: 8px; bottom: 8px;
+    width: 3px;
+    background: var(--amber);
+    border-radius: 1px;
+    box-shadow: 0 0 6px var(--amber-dim);
+  }
+
+  /* Tighter project-card padding now that children are cards */
+  .panel.project-card { padding: 16px 14px 10px; }
+  .panel.project-card .task-row:last-of-type { margin-bottom: 10px; }
+  .panel.project-card .add-task-ghost { margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="40 Onboard Review">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="topbar">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status">SETUP · REVIEW</span>
+    </div>
+
+    <div class="viewport review-viewport">
+      <div class="review-eyebrow">
+        ➤ // HERE'S WHAT I FILED. FIX ANYTHING.
+        <span class="line2">// DRAG TO REORDER. LONG-PRESS TO MARK URGENT.</span>
+      </div>
+
+      <!-- 708 PALLISTER — matched to existing vault project -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat yellow"></span>
+          <span class="project-name">708 PALLISTER</span>
+          <span class="urgent-count"><span class="n-urgent">2 URGENT</span><span class="slash">/</span>3</span>
+        </div>
+        <div class="match-row">
+          <span class="match-badge">● MATCH</span>
+          <span class="match-line-text"><span class="arrow">→</span> MERGING INTO 708 PALLISTER</span>
+          <button class="toggle">CREATE NEW</button>
+        </div>
+
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Call Sam re: countertop installer — Monday</div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Finalize easement SNDA provisions w/ Rick</div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="drag-handle"></span>
+          <div class="task-text">Review Rick's budget</div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <button class="add-task-ghost">+ ADD TASK</button>
+      </div>
+
+      <!-- LIONMAKER SYSTEMS — matched -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat green"></span>
+          <span class="project-name">LIONMAKER SYSTEMS</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>2</span>
+        </div>
+        <div class="match-row">
+          <span class="match-badge">● MATCH</span>
+          <span class="match-line-text"><span class="arrow">→</span> MERGING INTO LIONMAKER SYSTEMS</span>
+          <button class="toggle">CREATE NEW</button>
+        </div>
+
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Ship V2 onboarding rebuild</div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <div class="task-row">
+          <span class="drag-handle"></span>
+          <div class="task-text">Port remaining V1 components to Preact</div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <button class="add-task-ghost">+ ADD TASK</button>
+      </div>
+
+      <!-- MARCUS — new (no MATCH badge) -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat red"></span>
+          <span class="project-name">MARCUS</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>1</span>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Verify trading resumed after MDD lockout</div>
+          <div class="task-actions"><button class="btn-icon edit">✎</button><button class="btn-icon delete">×</button></div>
+        </div>
+        <button class="add-task-ghost">+ ADD TASK</button>
+      </div>
+
+      <button class="add-project-ghost">+ ADD PROJECT</button>
+
+      <!-- Orphan tasks section -->
+      <div class="orphan-panel">
+        <div class="orphan-head">◇ // COULDN'T PLACE THESE</div>
+        <div class="orphan-sub">Assign a project or delete.</div>
+
+        <div class="orphan-row">
+          <span class="orphan-glyph">◇</span>
+          <div class="orphan-text">Gym tomorrow morning, 6am</div>
+          <select class="orphan-select" aria-label="Assign project">
+            <option>ASSIGN →</option>
+            <option>708 PALLISTER</option>
+            <option>LIONMAKER SYSTEMS</option>
+            <option>MARCUS</option>
+            <option>+ NEW: HEALTH</option>
+            <option>× DELETE</option>
+          </select>
+        </div>
+
+        <div class="orphan-row">
+          <span class="orphan-glyph">◇</span>
+          <div class="orphan-text">Reply to Jen's email re: dinner</div>
+          <select class="orphan-select" aria-label="Assign project">
+            <option>ASSIGN →</option>
+            <option>708 PALLISTER</option>
+            <option>LIONMAKER SYSTEMS</option>
+            <option>MARCUS</option>
+            <option>+ NEW PROJECT…</option>
+            <option>× DELETE</option>
+          </select>
+        </div>
+
+        <div class="orphan-row">
+          <span class="orphan-glyph">◇</span>
+          <div class="orphan-text">Look into that accountant referral</div>
+          <select class="orphan-select" aria-label="Assign project">
+            <option>ASSIGN →</option>
+            <option>708 PALLISTER</option>
+            <option>LIONMAKER SYSTEMS</option>
+            <option>MARCUS</option>
+            <option>+ NEW PROJECT…</option>
+            <option>× DELETE</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slim pinned CTA dock -->
+    <div class="lock-dock slim">
+      <button class="review-lock" style="width:100%">LOCK IT IN ▶</button>
+    </div>
+
+  </div>
+  <div class="caption">40 / 42 — REVIEW · DRAG + URGENT + MATCH + ORPHANS</div>
+</div>
+</body>
+</html>

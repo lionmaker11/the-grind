@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>35 — Board: Two-Line Wrap Treatment</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  /* 35-only: task text wraps to max 2 lines, truncates with ellipsis past that */
+  .task-text.wrap2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  /* Taller card for 2-line content; action buttons compact */
+  .task-row.wrap2 {
+    min-height: 72px;
+    align-items: stretch;
+  }
+  .task-row.wrap2 .task-text {
+    align-self: center;
+    padding: 4px 0;
+  }
+  .task-row.wrap2 .task-actions {
+    align-self: center;
+    gap: 6px;
+  }
+  .task-row.wrap2 .btn-icon {
+    min-width: 36px; min-height: 36px; width: 36px; height: 36px;
+  }
+
+  .demo-label {
+    font-family: var(--font-mono);
+    font-size: .58rem;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin: 14px 0 4px;
+    padding: 6px 10px;
+    border-left: 2px solid var(--cyan);
+    background: rgba(0,240,255,.04);
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="35 Board Two-Line Wrap">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="topbar">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status">TUE · 09:41</span>
+    </div>
+
+    <div class="viewport">
+      <div class="section-title">IN CONTEXT</div>
+      <div class="section-sub">3 PROJECTS · 3 URGENT / 10</div>
+
+      <div class="demo-label">// TREATMENT A · 2-LINE WRAP WITH ELLIPSIS OVERFLOW</div>
+
+      <!-- Pallister — realistic long-text tasks -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat yellow"></span>
+          <span class="project-name">708 PALLISTER</span>
+          <span class="urgent-count"><span class="n-urgent">2 URGENT</span><span class="slash">/</span>3</span>
+        </div>
+
+        <!-- Urgent, 2-line wrap -->
+        <div class="task-row wrap2 urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text wrap2">Call Sam re: countertop installer — confirm Monday site visit window (30 minute minimum)</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+
+        <!-- Urgent, 2-line wrap with overflow ellipsis -->
+        <div class="task-row wrap2 urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text wrap2">Finalize easement SNDA provisions with opposing counsel before Friday filing deadline, include revised 6.2 exhibit and updated schedule</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+
+        <!-- Normal, 1-line -->
+        <div class="task-row wrap2">
+          <span class="drag-handle"></span>
+          <div class="task-text wrap2">Review Rick's budget</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+      </div>
+
+      <!-- Lionmaker -->
+      <div class="panel project-card">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <div class="project-head">
+          <span class="heartbeat green"></span>
+          <span class="project-name">LIONMAKER SYSTEMS</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>2</span>
+        </div>
+        <div class="task-row wrap2 urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text wrap2">Ship V2 DESIGN.md to repo with updated phase 5 onboarding flow and error-state spec</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row wrap2">
+          <span class="drag-handle"></span>
+          <div class="task-text wrap2">Port V1 components to Preact</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="execute-wrap">
+      <button class="btn-primary">▶ EXECUTE</button>
+    </div>
+
+    <div class="muse-fab">●</div>
+  </div>
+  <div class="caption">35 — BOARD · 2-LINE WRAP + DRAG-HANDLE RAIL</div>
+</div>
+</body>
+</html>

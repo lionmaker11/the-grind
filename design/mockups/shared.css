@@ -1,5 +1,5 @@
 /* Shared stage + ambient layer + components for all TheGrind mockups */
-@import url('./tokens.css?v=2');
+@import url('./tokens.css?v=3');
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -222,13 +222,225 @@ html, body {
   text-transform: uppercase;
 }
 
-/* ============ TASKS ============ */
-.task-row {
+/* ============ BACKLOG ROW — card with side drag rail ============ */
+.backlog-row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: rgba(255,255,255,.015);
+  position: relative;
+  align-items: start;
+}
+.backlog-row .drag-handle {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  height: 100%;
+  width: 24px;
+  align-self: stretch;
+  border-right: 1px dashed var(--border);
+  color: var(--text-muted);
+}
+.backlog-row > *:not(.drag-handle) {
+  grid-column: 2;
+}
+.backlog-row .task-text {
+  font-size: .88rem;
+  line-height: 1.35;
+}
+.backlog-row .pomo-row {
+  display: inline-flex;
+  gap: 3px;
+  margin-top: 6px;
+}
+.backlog-row .backlog-meta {
+  margin-top: 6px;
+}
+.backlog-row .backlog-actions {
   display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255,255,255,.06);
+}
+.backlog-row.near-done {
+  opacity: .55;
+}
+.backlog-row.urgent {
+  border-color: var(--amber-dim);
+  background: linear-gradient(90deg, rgba(255,167,38,.04), transparent 30%);
+}
+.backlog-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: -1px; top: -1px; bottom: -1px;
+  width: 3px;
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber-dim);
+  border-top-left-radius: var(--r-sm);
+  border-bottom-left-radius: var(--r-sm);
+}
+
+/* ============ TASK ROW V2 — DRAG HANDLE + URGENT ACCENT ============ */
+
+/* Drag handle glyph — ≡ rendered as 3 stacked bars in Share Tech Mono */
+.drag-handle {
+  width: 28px;
+  min-width: 28px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: grab;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+.drag-handle {
+  color: var(--text-dim);
+}
+.drag-handle::before { content: '≡'; }
+.drag-handle:hover, .drag-handle:active { color: var(--cyan); cursor: grabbing; }
+
+/* Urgent accent — amber left rail ON the card. Works with the card-based .task-row. */
+.task-row.urgent {
+  border-color: var(--amber-dim);
+  background: linear-gradient(90deg, rgba(255,167,38,.05), rgba(255,255,255,.02) 30%);
+}
+.task-row.urgent .drag-handle {
+  border-right: 1px solid var(--amber-dim);
+  color: var(--amber);
+}
+.task-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: -1px; top: 8px; bottom: 8px;
+  width: 3px;
+  background: var(--amber);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--amber-dim);
+}
+
+/* Backlog row retains the older flat urgent accent */
+.backlog-row.urgent {
+  position: relative;
+  padding-left: 10px;
+}
+.backlog-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 3px;
+  background: var(--amber);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--amber-dim);
+}
+
+/* Lifted visual when a row is mid-drag */
+.task-row.dragging, .backlog-row.dragging {
+  background: rgba(0,240,255,.04);
+  border: 1px solid rgba(0,240,255,.25);
+  border-radius: var(--r-sm);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 0 16px var(--cyan-dim);
+  z-index: 5;
+}
+
+/* Long-press amber pulse confirmation */
+@keyframes urgent-pulse {
+  0%   { box-shadow: inset 3px 0 0 var(--amber), 0 0 0 rgba(255,167,38,0); transform: scale(1); }
+  40%  { box-shadow: inset 3px 0 0 var(--amber), 0 0 24px var(--amber-glow); transform: scale(1.01); }
+  100% { box-shadow: inset 3px 0 0 var(--amber), 0 0 0 rgba(255,167,38,0); transform: scale(1); }
+}
+.task-row.toggling-urgent,
+.backlog-row.toggling-urgent {
+  animation: urgent-pulse 300ms var(--ease-out);
+}
+
+/* Urgent count in project head */
+.urgent-count {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.urgent-count .n-urgent {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-dim);
+}
+.urgent-count .slash {
+  color: var(--text-muted);
+  margin: 0 3px;
+}
+.urgent-count.zero .n-urgent { color: var(--text-dim); text-shadow: none; }
+
+/* ============ TASKS ============
+   Task rows are discrete cards with a flush-left drag rail.
+   Matches the Review (40) pattern and is used across the entire app. */
+.task-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
   gap: 10px;
+  padding: 10px 10px 10px 0;
+  margin: 8px 0;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  min-height: 56px;
+}
+.task-row .drag-handle {
+  grid-column: 1;
+  width: 32px;
+  height: 100%;
+  min-height: 100%;
+  align-self: stretch;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: grab;
+}
+.task-row .task-text {
+  grid-column: 2;
+  padding: 2px 0;
+}
+.task-row .task-actions {
+  grid-column: 3;
+  display: flex;
+  gap: 4px;
+  padding-right: 2px;
+}
+/* Legacy flat variant — opt-in via .task-row.flat for anything that must stay the old look */
+.task-row.flat {
+  display: flex;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   padding: 6px 0;
+  margin: 0;
   min-height: 44px;
+}
+.task-row.flat .drag-handle {
+  border-right: none;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  align-self: center;
 }
 .p-badge {
   font-family: var(--font-mono);
@@ -1014,6 +1226,429 @@ html, body {
   margin-top: 8px;
 }
 
+/* ============ POMODORO GLYPH ============ */
+.pomo-row { display: inline-flex; gap: 6px; align-items: center; }
+.pomo {
+  position: relative;
+  width: 16px; height: 16px;
+  border: 1.2px solid var(--cyan);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 4px rgba(0,240,255,.35);
+  flex: 0 0 auto;
+  transition: all var(--dur-micro) var(--ease-out);
+}
+.pomo::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: .5px dashed rgba(0,240,255,.3);
+  opacity: 0;
+}
+.pomo::after {
+  content: '';
+  position: absolute;
+  top: -3px; right: -1px;
+  width: 7px; height: 6px;
+  background: var(--magenta);
+  clip-path: polygon(0% 45%, 55% 0%, 100% 35%, 75% 70%, 100% 100%, 45% 75%, 0% 100%);
+  opacity: .85;
+  filter: drop-shadow(0 0 2px var(--magenta));
+}
+.pomo.filled {
+  background: radial-gradient(circle at 38% 38%, rgba(255,255,255,.9), rgba(0,240,255,.9) 35%, rgba(0,160,220,.75) 100%);
+  box-shadow: 0 0 8px var(--cyan), inset 0 0 3px rgba(255,255,255,.6);
+  border-color: rgba(255,255,255,.7);
+}
+.pomo.filled::before { opacity: .8; border-color: rgba(0,20,40,.5); }
+.pomo.dimmed { opacity: .35; box-shadow: none; }
+
+.pomo.study {
+  width: 56px; height: 56px;
+  border-width: 2px;
+  box-shadow: 0 0 14px rgba(0,240,255,.4);
+}
+.pomo.study::before { inset: 6px; border-width: 1px; }
+.pomo.study::after {
+  top: -10px; right: -3px;
+  width: 24px; height: 20px;
+}
+.pomo.study.filled {
+  box-shadow: 0 0 22px var(--cyan), inset 0 0 8px rgba(255,255,255,.6);
+}
+
+/* ============ BACKLOG ROW (two-line) ============ */
+.backlog-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 6px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0,240,255,.06);
+  align-items: start;
+}
+.backlog-row:last-of-type { border-bottom: none; }
+.backlog-row .p-badge {
+  grid-row: 1 / 3;
+  width: 44px; height: 44px;
+  font-size: .72rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.backlog-row .task-text {
+  grid-row: 1; grid-column: 2;
+  font-family: var(--font-body);
+  font-size: .95rem;
+  color: var(--text);
+  line-height: 1.35;
+  text-wrap: pretty;
+  padding-top: 2px;
+  align-self: center;
+}
+.backlog-row .pomo-row { grid-row: 1; grid-column: 3; padding-top: 4px; align-self: center; }
+.backlog-row .backlog-meta {
+  grid-row: 2; grid-column: 2;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 30px;
+}
+.backlog-row .backlog-meta .task-meta { margin: 0; }
+.backlog-row .backlog-actions {
+  grid-row: 2; grid-column: 3;
+  display: flex; gap: 4px;
+  justify-content: flex-end;
+}
+.backlog-row .backlog-actions .btn-icon {
+  width: 32px; height: 32px;
+  font-size: .78rem;
+  min-height: 32px;
+}
+.backlog-row.near-done .task-text { opacity: .55; text-decoration: line-through; text-decoration-color: rgba(0,240,255,.4); }
+
+/* ============ ONBOARD V2 — CAPTURE / CLARIFY / REVIEW ============ */
+
+/* × close button, top-right of onboarding chrome */
+.onboard-close {
+  position: absolute;
+  top: calc(47px + 10px);
+  right: 14px;
+  width: 40px; height: 40px;
+  min-width: 40px; min-height: 40px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 30;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+}
+.onboard-close:hover { color: var(--red); border-color: var(--red); }
+
+/* Question bubble for capture — big, muse-styled */
+.capture-question {
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 16px 18px;
+  background: rgba(255,0,222,.08);
+  border: 1px solid rgba(255,0,222,.38);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+  text-wrap: pretty;
+}
+.capture-question + .capture-subtext {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding-left: 4px;
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Smaller mic variant for clarify */
+.big-mic.small {
+  width: 72px; height: 72px;
+  font-size: 1.5rem;
+  border-width: 1.5px;
+}
+
+/* Compressed prior-answer bubble shown above clarify question */
+.capture-compressed {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: 9px 12px;
+  background: rgba(0,240,255,.05);
+  border: 1px solid rgba(0,240,255,.18);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: .82rem;
+  line-height: 1.35;
+  color: var(--text-dim);
+  opacity: .7;
+}
+.capture-compressed .tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* Skip button — bottom-right of clarify */
+.skip-btn {
+  position: absolute;
+  right: 20px;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0));
+  min-height: 44px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  z-index: 25;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.skip-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* Footer status strip — sits above the mic, one line */
+.onboard-footer-status {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0));
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  z-index: 5;
+  pointer-events: none;
+}
+.onboard-footer-status.listening { color: var(--magenta); }
+.onboard-footer-status .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 6px;
+  vertical-align: 1px;
+  box-shadow: 0 0 6px currentColor;
+}
+.onboard-footer-status.listening .dot { animation: mic-pulse 1s ease-in-out infinite; }
+
+/* Review additions */
+/* Match badge — always sits BELOW project-head on its own row for layout consistency.
+   Use inside a <div class="match-row">…</div> placed immediately after .project-head. */
+.match-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: .52rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  border: 1px solid var(--cyan-dim);
+  background: rgba(0,240,255,.06);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+  flex-wrap: wrap;
+}
+.match-line-text {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+.match-line-text .arrow { color: var(--text-muted); margin-right: 4px; }
+.match-row .toggle {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: .54rem;
+  letter-spacing: 1.5px;
+  padding: 4px 8px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.match-row .toggle:hover { color: var(--magenta); border-color: var(--magenta); }
+
+/* Bottom separator under the match-row (replaces old match-line border) */
+.match-row + .review-task { margin-top: 12px; position: relative; }
+.match-row {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.match-line {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  padding: 4px 0 8px 0;
+  margin: -2px 0 6px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.match-line .arrow { color: var(--text-muted); }
+.match-line .toggle {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: .52rem;
+  letter-spacing: 1.3px;
+  padding: 4px 8px;
+  min-height: 26px;
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.match-line .toggle:hover { color: var(--magenta); border-color: var(--magenta); }
+
+/* Non-interactive P-badge in review */
+.p-badge.view-only {
+  opacity: .85;
+  min-height: 32px;
+  min-width: 32px;
+  font-size: .62rem;
+}
+
+/* Orphan panel */
+.orphan-panel {
+  margin-top: 20px;
+  padding: 14px 16px 14px;
+  border: 1px dashed rgba(255,230,0,.35);
+  background: rgba(255,230,0,.02);
+  border-radius: var(--r-md);
+  position: relative;
+}
+.orphan-panel .orphan-head {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .66rem;
+  letter-spacing: 2.5px;
+  color: var(--yellow);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.orphan-panel .orphan-sub {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.orphan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,230,0,.12);
+}
+.orphan-row:first-of-type { border-top: none; padding-top: 0; }
+.orphan-row .orphan-glyph {
+  width: 26px;
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: .9rem;
+  text-align: center;
+  flex-shrink: 0;
+  opacity: .6;
+}
+.orphan-row .orphan-text {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: .88rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+.orphan-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: 1.3px;
+  padding: 0 22px 0 10px;
+  min-height: 34px;
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 46%, var(--text-muted) 46%, var(--text-muted) 54%, transparent 54%),
+                    linear-gradient(-45deg, transparent 46%, var(--text-muted) 46%, var(--text-muted) 54%, transparent 54%);
+  background-position: right 8px top 14px, right 4px top 14px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.orphan-select:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* Base dock — pinned to bottom with fade-up gradient */
+.lock-dock {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(10,10,18,0) 0%, rgba(10,10,18,.85) 40%, rgba(10,10,18,.98) 100%);
+}
+.lock-dock .review-lock {
+  pointer-events: auto;
+  margin-top: 0;
+}
+
+/* Slimmer LOCK IT IN dock */
+.lock-dock.slim {
+  padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0));
+  background: linear-gradient(to bottom, rgba(10,10,18,0) 0%, rgba(10,10,18,.92) 60%, rgba(10,10,18,.98) 100%);
+}
+.lock-dock.slim .review-lock {
+  padding: 12px 20px;
+  min-height: 48px;
+  font-size: .82rem;
+  letter-spacing: 3.5px;
+  box-shadow: 0 0 24px var(--cyan-dim);
+}
+
 /* caption below device */
 .caption {
   position: absolute;
@@ -1027,4 +1662,12 @@ html, body {
   text-transform: uppercase;
   text-align: center;
   width: 100%;
+}
+
+/* inline urgent dot — amber, for focus-proj and muse action bubbles */
+.urgent-dot {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-glow);
+  font-size: 0.9em;
+  margin-right: 2px;
 }
