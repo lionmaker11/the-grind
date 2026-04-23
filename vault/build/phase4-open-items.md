@@ -93,6 +93,16 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** R5b-8, after the implementation prompts land and before phone test.
 
+### 17. deleteProject store action silently drops child tasks; spec requires orphan-conversion choice
+
+**Surface:** v2/src/state/onboard.js deleteProject() (lines ~417-441). v2/src/components/Onboard/OnboardReview.jsx delete-project × affordance (R5b-5 markup, R5b-6 wiring).
+
+**Concern:** The existing deleteProject store action unconditionally removes the project AND all its child tasks from extracted.projects. phase4-open-items item #7 ("R5b needs fully editable Review") specifies the delete affordance must offer "drop or convert to orphans" for child tasks — i.e., the user's spoken-aloud tasks shouldn't silently vanish when a mis-grouped project gets deleted. Options: (a) window.confirm with language naming the choice, (b) inline confirmation overlay with explicit CONVERT TO ORPHANS vs DROP buttons, (c) always convert to orphans on delete with no prompt (safer default).
+
+**Fix:** R5b-6 implements. Recommended direction: window.confirm for R5b-6 velocity, upgrade to inline overlay post-Phase-4 polish. Or simplest alternative: always convert to orphans on delete, no prompt, let the user discard orphans individually if they don't want them.
+
+**Schedule:** R5b-6. R5b-5 ships markup of × button but does not wire it.
+
 ## SCHEDULED — Planned fixes
 
 ### 3. Unmount/abort race patterns (partially addressed)
