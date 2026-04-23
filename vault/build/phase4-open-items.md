@@ -188,6 +188,16 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** Spec refresh post-Phase-4.
 
+### 19. R5b-5 commit bypassed pre-commit byte-accurate review
+
+**Surface:** v2/src/components/Onboard/OnboardReview.jsx, OnboardReview.css, and tokens.css at commit cf18a75.
+
+**Concern:** The R5b-5 commit was landed with partial pre-commit review. The "retype file content into chat" review protocol drifted on multi-hundred-line files, and the advisor's tools cannot fetch arbitrary raw GitHub URLs to verify the committed bytes. Three specific paste-vs-disk discrepancies were flagged during the R5b-5 review cycle that could not be resolved: (1) OnboardReview.css line 325 indentation, (2) line 326 renumbering artifact, (3) lines 548-549 possible duplicate property declarations. All three may be paste-retyping artifacts rather than disk defects; none would cause build failure even if they were real. Risk is limited to minor CSS edge cases.
+
+**Fix:** R5b-6 will modify the same files for interaction wiring. If any of the three flagged locations have real defects, R5b-6 review will surface them via grep or diff noise. If R5b-9 phone test reveals a visual defect in the Review surface that traces to a CSS issue, fix in a follow-up commit.
+
+**Schedule:** R5b-6 reviews these surfaces naturally. No standalone action.
+
 ## RESOLVED — Fixed during rebuild
 
 ### 10. OnboardError variant routing not yet wired
