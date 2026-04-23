@@ -4,6 +4,17 @@
   "project_name": "708 Pallister",
   "tasks": [
     {
+      "id": "pal-005",
+      "text": "Get countertops installed",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 0
+    },
+    {
       "id": "pal-001",
       "text": "Sam: countertop installer follow-up (14+ days overdue)",
       "done_condition": null,
