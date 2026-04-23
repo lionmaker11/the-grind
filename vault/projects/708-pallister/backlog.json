@@ -26,6 +26,17 @@
       "order": 1
     },
     {
+      "id": "pal-007",
+      "text": "Renew permit",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 2
+    },
+    {
       "id": "pal-001",
       "text": "Sam: countertop installer follow-up (14+ days overdue)",
       "done_condition": null,
