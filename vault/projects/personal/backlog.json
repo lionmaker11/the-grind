@@ -13,6 +13,17 @@
       "created": "2026-04-23",
       "urgent": false,
       "order": 0
+    },
+    {
+      "id": "per-002",
+      "text": "Water the plants",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 1
     }
   ]
 }
