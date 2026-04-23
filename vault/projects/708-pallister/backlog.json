@@ -15,6 +15,17 @@
       "order": 0
     },
     {
+      "id": "pal-010",
+      "text": "Confirm countertops are on site at 708 Pallister",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 1
+    },
+    {
       "id": "pal-008",
       "text": "Verify all windows on Pallister are good to go",
       "done_condition": null,
