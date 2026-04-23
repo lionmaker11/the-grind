@@ -37,6 +37,10 @@
   --indigo:       #7b5cff;   /* break mode, secondary */
   --indigo-glow:  rgba(123, 92, 255, 0.5);
 
+  --amber:        #ffa726;   /* urgent flag — distinct from yellow (warn) and red (overdue) */
+  --amber-glow:   rgba(255, 167, 38, 0.35);
+  --amber-wash:   rgba(255, 167, 38, 0.05);  /* urgent row background wash — subtler than --amber-glow */
+
   /* ---------- NEUTRALS ---------- */
   --bg:           #0a0a12;
   --bg-panel:     rgba(10, 15, 30, 0.85);

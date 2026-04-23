@@ -1,21 +1,30 @@
-/* Review surface lives under the TopBar, not inside the onboard-root
-   padding-top. Override positioning locally. */
+/* OnboardReview — R5b-5 structure styling. Ports design/mockups/40-onboard-review.html
+   and shared.css § Review additions, adapted to V2's token surface. Deliberately
+   avoids redeclaring globals that already live in v2/src/global.css:
+     .panel / .corner / .btn-icon / .add-project-ghost
+   Amber urgent accent uses --amber / --amber-glow from tokens.css. */
+
+/* ── Container — sit under TopBar (47 status + 56 topbar = 103) ── */
 .onboard-root[data-step='review'],
-.onboard-root[data-step='committing'] {
+.onboard-root[data-step='committing'],
+.onboard-root[data-step='done'] {
   padding: 0;
   background: var(--bg);
 }
 
 .or-viewport {
   position: absolute;
-  top: 103px; /* status bar 47 + topbar 56 */
+  top: 103px;
   left: 0;
   right: 0;
   bottom: 0;
   overflow-y: auto;
-  padding: 16px 16px calc(120px + env(safe-area-inset-bottom, 0px));
+  padding: 16px 16px calc(96px + env(safe-area-inset-bottom, 0px));
+  max-width: var(--container-max);
+  margin: 0 auto;
 }
 
+/* ── Eyebrow ── */
 .review-eyebrow {
   font-family: var(--font-mono);
   font-size: 0.62rem;
@@ -24,8 +33,20 @@
   text-transform: uppercase;
   line-height: 1.4;
   padding: 4px 2px 18px;
+  text-wrap: pretty;
+}
+.review-eyebrow .line2 {
+  display: block;
+  color: var(--text-dim);
+  margin-top: 6px;
+  letter-spacing: 1.8px;
+}
+.review-eyebrow .or-eyebrow-sub {
+  color: var(--text-muted);
+  opacity: 0.75;
 }
 
+/* ── Empty state (no projects extracted) ── */
 .or-empty {
   padding: 24px 16px;
   font-family: var(--font-mono);
@@ -38,109 +59,452 @@
   margin-bottom: 12px;
 }
 
-/* Project panel — neutral gray header (category colors deferred to Phase 5) */
-.or-panel {
-  padding: 14px 14px 12px;
+/* ── Project card ── */
+.project-card {
+  padding: 16px 14px 10px;
   margin-bottom: 14px;
 }
-.or-heartbeat {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-dim);
-  flex-shrink: 0;
+.project-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
 }
-.or-project-name {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text);
+.project-name {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   letter-spacing: 2.5px;
+  color: var(--text);
   text-transform: uppercase;
-  padding: 6px 8px;
-  border-radius: var(--r-sm);
-  outline: none;
-  min-height: 36px;
-}
-.or-project-name:focus {
-  border-color: var(--cyan);
-  background: rgba(0, 240, 255, 0.04);
-}
-
-.or-task-text {
   flex: 1;
   min-width: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 0.9rem;
-  line-height: 1.35;
-  padding: 6px 8px;
-  border-radius: var(--r-sm);
-  outline: none;
-  min-height: 36px;
-}
-.or-task-text:focus {
-  border-color: var(--cyan);
-  background: rgba(0, 240, 255, 0.04);
+  word-break: break-word;
 }
 
-/* Priority picker — chevrons flanking the P# badge */
-.or-pri {
+/* not in mockup — project-level drag handle sits at the LEFT of the head */
+.or-project-drag {
+  width: 22px;
+  height: 32px;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: grab;
   flex-shrink: 0;
-}
-.or-pri .p-badge {
-  min-width: 36px;
-  min-height: 28px;
-  padding: 0 6px;
-}
-.or-pri-step {
-  width: 20px;
-  height: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
   background: transparent;
   border: none;
+}
+.or-project-drag::before { content: '≡'; }
+
+/* not in mockup — expand chevron */
+.or-expand-chevron {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
   color: var(--text-dim);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  line-height: 1;
-  padding: 0;
+  font-size: 0.9rem;
+  border-radius: var(--r-sm);
   cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.or-pri-step:active {
+.or-expand-chevron:hover {
   color: var(--cyan);
+  border-color: var(--border-bright);
+}
+.or-expand-chevron:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
 }
 
-.btn-icon.delete {
-  color: var(--text-dim);
+/* not in mockup — project delete (× in head row, right after chevron) */
+.or-project-delete {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 0.9rem;
 }
-.btn-icon.delete:active {
+.or-project-delete:hover {
   color: var(--red);
   border-color: var(--red);
 }
 
-.or-partial-warn {
-  padding: 12px 14px;
-  margin-top: 12px;
-  background: rgba(255, 0, 60, 0.08);
-  border: 1px solid rgba(255, 0, 60, 0.3);
+/* ── Urgent count ── */
+.urgent-count {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.urgent-count .n-urgent {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-glow);
+}
+.urgent-count .slash {
+  color: var(--text-muted);
+  margin: 0 3px;
+}
+.urgent-count--zero .n-urgent {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
+/* ── Match row (between head and body) ── */
+.match-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  border: 1px solid var(--border-bright);
+  background: rgba(0, 240, 255, 0.06);
   border-radius: var(--r-sm);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.match-line-text {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.match-line-text .arrow {
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+.match-row .toggle {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 1.5px;
+  padding: 6px 10px;
+  min-height: 32px;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+  flex-shrink: 0;
+}
+.match-row .toggle:hover {
+  color: var(--magenta);
+  border-color: var(--magenta);
+}
+
+/* ── Project body (only when expanded) ── */
+.or-project-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Task row — card with flush drag rail. Overrides the legacy flat row. ── */
+.task-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 0;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  min-height: 56px;
+}
+.task-row .drag-handle {
+  grid-column: 1;
+  width: 32px;
+  height: 100%;
+  min-height: 100%;
+  align-self: stretch;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.task-row .drag-handle::before { content: '≡'; }
+.task-row .task-text {
+  grid-column: 2;
+  padding: 2px 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+  text-wrap: pretty;
+  word-break: break-word;
+}
+.task-row .task-actions {
+  grid-column: 3;
+  display: flex;
+  gap: 4px;
+  padding-right: 2px;
+}
+.task-row .task-actions .btn-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 0.82rem;
+}
+.task-row .task-actions .btn-icon.edit:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+.task-row .task-actions .btn-icon.delete:hover {
   color: var(--red);
+  border-color: var(--red);
+}
+
+/* Urgent task — amber left rail ON the card */
+.task-row.urgent {
+  border-color: var(--amber-glow);
+  background: linear-gradient(90deg, var(--amber-wash), rgba(255, 255, 255, 0.02) 30%);
+}
+.task-row.urgent .drag-handle {
+  border-right: 1px solid var(--amber-glow);
+  color: var(--amber);
+}
+.task-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--amber);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--amber-glow);
+}
+
+/* ── + ADD TASK ghost ── */
+.add-task-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 44px;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  margin-top: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+.add-task-ghost:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+
+/* ── Orphan panel ── */
+.orphan-panel {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px dashed rgba(255, 230, 0, 0.35);
+  background: rgba(255, 230, 0, 0.02);
+  border-radius: var(--r-md);
+  position: relative;
+}
+.orphan-panel .orphan-head {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.66rem;
+  letter-spacing: 2.5px;
+  color: var(--yellow);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.orphan-panel .orphan-sub {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.orphan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 230, 0, 0.12);
+}
+.orphan-row:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+.orphan-row .orphan-glyph {
+  width: 26px;
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+.orphan-row .orphan-text {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: var(--text);
+  word-break: break-word;
+}
+.or-orphan-assign {
+  flex-shrink: 0;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.or-orphan-assign:hover {
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.or-orphan-pill {
+  flex-shrink: 1;
+  padding: 6px 10px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--r-sm);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.or-orphan-pill--discarded {
+  color: var(--red);
+  background: rgba(255, 0, 60, 0.06);
+  border-color: rgba(255, 0, 60, 0.4);
+}
+.or-orphan-undo {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.or-orphan-undo:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+
+.orphan-row--discarded .orphan-text {
+  color: var(--text-dim);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 0, 60, 0.5);
+}
+
+/* ── Error banner (shown if step transitions to error during commit) ── */
+.or-error-banner {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--magenta);
+  border-radius: var(--r-sm);
+  background: rgba(255, 0, 222, 0.05);
+  color: var(--magenta);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.or-error-banner button {
+  align-self: flex-start;
+  padding: 6px 14px;
+  min-height: 36px;
+  background: transparent;
+  border: 1px solid var(--magenta);
+  color: var(--magenta);
   font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  cursor: pointer;
 }
 
-/* Pinned CTA dock */
+/* ── Sticky LOCK IT IN dock ── */
 .lock-dock {
   position: absolute;
   left: 0;
@@ -156,24 +520,35 @@
     rgba(10, 10, 18, 0.98) 100%
   );
 }
+.lock-dock.slim {
+  padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0));
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 18, 0) 0%,
+    rgba(10, 10, 18, 0.92) 60%,
+    rgba(10, 10, 18, 0.98) 100%
+  );
+}
 .review-lock {
   pointer-events: auto;
   width: 100%;
-  padding: 18px 24px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, var(--cyan), #00c8ff);
   color: #000;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 0.95rem;
-  letter-spacing: 4px;
+  font-size: 0.82rem;
+  letter-spacing: 3.5px;
   text-transform: uppercase;
   border: none;
   border-radius: var(--r-sm);
-  box-shadow: 0 0 40px var(--cyan-dim);
+  box-shadow: 0 0 24px var(--cyan-dim);
   clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
-  min-height: 56px;
+  min-height: 48px;
+  cursor: pointer;
 }
 .review-lock:disabled {
   opacity: 0.55;
   box-shadow: none;
+  cursor: not-allowed;
 }

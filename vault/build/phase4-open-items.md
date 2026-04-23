@@ -180,6 +180,14 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** Spec refresh post-Phase-4 close. Non-blocking.
 
+### 18. "● MATCH" badge copy is Claude-authored, not in copy manifest
+
+**Surface:** v2/src/components/Onboard/OnboardReview.jsx match-row rendering.
+
+**Concern:** R5b-5 renders a `<span class="match-badge">● MATCH</span>` element to anchor the match-row visually. The badge copy comes from the mockup, not the R5b-5 copy manifest in phase4-flow-redesign.md. The badge is useful for wayfinding (it explains what the row is before the user parses the toggle), but post-phase spec refresh should either: (a) add the badge to the manifest, or (b) confirm it's OK as visual decoration and note it's mockup-sourced.
+
+**Schedule:** Spec refresh post-Phase-4.
+
 ## RESOLVED — Fixed during rebuild
 
 ### 10. OnboardError variant routing not yet wired
