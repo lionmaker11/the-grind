@@ -136,6 +136,22 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** Polish pass. Non-blocking for Phase 4 ship.
 
+### 12. `error.recoverable` field is now redundant with `error.variant`
+
+**Surface:** v2/src/state/onboard.js error object shape.
+
+**Concern:** After R5b-3b introduces `variant`, every known variant is recoverable. The `recoverable` field is preserved for backwards compatibility and defensive handling of a hypothetical future 'fatal' variant, but currently adds noise. Candidate for removal in a later cleanup sweep, along with simplification of any render checks that still read it.
+
+**Schedule:** Polish pass post-Phase-4.
+
+### 13. Mic-permission-denied misclassified as transcription failure
+
+**Surface:** v2/src/components/Onboard/OnboardRecord.jsx getUserMedia / recorder startup errors (lines 65, 107) classified as `variant: 'transcription'` in R5b-3b.
+
+**Concern:** Transcription copy ("Didn't catch that. Try again?") is misleading when the actual failure is mic permission denied or device unavailable. "Try again" loops the user — they need to change iOS permissions, not retry. A dedicated `'mic-unavailable'` variant with copy like "Can't hear you. Check your mic permissions." and ideally a link to iOS settings would fix this.
+
+**Schedule:** Polish pass post-Phase-4, or whenever this surfaces in dogfooding.
+
 ## RESOLVED — Fixed during rebuild
 
 ### R6. Schema gap between R3 and R2 backend (resolved in R2.5)
