@@ -15,6 +15,17 @@
       "order": 0
     },
     {
+      "id": "pal-006",
+      "text": "Coordinate with electrician",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 1
+    },
+    {
       "id": "pal-001",
       "text": "Sam: countertop installer follow-up (14+ days overdue)",
       "done_condition": null,
