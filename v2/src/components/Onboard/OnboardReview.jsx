@@ -29,26 +29,36 @@
 // component unmounts. Not fixing in R5b-5 — pre-existing issue, revisit
 // when commit orchestrator wiring lands in R5b-6 or later.
 //
-// ─── R5b-6 open wiring (marked `/* R5b-6 */` at each call site) ───────────
-// - project expand chevron
-// - project drag handle (createListDragController + reorderProjects)
-// - project × (needs open-item #17 resolution first)
-// - project-name inline edit
-// - urgent-count long-press
-// - match-row toggle (setMatchDecision)
-// - task drag handle (reorderTasks)
-// - task text inline edit (editTaskText)
-// - task edit ✎ (per-row long-press urgent alternative?)
-// - task delete × (deleteTask)
-// - + ADD TASK (addTask)
-// - + ADD PROJECT (addProject)
-// - orphan ASSIGN → (opens OrphanPicker)
-// - orphan UNDO (assignOrphan undefined? or re-open picker)
-// - LOCK IT IN (startCommit + commitOnboardingResults) — gated by isReadyToCommit()
+// ─── R5b-6 open wiring ────────────────────────────────────────────────────
+// - project expand chevron (R5b-6a ✓)
+// - project drag handle (createListDragController + reorderProjects) — R5b-6b
+// - project × (R5b-6a ✓ — calls existing deleteProject; orphan-conversion per open #17 is R5b-6b)
+// - project-name inline edit — R5b-6b
+// - urgent-count long-press — R5b-6b
+// - match-row toggle (setMatchDecision) (R5b-6a ✓)
+// - task drag handle (reorderTasks) — R5b-6b
+// - task text inline edit (editTaskText) — R5b-6b
+// - task edit ✎ (focus contentEditable) — R5b-6b
+// - task delete × (deleteTask) (R5b-6a ✓)
+// - + ADD TASK (addTask) (R5b-6a ✓)
+// - + ADD PROJECT (addProject) (R5b-6a ✓)
+// - orphan ASSIGN → (opens OrphanPicker) — R5b-6b
+// - orphan UNDO (assignOrphan undefined? or re-open picker) — R5b-6b
+// - LOCK IT IN (startCommit + commitOnboardingResults) — R5b-6c (depends on order:'append' wiring)
 
 import { useEffect, useState } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
-import { onboardStore, closeOnboard, clearError, isReadyToCommit } from '../../state/onboard.js';
+import {
+  onboardStore,
+  closeOnboard,
+  clearError,
+  isReadyToCommit,
+  setMatchDecision,
+  deleteTask,
+  addTask,
+  addProject,
+  deleteProject,
+} from '../../state/onboard.js';
 import { boardStore } from '../../state/board.js';
 import { OnboardFooter } from './OnboardFooter.jsx';
 import './OnboardReview.css';
@@ -99,10 +109,13 @@ export function OnboardReview() {
     return expandedTempIds.has(tempId);
   }
 
-  // R5b-6 will replace this stub with real toggle behavior. R5b-5 renders
-  // aria-expanded accurately but the onClick is a no-op.
-  function toggleExpand(_tempId) {
-    /* R5b-6 */
+  function toggleExpand(tempId) {
+    setExpandedTempIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(tempId)) next.delete(tempId);
+      else next.add(tempId);
+      return next;
+    });
   }
 
   return (
@@ -121,7 +134,7 @@ export function OnboardReview() {
           </div>
         )}
 
-        {projects.map((p) => {
+        {projects.map((p, pIdx) => {
           const expanded = isExpanded(p.tempId);
           const nUrgent = urgentCountFor(p);
           const nTotal = (p.tasks || []).length;
@@ -178,7 +191,7 @@ export function OnboardReview() {
                   aria-expanded={expanded}
                   aria-controls={`onboard-project-body-${p.tempId}`}
                   aria-label={expanded ? 'Collapse project' : 'Expand project'}
-                  onClick={() => toggleExpand(p.tempId) /* R5b-6 */}
+                  onClick={() => toggleExpand(p.tempId)}
                   data-testid={`onboard-project-expand-${p.tempId}`}
                 >
                   {expanded ? '▾' : '▸'}
@@ -188,7 +201,14 @@ export function OnboardReview() {
                   type="button"
                   class="btn-icon delete or-project-delete"
                   aria-label="Delete project"
-                  onClick={() => { /* R5b-6 */ }}
+                  onClick={() => {
+                    deleteProject(pIdx);
+                    setExpandedTempIds((prev) => {
+                      const next = new Set(prev);
+                      next.delete(p.tempId);
+                      return next;
+                    });
+                  }}
                   data-testid={`onboard-project-delete-${p.tempId}`}
                 >
                   ×
@@ -204,7 +224,7 @@ export function OnboardReview() {
                   <button
                     type="button"
                     class="toggle"
-                    onClick={() => { /* R5b-6 */ }}
+                    onClick={() => setMatchDecision(p.tempId, !(decision?.merge === true))}
                     data-testid={`onboard-match-toggle-${p.tempId}`}
                   >
                     {matchToggleLabel}
@@ -214,7 +234,7 @@ export function OnboardReview() {
 
               {expanded && (
                 <div id={`onboard-project-body-${p.tempId}`} class="or-project-body">
-                  {(p.tasks || []).map((t) => (
+                  {(p.tasks || []).map((t, tIdx) => (
                     <div
                       key={t.tempId}
                       class={`task-row${t.urgent ? ' urgent' : ''}`}
@@ -231,7 +251,7 @@ export function OnboardReview() {
                           type="button"
                           class="btn-icon edit"
                           aria-label="Edit task"
-                          onClick={() => { /* R5b-6 */ }}
+                          onClick={() => { /* R5b-6b — focus contentEditable */ }}
                           data-testid={`onboard-task-edit-${t.tempId}`}
                         >
                           ✎
@@ -240,7 +260,7 @@ export function OnboardReview() {
                           type="button"
                           class="btn-icon delete"
                           aria-label="Delete task"
-                          onClick={() => { /* R5b-6 */ }}
+                          onClick={() => deleteTask(pIdx, tIdx)}
                           data-testid={`onboard-task-delete-${t.tempId}`}
                         >
                           ×
@@ -251,7 +271,7 @@ export function OnboardReview() {
                   <button
                     type="button"
                     class="add-task-ghost"
-                    onClick={() => { /* R5b-6 */ }}
+                    onClick={() => addTask(pIdx)}
                     data-testid={`onboard-add-task-${p.tempId}`}
                   >
                     + ADD TASK
@@ -265,7 +285,7 @@ export function OnboardReview() {
         <button
           type="button"
           class="add-project-ghost"
-          onClick={() => { /* R5b-6 */ }}
+          onClick={() => addProject()}
           data-testid="onboard-add-project"
         >
           + ADD PROJECT
@@ -307,7 +327,7 @@ export function OnboardReview() {
                     <button
                       type="button"
                       class="or-orphan-assign"
-                      onClick={() => { /* R5b-6 */ }}
+                      onClick={() => { /* R5b-6b — open OrphanPicker */ }}
                       data-testid={`onboard-orphan-assign-${o.tempId}`}
                     >
                       ASSIGN →
@@ -322,7 +342,7 @@ export function OnboardReview() {
                         type="button"
                         class="or-orphan-undo"
                         aria-label="Change assignment"
-                        onClick={() => { /* R5b-6 */ }}
+                        onClick={() => { /* R5b-6b */ }}
                         data-testid={`onboard-orphan-undo-${o.tempId}`}
                       >
                         ×
@@ -336,7 +356,7 @@ export function OnboardReview() {
                         type="button"
                         class="or-orphan-undo"
                         aria-label="Undo discard"
-                        onClick={() => { /* R5b-6 */ }}
+                        onClick={() => { /* R5b-6b */ }}
                         data-testid={`onboard-orphan-undo-${o.tempId}`}
                       >
                         ↺
@@ -368,7 +388,7 @@ export function OnboardReview() {
           type="button"
           class="review-lock"
           disabled={lockDisabled}
-          onClick={() => { /* R5b-6 */ }}
+          onClick={() => { /* R5b-6c — startCommit + commitOnboardingResults */ }}
           data-testid="onboard-lock-in"
         >
           {inProgress ? (
