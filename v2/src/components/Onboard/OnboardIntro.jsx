@@ -16,7 +16,7 @@ export function OnboardIntro() {
         <div class="onboard-welcome">
           Dump what&apos;s on your plate.
           <br />
-          Out loud. Take your time.
+          Out loud. Take your time. A couple minutes, not ten seconds.
         </div>
         <button
           type="button"
@@ -25,7 +25,7 @@ export function OnboardIntro() {
           onClick={beginCapture}
           data-testid="onboard-begin"
         >
-          ▶
+          START ▶
         </button>
       </div>
       <div class="intro-bottom" />

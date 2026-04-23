@@ -17,15 +17,6 @@
   width: 100%;
   backdrop-filter: blur(12px);
 }
-.oec-title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 3.5px;
-  color: var(--magenta);
-  text-align: center;
-  margin-bottom: 12px;
-}
 .oec-body {
   font-family: var(--font-body);
   font-size: 0.95rem;

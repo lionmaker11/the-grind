@@ -8,26 +8,25 @@ import './OnboardExitConfirm.css';
 
 export function OnboardExitConfirm() {
   return (
-    <div class="oec-backdrop" role="dialog" aria-modal="true" aria-labelledby="oec-title">
+    <div class="oec-backdrop" role="dialog" aria-modal="true" aria-label="Exit onboarding confirmation">
       <div class="oec-box">
-        <div id="oec-title" class="oec-title">// EXIT ONBOARDING?</div>
-        <div class="oec-body">Your answers will be lost.</div>
+        <div class="oec-body">Bail out? You&apos;ll lose what you said.</div>
         <div class="oec-actions">
-          <button
-            type="button"
-            class="oec-btn"
-            onClick={cancelExit}
-            data-testid="onboard-exit-cancel"
-          >
-            CANCEL
-          </button>
           <button
             type="button"
             class="oec-btn oec-btn--danger"
             onClick={confirmExit}
             data-testid="onboard-exit-confirm"
           >
-            EXIT
+            BAIL
+          </button>
+          <button
+            type="button"
+            class="oec-btn"
+            onClick={cancelExit}
+            data-testid="onboard-exit-cancel"
+          >
+            KEEP GOING
           </button>
         </div>
       </div>

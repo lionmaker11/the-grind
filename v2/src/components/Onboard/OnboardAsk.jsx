@@ -12,8 +12,8 @@ import { OnboardFooter } from './OnboardFooter.jsx';
 import { OnboardMessage } from './OnboardMessage.jsx';
 import './OnboardMessage.css';
 
-const CAPTURE_QUESTION = "Walk me through what's active. Every project, what's happening.";
-const CAPTURE_SUBTEXT = '// Work, personal, health, anything.';
+const CAPTURE_QUESTION = "What's active right now?";
+const CAPTURE_SUBTEXT = '// Jump around. Name projects when you switch.';
 const MIC_HINT = 'Tap to start. Take your time — 1 to 3 minutes is normal.';
 
 export function OnboardAsk() {

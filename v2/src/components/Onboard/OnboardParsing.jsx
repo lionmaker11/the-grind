@@ -21,7 +21,7 @@ import { OnboardMessage } from './OnboardMessage.jsx';
 import './OnboardMessage.css';
 import './OnboardParsing.css';
 
-const CAPTURE_QUESTION = "Walk me through what's active. Every project, what's happening.";
+const CAPTURE_QUESTION = "What's active right now?";
 
 function buildTranscriptMessage(capture, clarify) {
   const parts = [`[CAPTURE]\n${(capture || '').trim()}`];
@@ -82,7 +82,7 @@ export function OnboardParsing() {
         <div class="parsing-block">
           <div class="parsing-spinner" aria-hidden="true" />
           <div class="parsing-label">
-            <span>// EXTRACTING PROJECTS + TASKS</span>
+            <span>Thinking…</span>
             <span class="parsing-dots" aria-hidden="true">
               <span /><span /><span />
             </span>

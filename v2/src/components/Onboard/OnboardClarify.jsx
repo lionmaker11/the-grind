@@ -43,7 +43,7 @@ export function OnboardClarify() {
         onClick={skipClarify}
         data-testid="onboard-skip-clarify"
       >
-        SKIP →
+        SKIP — I'LL FIX IN REVIEW
       </button>
       <div class="big-mic-wrap">
         <button
