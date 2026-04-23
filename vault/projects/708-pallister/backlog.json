@@ -175,6 +175,15 @@
       "priority": 3,
       "status": "pending",
       "created": "2026-04-21"
+    },
+    {
+      "id": "pal-017",
+      "text": "R5b-2 verify append",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23"
     }
   ]
 }
