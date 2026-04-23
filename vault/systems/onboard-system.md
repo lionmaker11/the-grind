@@ -22,11 +22,14 @@ Transcripts are raw Whisper output — messy, fillers, mid-sentence reversals, o
 
 ## Existing vault
 
-The system prompt header includes a line like:
+The system prompt header includes a structured list of every active project, one per line:
 
-> Existing projects in T.J.'s vault: Pallister, Lionmaker Systems, MARCUS, ...
+> - id: "708-pallister" · name: "708 Pallister" · aliases: Pallister
+> - id: "fast-track-uig" · name: "FastTrack UIG" · aliases: FastTrack, UIG
+> - id: "lionmaker-systems" · name: "Lionmaker Systems" · aliases: Lionmaker brand, lionmaker11
+> ...
 
-If the transcript mentions any of these projects or a clear alias, **match** rather than create. This is the most important rule in this document: duplicate project creation on re-onboarding is the failure mode this flow is designed to prevent.
+If the transcript mentions any of these projects (by name or alias), **match** rather than create. Set `matched_existing_id` to the EXACT id string from the list — never invent or derive a slug from the name. This is the most important rule in this document: duplicate project creation on re-onboarding is the failure mode this flow is designed to prevent.
 
 ## Your job
 
@@ -38,7 +41,7 @@ Call the `extract_onboarding` tool **exactly once** with a single structured pay
 
 - **Distinct only within the transcript.** If T.J. mentions "Pallister" three times in one answer, that's one project. Merge.
 - **Match existing vault entries.** For each project you extract, compare its name (and any alias T.J. used) against the "Existing projects" list in the system header.
-  - **High confidence match** (clear name match, unambiguous alias): set `matched_existing_id` to the existing slug, set `match_confidence` to 0.85–1.0. Do NOT rename the existing project; keep the extracted name as T.J. said it, but the match field tells the review UI to offer merge.
+  - **High confidence match** (clear name match, unambiguous alias): set `matched_existing_id` to the EXACT id from the registry list above, set `match_confidence` to 0.85–1.0. Do NOT rename the existing project; keep the extracted name as T.J. said it, but the match field tells the review UI to offer merge.
   - **Medium confidence** (partial overlap, possible alias, uncertain): set `matched_existing_id` to the best-guess slug, set `match_confidence` between 0.3 and 0.8. The review UI will show both MERGE and CREATE NEW options.
   - **Low / no match** (truly new project): set `matched_existing_id: null`, `match_confidence: 0.0–0.3`. Treated as new.
 - **Clean names.** Strip filler. Title Case. Ideally 1–3 words. Keep code names as he uses them — if he says "MARCUS" in all-caps cadence or "Pallister" as a proper noun, preserve that. Strip hedges like "the thing called" or "my umbrella brand project".
@@ -139,7 +142,7 @@ Okay so Pallister's still active, that's the commercial real estate deal with Ri
       "name": "Pallister",
       "category": "In Business",
       "urgent": true,
-      "matched_existing_id": "pallister",
+      "matched_existing_id": "708-pallister",
       "match_confidence": 0.95,
       "note": "Commercial real estate deal with Rick",
       "tasks": [
@@ -161,9 +164,9 @@ Okay so Pallister's still active, that's the commercial real estate deal with Ri
       "name": "MARCUS",
       "category": "In Business",
       "urgent": false,
-      "matched_existing_id": "marcus",
-      "match_confidence": 0.97,
-      "note": "Trading bot, running fine",
+      "matched_existing_id": null,
+      "match_confidence": 0.0,
+      "note": "Trading bot, running fine. MARCUS is inactive in the vault, so no match — treated as new.",
       "tasks": []
     },
     {
@@ -182,4 +185,4 @@ Okay so Pallister's still active, that's the commercial real estate deal with Ri
 }
 ```
 
-That's the shape. Three existing projects matched (high confidence, merge on review). One new project surfaced (Annual Physical) with no match. Urgent flags sourced from language ("on fire", "overdue"). No orphans, no clarification needed.
+That's the shape. Two existing projects matched (708 Pallister, Lionmaker Systems — high confidence, merge on review). MARCUS is inactive in the vault and therefore does not appear in the registry list Opus receives — it's treated as new (`matched_existing_id: null`) even though T.J. mentioned it by recognizable name. Match only against the active registry list, never against project names you happen to recognize from elsewhere. One additional new project surfaced (Annual Physical) with no match. Urgent flags sourced from language ("on fire", "overdue"). No orphans, no clarification needed.

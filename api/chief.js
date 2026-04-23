@@ -209,7 +209,7 @@ const ONBOARD_EXTRACT_TOOL = {
             name: { type: 'string', description: 'Clean project name. Title Case. 1-3 words ideal.' },
             category: { type: 'string', enum: CATEGORIES, description: 'Best-fit category. Omit if unclear rather than guess.' },
             urgent: { type: 'boolean', description: 'True if ANY task is urgent OR user flagged the whole project as urgent. Binary — be conservative.' },
-            matched_existing_id: { type: ['string', 'null'], description: 'Existing registry slug if this project matches one in the vault. Null if new.' },
+            matched_existing_id: { type: ['string', 'null'], description: 'EXACT id string from the "Existing projects in T.J.\'s vault" list in the system prompt. Use the verbatim id, never a name-derived guess. Null if no existing project matches.' },
             match_confidence: { type: 'number', minimum: 0, maximum: 1, description: '0.85+ = clear match (merge default on review). 0.3-0.8 = possible match (UI shows both options, no default). <0.3 = treat as new.' },
             note: { type: 'string', description: 'Optional one-sentence context.' },
             tasks: {
@@ -299,10 +299,18 @@ export default async function handler(req, res) {
     // stays stable across onboarding sessions; the registry line sits
     // uncached so vault writes don't invalidate the cache prefix.
     const registry = await fetchRegistryLive();
-    const activeNames = getActiveProjects(registry).map(p => p.name).filter(Boolean);
-    const registryTail = activeNames.length
-      ? `## Existing projects in T.J.'s vault\n${activeNames.join(', ')}\n\nIf the transcript mentions any of these or a clear alias, set matched_existing_id + match_confidence rather than creating a new project.`
-      : `## Existing projects in T.J.'s vault\n(none — first-time onboarding)`;
+    const activeProjects = getActiveProjects(registry);
+    const registryLines = activeProjects
+      .filter(p => p.id && p.name)
+      .map(p => {
+        const aliasStr = Array.isArray(p.aliases) && p.aliases.length
+          ? ` · aliases: ${p.aliases.join(', ')}`
+          : '';
+        return `- id: "${p.id}" · name: "${p.name}"${aliasStr}`;
+      });
+    const registryTail = registryLines.length
+      ? `## Existing projects in T.J.'s vault\n\n${registryLines.join('\n')}\n\nWhen the transcript mentions any of these (by name or alias), set matched_existing_id to the EXACT id string from the list above. Never invent or derive a slug — only use ids that appear verbatim in this list. If no existing project matches, set matched_existing_id to null.`
+      : `## Existing projects in T.J.'s vault\n\n(none — first-time onboarding)\n\nSet matched_existing_id to null for all projects.`;
     system = [
       { type: 'text', text: onboardHead, cache_control: { type: 'ephemeral' } },
       { type: 'text', text: registryTail }
