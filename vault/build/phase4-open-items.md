@@ -126,6 +126,16 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** User discretion. Not a Phase 4 blocker.
 
+### 11. CAPTURE_QUESTION duplicated across OnboardAsk.jsx and OnboardParsing.jsx
+
+**Surface:** v2/src/components/Onboard/OnboardAsk.jsx and v2/src/components/Onboard/OnboardParsing.jsx both declare `const CAPTURE_QUESTION = "What's active right now?"` as file-local literals.
+
+**Concern:** Future copy changes to the capture question will need to be applied in both files or the Parsing screen will echo a stale prompt. Low-severity drift risk.
+
+**Fix:** Extract to a shared constants module (e.g. v2/src/components/Onboard/onboardStrings.js) and import from both. Minor refactor.
+
+**Schedule:** Polish pass. Non-blocking for Phase 4 ship.
+
 ## RESOLVED — Fixed during rebuild
 
 ### R6. Schema gap between R3 and R2 backend (resolved in R2.5)
