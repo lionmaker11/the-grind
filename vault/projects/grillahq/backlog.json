@@ -4,6 +4,17 @@
   "project_name": "GrillaHQ",
   "tasks": [
     {
+      "id": "gh-003",
+      "text": "Run end-to-end testing once A2P approval lands",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 0
+    },
+    {
       "id": "gh-001",
       "text": "Check A2P / 10DLC registration status",
       "done_condition": "Carrier registration confirmed approved OR blocker identified",
