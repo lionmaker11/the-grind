@@ -1,6 +1,16 @@
 // Parsing screen — fires off the onboard-mode chief request and routes
-// the extracted projects into the review surface. Only component that
-// imports postChief.
+// the extracted payload (projects + orphan tasks + optional clarification)
+// into the review / clarify surface via receiveExtraction. Only component
+// that imports postChief.
+//
+// Runs on both first pass (after capture-record) and second pass (after
+// clarify-record). Second-pass request bundles the clarify transcript so
+// Opus can refine its extraction; receiveExtraction suppresses a second
+// clarification round even if the model emits one.
+//
+// Mockup reference: 39-onboard-parsing.html — renders the capture Q/A
+// (and clarify Q/A if it happened) as conversation bubbles, with the
+// extraction spinner beneath.
 
 import { useEffect, useRef } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
@@ -11,50 +21,68 @@ import { OnboardMessage } from './OnboardMessage.jsx';
 import './OnboardMessage.css';
 import './OnboardParsing.css';
 
-const QUESTIONS = {
-  1: 'What projects are you running right now?',
-  2: "What's on fire? Anything overdue or due this week.",
-  3: 'Close one thing this week. What is it?'
-};
+const CAPTURE_QUESTION = "Walk me through what's active. Every project, what's happening.";
 
-function buildTranscriptMessage(answers) {
-  return [
-    `[Q1 — ${QUESTIONS[1]}]\n${(answers.q1 || '').trim()}`,
-    `[Q2 — ${QUESTIONS[2]}]\n${(answers.q2 || '').trim()}`,
-    `[Q3 — ${QUESTIONS[3]}]\n${(answers.q3 || '').trim()}`
-  ].join('\n\n');
+function buildTranscriptMessage(capture, clarify) {
+  const parts = [`[CAPTURE]\n${(capture || '').trim()}`];
+  if (clarify) {
+    parts.push(`[CLARIFY]\n${clarify.trim()}`);
+  }
+  return parts.join('\n\n');
 }
 
 export function OnboardParsing() {
-  const { step, answers } = useStore(onboardStore);
+  const { step, capture, clarify, extracted } = useStore(onboardStore);
   const firedRef = useRef(false);
+  const unmountedRef = useRef(false);
+
+  // Second-pass parsing: if we already have `extracted` AND `clarify`,
+  // the user went through the clarify round and landed back here.
+  // Render both Q/A pairs. On first pass, only the capture pair.
+  const clarifyQuestion = extracted?.clarificationNeeded?.question || '';
+  const showClarifyPair = Boolean(clarify) && Boolean(clarifyQuestion);
 
   useEffect(() => {
     if (firedRef.current) return;
     firedRef.current = true;
     (async () => {
       try {
-        const message = buildTranscriptMessage(answers);
+        const message = buildTranscriptMessage(capture, clarify);
         const res = await postChief({ mode: 'onboard', message });
+        if (unmountedRef.current) return;
         const extract = (res.actions || []).find((a) => a.type === 'extract_onboarding');
-        const projects = extract && Array.isArray(extract.projects) ? extract.projects : [];
-        receiveExtraction(projects);
+        const payload = extract && typeof extract === 'object' ? extract : {};
+        receiveExtraction({
+          projects: Array.isArray(payload.projects) ? payload.projects : [],
+          orphan_tasks: Array.isArray(payload.orphan_tasks) ? payload.orphan_tasks : [],
+          clarification_needed: payload.clarification_needed || null
+        });
       } catch (err) {
+        if (unmountedRef.current) return;
         setError('parsing', err?.message || 'extraction failed', true);
       }
     })();
+    return () => {
+      unmountedRef.current = true;
+    };
   }, []);
 
   return (
     <>
       <OnboardFooter step={step} />
       <div class="onboard-convo" data-testid="onboard-convo">
-        <OnboardMessage role="muse" text={QUESTIONS[3]} />
-        <OnboardMessage role="user" variant="finalized" text={answers.q3 || '—'} />
+        <OnboardMessage role="muse" text={CAPTURE_QUESTION} />
+        {capture && <OnboardMessage role="user" variant="finalized" text={capture} />}
+        {showClarifyPair && (
+          <>
+            <OnboardMessage role="muse" text={clarifyQuestion} />
+            <OnboardMessage role="user" variant="finalized" text={clarify} />
+          </>
+        )}
         <div class="parsing-block">
           <div class="parsing-spinner" aria-hidden="true" />
           <div class="parsing-label">
-            <span>// PARSING INPUT</span>
+            <span>// EXTRACTING PROJECTS + TASKS</span>
             <span class="parsing-dots" aria-hidden="true">
               <span /><span /><span />
             </span>

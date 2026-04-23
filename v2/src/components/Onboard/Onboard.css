@@ -289,3 +289,182 @@
   box-shadow: 0 0 30px var(--cyan-dim);
   min-height: 44px;
 }
+
+/* ─── Capture / Clarify shared bits ──────────────────────────────────── */
+
+/* Subtext below the capture question (OnboardAsk) — small dim mono caption.
+   Mockup 36 line 38: "// Work, personal, health, anything." */
+.capture-subtext {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-left: 42px; /* aligns under the muse bubble (after avatar) */
+  margin-top: -6px;
+}
+
+/* Compressed-capture preview block. Used by OnboardClarify (clarify-ask)
+   and OnboardRecord (clarify-record) to show the prior capture transcript
+   in an abbreviated form above the new question. Mockup 38 line 33-36. */
+.capture-compressed {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px dashed rgba(0, 240, 255, 0.35);
+  border-radius: var(--r-sm);
+  background: rgba(0, 240, 255, 0.04);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+  /* Truncate visually after ~3 lines — full text still in DOM for testing */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.capture-compressed .tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  color: rgba(0, 240, 255, 0.75);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ─── Skip button (OnboardClarify) ───────────────────────────────────── */
+
+/* Positioned top-right, BELOW the × close button so the two affordances
+   don't collide. Close is at top: env+12, height 44 → skip starts at env+64. */
+.skip-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  right: 14px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--cyan-dim);
+  border-radius: var(--r-sm);
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  z-index: 25;
+  min-height: 36px;
+}
+.skip-btn:active {
+  background: rgba(0, 240, 255, 0.08);
+}
+
+/* ─── Big mic — small variant (OnboardClarify) ───────────────────────── */
+
+/* Smaller mic for clarify-ask: shorter answer expected, smaller affordance.
+   Mockup 38 line 48: <div class="big-mic armed small">.
+   ~80% of default (96px) keeps the proportional feel. */
+.big-mic.small {
+  width: 76px;
+  height: 76px;
+  font-size: 1.6rem;
+}
+
+/* ─── R5a Review placeholder ─────────────────────────────────────────── */
+
+/* All .or-placeholder-* classes are throwaway. R5b replaces this file's
+   review styling wholesale. Minimal styling here just to keep the
+   placeholder readable on a phone for end-to-end flow validation. */
+.or-placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px 0;
+}
+.or-placeholder-banner {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: var(--magenta);
+  text-transform: uppercase;
+  padding: 10px 12px;
+  border: 1px dashed var(--magenta-dim);
+  border-radius: var(--r-sm);
+  background: rgba(255, 0, 222, 0.04);
+}
+.or-placeholder-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.or-placeholder-list li {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: rgba(10, 10, 18, 0.4);
+}
+.or-placeholder-match {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+.or-placeholder-orphans {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+.or-placeholder-progress,
+.or-placeholder-done {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  text-align: center;
+  padding: 10px;
+}
+.or-placeholder-error {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--magenta);
+  padding: 10px 12px;
+  border: 1px solid var(--magenta);
+  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.or-placeholder-error button {
+  align-self: flex-start;
+  padding: 6px 12px;
+  background: var(--magenta);
+  color: #000;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  min-height: 36px;
+}
+.or-placeholder-lock {
+  margin-top: 12px;
+  padding: 16px;
+  background: var(--cyan);
+  color: #000;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  min-height: 56px;
+  box-shadow: 0 0 30px var(--cyan-dim);
+}
+.or-placeholder-lock:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}

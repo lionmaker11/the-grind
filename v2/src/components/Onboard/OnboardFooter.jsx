@@ -1,22 +1,31 @@
 // Muse-header strip at the top of every onboarding screen (except intro).
-// Derives its status label from the current step + flags — no numerator.
+// Derives its status label from the current step + flags. Labels mirror
+// the mockup copy (36/37/38/39/40) so status strings stay consistent
+// between design reference and running app.
 
 import './OnboardFooter.css';
 
 function deriveLabel(step, isRecording, isTranscribing) {
-  if (step === 'q1-ask' || step === 'q2-ask' || step === 'q3-ask') {
-    const n = step.charAt(1);
-    return `Q${n} · MIC ARMED`;
+  if (step === 'capture-ask') {
+    return 'CAPTURE · MIC ARMED';
   }
-  if (step === 'q1-record' || step === 'q2-record' || step === 'q3-record') {
-    const n = step.charAt(1);
-    if (isTranscribing) return `Q${n} · TRANSCRIBING`;
-    if (isRecording) return `Q${n} · RECORDING`;
-    return `Q${n} · READY`;
+  if (step === 'capture-record') {
+    if (isTranscribing) return 'CAPTURE · TRANSCRIBING';
+    if (isRecording) return 'CAPTURE · RECORDING';
+    return 'CAPTURE · READY';
+  }
+  if (step === 'clarify-ask') {
+    return 'CLARIFY · MIC ARMED';
+  }
+  if (step === 'clarify-record') {
+    if (isTranscribing) return 'CLARIFY · TRANSCRIBING';
+    if (isRecording) return 'CLARIFY · RECORDING';
+    return 'CLARIFY · READY';
   }
   if (step === 'parsing') return 'PARSING';
   if (step === 'review') return 'REVIEW';
   if (step === 'committing') return 'LOCKING IN';
+  if (step === 'done') return 'DONE';
   if (step === 'error') return 'ERROR';
   return 'ONBOARDING';
 }

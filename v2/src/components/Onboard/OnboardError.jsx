@@ -1,7 +1,9 @@
 // Error surface. Rendered when onboardStore.step === 'error'. The error
 // object carries the origin step + a user-readable message + whether
-// retry is offered. Retry routes to ERROR_RECOVERY_STEP (clearError);
-// restart resets the flow to intro.
+// retry is offered. Retry routes per ERROR_RECOVERY_STEP in the state
+// store (capture-record → capture-ask, clarify-record → clarify-ask,
+// parsing → review, committing → review) via clearError; restart
+// resets to intro via recoverToIntro.
 
 import { useStore } from '@nanostores/preact';
 import { onboardStore, clearError, recoverToIntro } from '../../state/onboard.js';

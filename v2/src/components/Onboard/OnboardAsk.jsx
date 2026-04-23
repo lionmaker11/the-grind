@@ -1,6 +1,10 @@
-// "Asking" screen — Muse has posed the current question and is awaiting
-// the mic tap. Conversation history (prior Q/A pairs) scrolls above.
-// Tap the armed mic to transition to the corresponding record step.
+// Capture-ask screen — Muse poses the single capture question and waits
+// for the mic tap. No conversation history (capture is one pass); the
+// mockup's subtext ("// Work, personal, health, anything.") sits below
+// the question. Tap the armed mic to transition to capture-record.
+//
+// Clarify-ask is a different component (OnboardClarify) — distinct UI
+// (compressed capture preview, skip button, dynamic LLM question).
 
 import { useStore } from '@nanostores/preact';
 import { onboardStore, startRecording } from '../../state/onboard.js';
@@ -8,31 +12,19 @@ import { OnboardFooter } from './OnboardFooter.jsx';
 import { OnboardMessage } from './OnboardMessage.jsx';
 import './OnboardMessage.css';
 
-const QUESTIONS = {
-  1: 'What projects are you running right now?',
-  2: "What's on fire? Anything overdue or due this week.",
-  3: 'Close one thing this week. What is it?'
-};
+const CAPTURE_QUESTION = "Walk me through what's active. Every project, what's happening.";
+const CAPTURE_SUBTEXT = '// Work, personal, health, anything.';
+const MIC_HINT = 'Tap to start. Take your time — 1 to 3 minutes is normal.';
 
 export function OnboardAsk() {
-  const { step, currentQuestion, answers } = useStore(onboardStore);
-  const qNum = currentQuestion || parseInt(step.charAt(1), 10) || 1;
-
-  const history = [];
-  for (let i = 1; i < qNum; i++) {
-    history.push({ role: 'muse', text: QUESTIONS[i] });
-    const ans = answers[`q${i}`];
-    if (ans) history.push({ role: 'user', text: ans });
-  }
+  const { step } = useStore(onboardStore);
 
   return (
     <>
       <OnboardFooter step={step} />
       <div class="onboard-convo" data-testid="onboard-convo">
-        {history.map((m, i) => (
-          <OnboardMessage key={`h-${i}`} role={m.role} text={m.text} variant={m.role === 'user' ? 'finalized' : undefined} />
-        ))}
-        <OnboardMessage role="muse" text={QUESTIONS[qNum]} />
+        <OnboardMessage role="muse" text={CAPTURE_QUESTION} />
+        <div class="capture-subtext">{CAPTURE_SUBTEXT}</div>
       </div>
       <div class="big-mic-wrap">
         <button
@@ -44,7 +36,7 @@ export function OnboardAsk() {
         >
           ●
         </button>
-        <div class="mic-hint">Tap to record — tap again when done</div>
+        <div class="mic-hint">{MIC_HINT}</div>
       </div>
     </>
   );

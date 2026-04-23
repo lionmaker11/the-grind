@@ -1,164 +1,117 @@
-// Review screen — editable project/task list + pinned LOCK IT IN dock.
-// Edits dispatch into onboardStore (no local form state). Commit fires
-// commitOnboardingResults() which orchestrates the real API calls.
+// R5a FUNCTIONAL PLACEHOLDER — replaced in R5b by full review UI. Exists
+// to validate end-to-end commit flow before R5b's UI surface lands.
+// Renders a minimal read-only list of extracted projects + orphan count,
+// auto-deletes orphans on commit (bypassing assignment UI), and watches
+// for step === 'done' to tear down the onboard takeover.
+//
+// No polish, no match-merge decisions surfaced, no urgent toggles, no
+// drag. R5b owns all of that.
 
+import { useEffect } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import {
   onboardStore,
-  editProjectName,
-  editProjectPriority,
-  deleteProject,
-  addProject,
-  editTaskText,
-  editTaskPriority,
-  deleteTask,
-  addTask,
+  deleteOrphan,
   startCommit,
-  commitOnboardingResults
+  commitOnboardingResults,
+  clearError,
+  closeOnboard
 } from '../../state/onboard.js';
-import { TopBar } from '../TopBar/TopBar.jsx';
-import './OnboardReview.css';
-
-function PriorityBadge({ value, onDec, onInc }) {
-  const cls = `p-badge p${Math.min(Math.max(value || 3, 1), 5)}`;
-  return (
-    <div class="or-pri">
-      <button type="button" class="or-pri-step" aria-label="Raise priority" onClick={onDec} tabIndex={-1}>▲</button>
-      <span class={cls}>P{value}</span>
-      <button type="button" class="or-pri-step" aria-label="Lower priority" onClick={onInc} tabIndex={-1}>▼</button>
-    </div>
-  );
-}
-
-function TaskRow({ projectIdx, taskIdx, task }) {
-  return (
-    <div class="task-row">
-      <PriorityBadge
-        value={task.priority}
-        onDec={() => editTaskPriority(projectIdx, taskIdx, Math.max(1, (task.priority || 3) - 1))}
-        onInc={() => editTaskPriority(projectIdx, taskIdx, Math.min(5, (task.priority || 3) + 1))}
-      />
-      <input
-        type="text"
-        class="or-task-text"
-        value={task.text || ''}
-        placeholder="Task…"
-        onInput={(e) => editTaskText(projectIdx, taskIdx, e.currentTarget.value)}
-        data-testid={`onboard-task-${projectIdx}-${taskIdx}`}
-      />
-      <button
-        type="button"
-        class="btn-icon delete"
-        aria-label="Delete task"
-        onClick={() => deleteTask(projectIdx, taskIdx)}
-      >
-        ×
-      </button>
-    </div>
-  );
-}
-
-function ProjectPanel({ project, idx }) {
-  return (
-    <div class="panel project-card or-panel" data-testid={`onboard-project-${idx}`}>
-      <span class="corner tl" />
-      <span class="corner tr" />
-      <span class="corner bl" />
-      <span class="corner br" />
-      <div class="project-head">
-        <span class="or-heartbeat" />
-        <input
-          type="text"
-          class="or-project-name"
-          value={project.name || ''}
-          placeholder="PROJECT NAME"
-          onInput={(e) => editProjectName(idx, e.currentTarget.value)}
-          data-testid={`onboard-project-name-${idx}`}
-        />
-        <PriorityBadge
-          value={project.priority}
-          onDec={() => editProjectPriority(idx, Math.max(1, (project.priority || 3) - 1))}
-          onInc={() => editProjectPriority(idx, Math.min(5, (project.priority || 3) + 1))}
-        />
-        <button
-          type="button"
-          class="btn-icon delete"
-          aria-label="Delete project"
-          onClick={() => deleteProject(idx)}
-        >
-          ×
-        </button>
-      </div>
-      {(project.tasks || []).map((t, tIdx) => (
-        <TaskRow key={t.tempId || `t-${tIdx}`} projectIdx={idx} taskIdx={tIdx} task={t} />
-      ))}
-      <button
-        type="button"
-        class="add-task-ghost"
-        onClick={() => addTask(idx)}
-        data-testid={`onboard-add-task-${idx}`}
-      >
-        + ADD TASK
-      </button>
-    </div>
-  );
-}
+import { OnboardFooter } from './OnboardFooter.jsx';
 
 export function OnboardReview() {
-  const { step, extracted, committing, commitProgress } = useStore(onboardStore);
+  const { step, extracted, commitProgress, error } = useStore(onboardStore);
   const projects = extracted?.projects || [];
-  const inProgress = step === 'committing';
+  const orphans = extracted?.orphanTasks || [];
   const { total, completed, failed } = commitProgress;
+  const inProgress = step === 'committing';
+  const isDone = step === 'done';
+  const isError = step === 'error';
+
+  // Tear down the takeover ~1s after finishCommit flips step to 'done'
+  // so the user sees the "DONE" status briefly before the Board appears.
+  useEffect(() => {
+    if (!isDone) return;
+    const id = setTimeout(() => closeOnboard(true), 1000);
+    return () => clearTimeout(id);
+  }, [isDone]);
 
   function handleLock() {
-    if (committing) return;
+    if (inProgress) return;
+    // Placeholder shortcut: auto-delete every orphan so the commit
+    // orchestrator doesn't need per-orphan assignments. R5b's UI lets
+    // the user assign them to projects (new or existing) instead.
+    for (const o of orphans) {
+      if (!o.committed) deleteOrphan(o.tempId);
+    }
     startCommit();
     commitOnboardingResults();
   }
 
-  const lockLabel = inProgress
-    ? (total > 0 ? `LOCKING IN · ${completed} / ${total}` : 'LOCKING IN…')
-    : 'LOCK IT IN ▶';
-
   return (
     <>
-      <TopBar />
-      <div class="or-viewport">
-        <div class="review-eyebrow">
-          ➤ // HERE&apos;S WHAT I FILED.
-          <br />FIX ANYTHING THAT&apos;S WRONG.
+      <OnboardFooter step={step} />
+      <div class="or-placeholder" data-testid="onboard-review-placeholder">
+        <div class="or-placeholder-banner">
+          // R5a PLACEHOLDER — full review UI lands in R5b.
         </div>
-        {projects.length === 0 && (
-          <div class="or-empty">
-            // Nothing extracted. Add a project below or exit to retry.
+
+        <ul class="or-placeholder-list">
+          {projects.map((p) => (
+            <li key={p.tempId} data-testid={`onboard-project-${p.tempId}`}>
+              <strong>{p.name || '(unnamed)'}</strong>
+              {' — '}
+              {p.tasks.length} task{p.tasks.length === 1 ? '' : 's'}
+              {p.matched_existing_id && (
+                <span class="or-placeholder-match">
+                  {' · matches '}<code>{p.matched_existing_id}</code>
+                  {' (confidence '}{p.match_confidence.toFixed(2)}{')'}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        <div class="or-placeholder-orphans" data-testid="onboard-orphan-count">
+          Orphan tasks: {orphans.length} (will be auto-deleted on commit)
+        </div>
+
+        {inProgress && (
+          <div class="or-placeholder-progress" data-testid="onboard-commit-progress">
+            LOCKING IN · {completed} / {total}
+            {failed.length > 0 && (
+              <span> · {failed.length} failed</span>
+            )}
           </div>
         )}
-        {projects.map((p, i) => (
-          <ProjectPanel key={p.tempId || `p-${i}`} project={p} idx={i} />
-        ))}
-        <button
-          type="button"
-          class="add-project-ghost"
-          onClick={addProject}
-          data-testid="onboard-add-project"
-        >
-          + ADD PROJECT
-        </button>
-        {failed.length > 0 && !inProgress && (
-          <div class="or-partial-warn" role="alert">
-            // {failed.length} item{failed.length === 1 ? '' : 's'} failed. Retry to try again.
+
+        {isError && (
+          <div class="or-placeholder-error" role="alert">
+            // ERROR: {error?.message || 'commit failed'}
+            <button
+              type="button"
+              onClick={clearError}
+              data-testid="onboard-placeholder-retry"
+            >
+              RETRY
+            </button>
           </div>
         )}
-      </div>
-      <div class="lock-dock">
+
+        {isDone && (
+          <div class="or-placeholder-done" data-testid="onboard-commit-done">
+            // DONE · closing…
+          </div>
+        )}
+
         <button
           type="button"
-          class="review-lock"
+          class="or-placeholder-lock"
           onClick={handleLock}
-          disabled={inProgress || projects.length === 0}
+          disabled={inProgress || isDone || projects.length === 0}
           data-testid="onboard-lock-in"
         >
-          {lockLabel}
+          LOCK IT IN (TEST) ▶
         </button>
       </div>
     </>

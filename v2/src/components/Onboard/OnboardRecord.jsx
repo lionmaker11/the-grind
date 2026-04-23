@@ -1,6 +1,7 @@
-// Recording screen. On mount, fires up the MediaRecorder via voice.js.
-// User taps the pulsing mic to stop → postTranscribe → finalizeTranscript
-// → auto-advance to next question or to parsing.
+// Recording screen — drives MediaRecorder via voice.js, dispatches back
+// to the store on stop. Handles BOTH capture-record and clarify-record:
+// three step-aware decisions only (finalize target, question bubble,
+// compressed-capture preview). All mic machinery is shared.
 //
 // This is the only Onboard component that imports voice.js or
 // postTranscribe — other screens stay pure.
@@ -10,7 +11,8 @@ import { useStore } from '@nanostores/preact';
 import {
   onboardStore,
   stopRecording,
-  finalizeTranscript,
+  finalizeCapture,
+  finalizeClarify,
   setError
 } from '../../state/onboard.js';
 import { startRecording } from '../../lib/voice.js';
@@ -19,11 +21,7 @@ import { OnboardFooter } from './OnboardFooter.jsx';
 import { OnboardMessage } from './OnboardMessage.jsx';
 import './OnboardMessage.css';
 
-const QUESTIONS = {
-  1: 'What projects are you running right now?',
-  2: "What's on fire? Anything overdue or due this week.",
-  3: 'Close one thing this week. What is it?'
-};
+const CAPTURE_QUESTION = "Walk me through what's active. Every project, what's happening.";
 
 function formatTimer(sec) {
   const m = Math.floor(sec / 60);
@@ -32,11 +30,17 @@ function formatTimer(sec) {
 }
 
 export function OnboardRecord() {
-  const { step, currentQuestion, answers, isRecording, isTranscribing } = useStore(onboardStore);
-  const qNum = currentQuestion || parseInt(step.charAt(1), 10) || 1;
+  const { step, capture, extracted, isRecording, isTranscribing } = useStore(onboardStore);
+  const isClarify = step === 'clarify-record';
 
   const handleRef = useRef(null);
   const startedAtRef = useRef(null);
+  // Guards post-stop dispatch: if the user exits (× → confirmExit) while
+  // transcription is in-flight, postTranscribe resolves against a store
+  // that's been reset. Check this after each await in handleStop so we
+  // don't fire finalizeCapture / finalizeClarify / setError into an
+  // unmounted context.
+  const unmountedRef = useRef(false);
   const [elapsed, setElapsed] = useState(0);
   const [stopping, setStopping] = useState(false);
 
@@ -46,20 +50,24 @@ export function OnboardRecord() {
     let cancelled = false;
     (async () => {
       try {
+        // Mark the start BEFORE awaiting the recorder so the on-screen
+        // timer reflects user perception ("I tapped the mic, time starts")
+        // rather than the getUserMedia resolve moment.
+        startedAtRef.current = Date.now();
         const handle = await startRecording();
         if (cancelled) {
           try { handle.cancel(); } catch (_e) { /* already stopped */ }
           return;
         }
         handleRef.current = handle;
-        startedAtRef.current = Date.now();
       } catch (err) {
         if (cancelled) return;
-        setError(`q${qNum}-record`, err?.message || 'microphone unavailable', true);
+        setError(step, err?.message || 'microphone unavailable', true);
       }
     })();
     return () => {
       cancelled = true;
+      unmountedRef.current = true;
       if (handleRef.current) {
         try { handleRef.current.cancel(); } catch (_e) { /* already stopped */ }
         handleRef.current = null;
@@ -86,36 +94,39 @@ export function OnboardRecord() {
     stopRecording();
     try {
       const blob = await handle.stop();
+      if (unmountedRef.current) return;
       const text = await postTranscribe(blob);
-      finalizeTranscript(text || '');
+      if (unmountedRef.current) return;
+      if (isClarify) {
+        finalizeClarify(text || '');
+      } else {
+        finalizeCapture(text || '');
+      }
     } catch (err) {
-      setError(`q${qNum}-record`, err?.message || 'transcription failed', true);
+      if (unmountedRef.current) return;
+      setError(step, err?.message || 'transcription failed', true);
     } finally {
       setStopping(false);
     }
   }
 
-  // Build history (prior Q/A pairs + current Q) so the conversation
-  // stream matches OnboardAsk.
-  const history = [];
-  for (let i = 1; i < qNum; i++) {
-    history.push({ role: 'muse', text: QUESTIONS[i] });
-    const ans = answers[`q${i}`];
-    if (ans) history.push({ role: 'user', text: ans });
-  }
+  const questionText = isClarify
+    ? (extracted?.clarificationNeeded?.question || '')
+    : CAPTURE_QUESTION;
 
-  const transcriptLabel = isTranscribing
-    ? 'TRANSCRIBING…'
-    : 'LISTENING…';
+  const transcriptLabel = isTranscribing ? 'TRANSCRIBING…' : 'LISTENING…';
 
   return (
     <>
       <OnboardFooter step={step} isRecording={isRecording} isTranscribing={isTranscribing} />
       <div class="onboard-convo" data-testid="onboard-convo">
-        {history.map((m, i) => (
-          <OnboardMessage key={`h-${i}`} role={m.role} text={m.text} variant={m.role === 'user' ? 'finalized' : undefined} />
-        ))}
-        <OnboardMessage role="muse" text={QUESTIONS[qNum]} />
+        {isClarify && capture && (
+          <div class="capture-compressed" data-testid="capture-compressed">
+            <span class="tag">// YOU · CAPTURE</span>
+            {capture}
+          </div>
+        )}
+        <OnboardMessage role="muse" text={questionText} />
         <OnboardMessage role="user" variant="dashed" text={transcriptLabel} showCaret />
       </div>
       <div class="big-mic-wrap">
