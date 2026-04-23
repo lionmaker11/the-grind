@@ -19,7 +19,7 @@ Living document tracking known issues, design concerns, and deferred work surfac
 
 Option (a) keeps backend clean but adds a network round-trip per merge. Option (b) adds a tiny backend surface but keeps commit serial.
 
-**Schedule:** Fix as part of R5b OR a dedicated R6 commit before R7 tests.
+**Schedule:** Still open — needs verification during R5b phone test or earlier. Fix as part of R5b OR a dedicated R6 commit before R7 tests.
 
 ### 2. App.jsx re-open loop on successful onboarding
 
@@ -32,6 +32,34 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 **Verification:** Phone test R5a end-to-end — complete full flow including LOCK IT IN, confirm UI closes cleanly to Board without re-opening onboarding.
 
 **Schedule:** Verify during R5a phone test. If bug manifests, fix before R5b.
+
+### 6. Extraction quality when user speaks naturally
+
+**Surface:** Opus extraction in `/api/chief.js` `op:onboard`.
+
+**Observed (R5a phone test):** When T.J. spoke a freeform brain-dump, Opus merged unrelated tasks under a fabricated "Personal" project rather than mapping each task to the correct existing project or surfacing as orphans. Result: tasks landed in the wrong place silently.
+
+**Concern:** The current extraction prompt + flow assume the user organizes their own thoughts by project. Real speech doesn't work that way. Need a flow redesign so the system can either (a) ask clarifying questions per ambiguous task, or (b) default ambiguous tasks to orphans for explicit assignment in Review, instead of inventing umbrella projects.
+
+**Schedule:** Council deliberation on flow redesign. Target before Phase 4 closes; may push into Phase 5.
+
+### 7. R5b needs fully editable Review
+
+**Surface:** R5b OnboardReview rewrite (replaces the placeholder shell from R5a).
+
+**Required affordances:**
+- Rename project (inline edit on the project header)
+- Split a task out into a different project (move task between project panels)
+- Add a brand-new project (with optional starting tasks)
+- Delete a project (and decide what happens to its tasks — drop or convert to orphans)
+- Edit task text inline
+- Toggle a task's `urgent` flag
+- Assign an orphan to a project (existing or new)
+- Reorder tasks within a project AND reorder projects in the list
+
+**Why:** Without these, item 6 (extraction quality) becomes a hard blocker — user can't fix Opus's mistakes mid-flow and is forced to either accept bad data or bail out and start over.
+
+**Schedule:** R5b. This is the bulk of R5b's scope.
 
 ## SCHEDULED — Planned fixes
 
@@ -75,6 +103,18 @@ R3 commits tasks with `urgent` + `order` fields. Original R2 op:add didn't accep
 ### R7. receiveExtraction signature mismatch (resolved in R5a)
 
 OnboardParsing.jsx called `receiveExtraction(projects)` with old signature. R5a rewrote to pass full payload `{projects, orphan_tasks, clarification_needed}`. Resolved.
+
+### R9. Slug invention bug in onboard extraction (resolved in 229e65c)
+
+Opus was inventing `matched_existing_id` slugs (e.g. `pallister` for the existing `708-pallister`) because `chief.js` op:onboard sent only project names in the registry tail, not ids. Tasks under "merged" projects then 404'd at `/api/backlog`. Fix: `chief.js` registry tail now emits structured `- id: "..." · name: "..." · aliases: ...` lines; schema description for `matched_existing_id` and `vault/systems/onboard-system.md` example both updated to require an EXACT id from the list. Resolved.
+
+### R10. Parallel-write race in api/project.js (resolved in 899c02d)
+
+`op:add` used `Promise.all` to write `_registry.json` and the new `backlog.json` in parallel. Both PUTs target the same GitHub ref; trees were computed independently and GitHub silently dropped one of the two commits. Phone test surfaced 3 stale registry entries (`personal`, `financial`, `motor-city-deals-command-center`) whose backlog files never landed even though both PUTs reported 200. Fix: serialize — backlog first, registry second, registry only writes if backlog landed. Resolved.
+
+### Stale registry entries cleanup (resolved in eb246a1 on main)
+
+Three orphan registry entries from broken parallel-write test runs (`personal`, `financial`, `motor-city-deals-command-center`) had no backing `backlog.json` files and were not real projects. Deleted from `_registry.json` directly on `main`. Recreatable via onboarding if the user actually wants any of them. Resolved.
 
 ### R8. Onboard.jsx done-state teardown (resolved in R5a)
 
