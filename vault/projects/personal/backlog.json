@@ -2,5 +2,17 @@
   "schema_version": 1,
   "project_id": "personal",
   "project_name": "Personal",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "per-001",
+      "text": "Get a quote for backyard patio at the house",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 0
+    }
+  ]
 }
