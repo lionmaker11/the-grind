@@ -4,21 +4,21 @@ Authoritative record of phase-by-phase state, approved exceptions, and patterns
 observed during the rebuild. Read this file first in any new Claude Code
 session before touching code.
 
-## Current state (22 April 2026)
+## Current state (23 April 2026)
 
 - Production: the-grind-gold.vercel.app (main branch, HEAD 73c7dd2)
-- Active branch: v2-phase4 (continues, not merged — mid-rebuild)
+- Active branch: v2-phase4 (HEAD 892ff9b, 41 commits ahead of main — mid-rebuild)
 - Architecture: V2 served at `/` via Vite build at `v2/dist/`, `/api/*` same-origin, all Vercel serverless functions
 - Lighthouse accessibility baseline: 100/100 (Phase 2 close, holds)
 
 Phase 4 onboarding is mid-rebuild. The initial 3-question implementation (commits f4fc3ba through c928abf) was phone-tested on 22 April 2026 and surfaced blocking issues: 4× POST /api/project returned 409 on LOCK IT IN (slug collisions between Opus-extracted project names and the existing vault registry); weak question phrasing producing poor extraction quality; broken project-task coupling across Q1/Q2/Q3 turns.
 
-A design council (Council 1: David_Allen_Methodologist, Julie_Zhuo_Designer, Ryan_Singer_Scope, Tobi_Lütke_Operator, Voice_UX_Researcher) redesigned the flow: single capture question + optional clarify + extended review with MATCH indicators and orphan handling. Concurrent with the redesign, a simplification pass removed P1/P2/P3 priority badges app-wide, removed aspirational due-date/overdue meta chips, and replaced the 1-5 priority scale with a binary urgent flag + universal drag-to-reorder ordering.
+A design council (Council 1: David_Allen_Methodologist, Julie_Zhuo_Designer, Ryan_Singer_Scope, Tobi_Lütke_Operator, Voice_UX_Researcher) redesigned the flow: single capture question + optional clarify + extended review with MATCH indicators and orphan handling. A second council (Council 2) produced the R5b flow redesign governing the current review-surface rebuild. Concurrent with the redesigns, a simplification pass removed P1/P2/P3 priority badges app-wide, removed aspirational due-date/overdue meta chips, and replaced the 1-5 priority scale with a binary urgent flag + universal drag-to-reorder ordering.
 
-Canonical rebuild spec: /vault/build/phase4-redesign-spec.md (landed in 03fe71a).
+Canonical rebuild specs: /vault/build/phase4-redesign-spec.md (Council 1, landed in 03fe71a) and /vault/build/phase4-flow-redesign.md (Council 2). Living open-items register: /vault/build/phase4-open-items.md. Session handoff doc: /vault/build/phase4-session-handoff.md.
 Design asset set: /design/mockups/ (full replacement in f56f5e0 — 30 active screens + shared.css + tokens.css + 3 assets, reflecting the simplification pass).
 
-Next step: rebuild onboarding implementation on v2-phase4 per spec. Commits 5448a95, 05ceba8, 285b1c9, c928abf will be superseded but remain as branch archaeology. No force-push, no history rewrite.
+Current step: R5b OnboardReview rebuild underway. R5b-1 through R5b-6a landed (see Phase 4 roadmap bullet). Next: R5b-6b₁ (drag wiring). Original commits 5448a95, 05ceba8, 285b1c9, c928abf preserved as branch archaeology. No force-push, no history rewrite.
 
 ## April 2026 simplification pass
 
@@ -66,12 +66,13 @@ user approval and a "show me the diff" review before any commit.
    while POST handlers wrote to GitHub directly. Muse-filed tasks were
    invisible until next deploy. See Pattern 1.
 
-Pending Phase 4 rebuild exceptions (not yet committed):
+Phase 4 rebuild exceptions (landed):
 
-- **Exception 5** (anticipated): `api/chief.js` onboard-mode prompt assembly now injects the user's existing project registry into the system prompt so Opus can detect matches. Minor logic change within the existing mode-routing scope (Exception 3) but flagged separately because it changes prompt composition, not just routing.
-- **Exception 6** (anticipated): `api/backlog.js` gets new op `toggle_urgent`. Single-field mutation handler, same endpoint as existing op=add. Likely covered by the existing `op` routing pattern (Phase 1 endpoint scope) rather than a true exception, but review the diff when the rebuild lands to confirm.
+- **Exception 5** (landed in 229e65c): `api/chief.js` onboard-mode prompt assembly injects the user's existing project registry into the system prompt so Opus can detect matches. Minor logic change within the existing mode-routing scope (Exception 3) but flagged separately because it changes prompt composition, not just routing.
+- **Exception 6** (landed in R3 commits): `api/backlog.js` op `toggle_urgent` — single-field mutation handler, same endpoint as existing op=add. Covered by the existing `op` routing pattern (Phase 1 endpoint scope) rather than a true exception.
+- **Exception 7** (landed in R5b-2): `api/backlog.js` op `add` accepts `order: 'append'` sentinel to place a new task at the end of an existing project's backlog. Needed by the commit orchestrator for merge-append (see open-item #1). Within existing op-routing scope; reviewed pre-commit.
 
-Each /api/* edit during the rebuild requires explicit diff review before commit. Four approved to date.
+Each /api/* edit during the rebuild requires explicit diff review before commit. Five approved to date (plus two rebuild-internal additions within existing routing scope).
 
 ## Model routing (locked)
 
@@ -175,6 +176,8 @@ voice → Muse response → task on Board in <10s.
 ## Phase roadmap
 
 - **Phase 4 — Onboarding rebuild.** Mid-rebuild after phone test revealed blocking issues in the original 3-question implementation. Redesigned flow per Council 1 output (22 April 2026): single capture + optional clarify + extended review with MATCH/orphan handling. Binary urgent flag replaces P-badges. Canonical spec: /vault/build/phase4-redesign-spec.md. Original commits on v2-phase4 (5448a95, 05ceba8, 285b1c9, c928abf) preserved as archaeology; rebuild will supersede them without force-push.
+
+  R5b underway since 23 April 2026. R5b-1 through R5b-6a landed: extraction prompt conservative-binding (R5b-1), api/backlog.js order:'append' sentinel (R5b-2), copy refresh across non-review onboarding components (R5b-3), OnboardError variant routing (R5b-3b), OrphanPicker component (R5b-4), OnboardReview structure + render (R5b-5, commit cf18a75), OnboardReview simple store-action wiring (R5b-6a, commit 892ff9b). Council 2 spec at vault/build/phase4-flow-redesign.md governs the overall R5b flow. Remaining R5b steps: R5b-6b (complex interactions — drag, contentEditable, long-press, orphan picker mount, deleteProject orphan-conversion; split into b₁ drag and b₂ edit/longpress/orphan clusters), R5b-6c (commit orchestrator — order:'append' frontend wiring + mid-commit abort guards), R5b-7 (drag utility upgrade if needed post-R5b-6b), R5b-8 (Playwright E2E rewrite), R5b-9 (pre-merge status report), phone test, merge.
 - **Phase 5a — Board interactions.** Check-off, launch to Focus stub, ghost-row wiring. Priority changes happen via drag (simplification pass made drag universal) — Board top-3 derives from backlog order. Pending.
 - **Phase 5b — Backlog detail + pom glyphs.** Modal overlay launched from Board project tap. Full task list with URGENT/NORMAL grouping, drag-to-reorder primary priority mechanism, inline pomodoro estimate glyphs, aggregate pom counter in header. Mockups 23 (detail), 24 (glyph study), 33 (reorder + urgent storyboard) in /design/mockups/. Scope tightened by simplification pass: drag-to-reorder (previously Phase 8 polish) now primary Phase 5b work. Depends on Phase 4 rebuild merging first and Phase 5a shipping the basic interaction primitives.
 - **Phase 6 — Focus surface + Ring timer.** Port sacred SVG from mockup 06.
@@ -187,7 +190,7 @@ voice → Muse response → task on Board in <10s.
 
 ### Pattern 1 — `/api/*` frozen rule keeps surfacing pre-existing bugs
 
-Four approved to date; the Phase 4 rebuild is expected to add two more (api/chief.js registry-injection, api/backlog.js toggle_urgent op). Review each diff before commit. None are scope creep; all are V1 bugs that had been silently broken. The frozen rule did its job by forcing explicit review of each backend touch, which surfaced the bugs instead of letting them compound.
+Five approved to date plus two rebuild-internal additions (api/chief.js registry-injection landed in 229e65c; api/backlog.js toggle_urgent op landed in R3; api/backlog.js order:'append' sentinel landed in R5b-2). Review each diff before commit. None are scope creep; all are V1 bugs that had been silently broken or known Phase 4 rebuild work. The frozen rule did its job by forcing explicit review of each backend touch, which surfaced the bugs instead of letting them compound.
 
 **Implication:** Expect more of these in Phases 4-7 as new surfaces exercise
 the backend. Budget 1-2 small `/api/*` exception commits per phase.
