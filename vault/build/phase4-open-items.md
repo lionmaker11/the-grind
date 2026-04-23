@@ -71,6 +71,28 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** Not fixed in R5b. Watch during phone test and dogfooding. If any write loss surfaces, dedicated commit.
 
+### 9. Copy manifest spec defects — mic-gesture copy and Parsing rationale
+
+**Surface:** vault/build/phase4-flow-redesign.md § "Copy manifest" rows for OnboardAsk (capture-ask mic CTA), OnboardRecord (stop CTA), and OnboardParsing (parsing state).
+
+**Concern (mic-gesture copy):** The manifest specifies `HOLD TO TALK` as the OnboardAsk mic CTA and `RELEASE TO STOP` as the OnboardRecord stop CTA, both labeled "Existing pattern." Neither is existing — the current components are tap-to-start-then-tap-to-stop, not press-and-hold. Writing these strings onto the components would lie about the interaction model. Deferred from R5b-3 (copy-only refresh) to R5b-3c, which will resolve as a paired decision: either add press-and-hold interaction (structural — wires a pointerdown/pointerup handler, replaces the current tap-toggle in OnboardAsk/OnboardRecord), or rewrite both manifest entries to reflect tap-to-stop semantics.
+
+**Concern (Parsing rationale):** The manifest row for OnboardParsing says `Thinking…` with rationale "Kept from R5a. Short is right." The actual R5a component renders `// EXTRACTING PROJECTS + TASKS`. The string contract (`Thinking…`) ships in R5b-3; the rationale text is stale. No action beyond this note.
+
+**Fix:** R5b-3c resolves the mic-gesture decision. Parsing rationale is closed by this note.
+
+**Schedule:** R5b-3c.
+
+### 10. OnboardError variant routing not yet wired
+
+**Surface:** v2/src/components/Onboard/OnboardError.jsx.
+
+**Concern:** Current OnboardError renders one generic message + fixed button labels. The copy manifest (phase4-flow-redesign.md) specifies three distinct error variants keyed by `error.step` origin: transcription-failed (TRY AGAIN → returns to capture-ask), empty-extraction (TAKE ANOTHER PASS → returns to intro), partial-commit (RETRY ▶ with N-failed interpolation → returns to review). Variant routing is new logic — out of scope for the copy-only R5b-3 pass. Implementation needs: a marker on the error object distinguishing empty-extraction from generic parsing failure (probably a flag set by setError or receiveExtraction), a variant resolver in OnboardError, and access to commitProgress.failed.length for the partial-commit interpolation.
+
+**Fix:** R5b-3b dedicated prompt before R5b-4 (OrphanPicker) lands, so error paths are real by the time Review stress-tests them.
+
+**Schedule:** R5b-3b, immediately after R5b-3.
+
 ## SCHEDULED — Planned fixes
 
 ### 3. Unmount/abort race patterns (partially addressed)
