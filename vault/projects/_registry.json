@@ -143,31 +143,6 @@
       "status": "inactive",
       "folder": "vault/projects/mcd-agent-org",
       "note": "Python companion to MCDCommand, stalled since 2026-03-17"
-    },
-    {
-      "id": "personal",
-      "name": "Personal",
-      "status": "active",
-      "priority": 3,
-      "folder": "vault/projects/personal",
-      "aliases": []
-    },
-    {
-      "id": "financial",
-      "name": "Financial",
-      "status": "active",
-      "priority": 3,
-      "folder": "vault/projects/financial",
-      "aliases": []
-    },
-    {
-      "id": "motor-city-deals-command-center",
-      "name": "Motor City Deals Command Center",
-      "status": "active",
-      "priority": 1,
-      "folder": "vault/projects/motor-city-deals-command-center",
-      "aliases": [],
-      "note": "Overdue; waiting on A2P."
     }
   ]
 }
