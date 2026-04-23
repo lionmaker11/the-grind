@@ -26,6 +26,17 @@
       "order": 1
     },
     {
+      "id": "pal-013",
+      "text": "Confirm electrician came today and work went well",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 2
+    },
+    {
       "id": "pal-009",
       "text": "Check on the windows at 708 Pallister",
       "done_condition": null,
