@@ -93,6 +93,16 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** R5b-3b, immediately after R5b-3.
 
+### 14. Playwright spec is stale across the R5 rewrite
+
+**Surface:** v2/tests/onboard-flow.spec.js.
+
+**Concern:** The spec targets the R3 three-question flow — `q1-ask`/`q2-ask`/`q3-ask` steps that no longer exist, `priority: 1` numeric field replaced by `urgent: bool`, Q1/Q2/Q3 transcript fixtures from the deleted prompt sequence. 30+ references to R3-era constructs across the file. Also contains 4 references to `onboard-error-retry` / `onboard-error-restart` test-ids that R5b-3b renamed. Patching any subset of these references would produce a file that reads current but still fails at the structural level.
+
+**Fix:** Wholesale rewrite in R5b-8 per phase4-redesign-spec.md § Playwright Test Plan (10-test suite against the Council 2 flow).
+
+**Schedule:** R5b-8, after the implementation prompts land and before phone test.
+
 ## SCHEDULED — Planned fixes
 
 ### 3. Unmount/abort race patterns (partially addressed)
