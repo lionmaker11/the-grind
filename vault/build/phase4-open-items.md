@@ -152,6 +152,24 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** Polish pass post-Phase-4, or whenever this surfaces in dogfooding.
 
+### 15. Spec wording: registry source for OrphanPicker
+
+**Surface:** vault/build/phase4-flow-redesign.md § "Review UX architecture" § "Orphan picker" — "Existing vault projects — scrollable list of vault registry projects."
+
+**Concern:** Spec handwaves the fetch path as "the same registry source used by extraction," which is technically wrong — extraction's registry is fetched server-side by api/chief.js. Frontend has boardStore.summary, which is the equivalent but distinct data path. OrphanPicker reuses boardStore per R5b-4; spec wording should be updated to name the store directly.
+
+**Schedule:** Spec refresh post-Phase-4 close. Non-blocking.
+
+### 16. Spec update: OrphanPicker deviations for R5b-4 landing
+
+**Surface:** vault/build/phase4-flow-redesign.md § "Review UX architecture" § "Orphan picker".
+
+**Concern:** R5b-4's implementation deviates from the manifest in two user-visible ways that should be reflected in the spec when next refreshed:
+(1) Suggested-name row AND free-form input row coexist when orphan.suggestedProjectName is present. Manifest implies mutual exclusion ("otherwise"). Coexistence is strictly better UX.
+(2) Orphan text reminder rendered as subhead under "Where does this go?" title. Manifest has no entry for this; added because users picking across multiple orphans need visible reminder of which task they're assigning.
+
+**Schedule:** Spec refresh post-Phase-4 close. Non-blocking.
+
 ## RESOLVED — Fixed during rebuild
 
 ### 10. OnboardError variant routing not yet wired
