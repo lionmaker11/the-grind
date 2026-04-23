@@ -13,6 +13,17 @@
       "created": "2026-04-21"
     },
     {
+      "id": "ls-005",
+      "text": "Identify top three tasks inside Mission Control and share them",
+      "done_condition": null,
+      "category": "On Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 1
+    },
+    {
       "id": "ls-002",
       "text": "Follow execution checklist Task 2",
       "done_condition": null,
