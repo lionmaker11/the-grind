@@ -46,7 +46,7 @@
 // - orphan UNDO (assignOrphan undefined? or re-open picker) — R5b-6b
 // - LOCK IT IN (startCommit + commitOnboardingResults) — R5b-6c (depends on order:'append' wiring)
 
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import {
   onboardStore,
@@ -58,8 +58,11 @@ import {
   addTask,
   addProject,
   deleteProject,
+  reorderProjects,
+  reorderTasks,
 } from '../../state/onboard.js';
 import { boardStore } from '../../state/board.js';
+import { createListDragController } from '../../lib/drag.js';
 import { OnboardFooter } from './OnboardFooter.jsx';
 import './OnboardReview.css';
 
@@ -102,6 +105,17 @@ export function OnboardReview() {
     const id = setTimeout(() => closeOnboard(true), 1000);
     return () => clearTimeout(id);
   }, [isDone]);
+
+  // Project-list drag controller — stable across renders, destroyed on unmount.
+  // One controller for the project list; per-project task controllers live in
+  // ExpandedProjectBody so they unmount with their project body.
+  const projectDrag = useMemo(
+    () => createListDragController({
+      onReorder: (from, to) => reorderProjects(from, to),
+    }),
+    []
+  );
+  useEffect(() => () => projectDrag.destroy(), [projectDrag]);
 
   const lockDisabled = inProgress || isDone || !isReadyToCommit();
 
@@ -158,6 +172,7 @@ export function OnboardReview() {
           return (
             <div
               key={p.tempId}
+              {...projectDrag.itemProps(pIdx)}
               class="panel project-card or-project"
               data-testid={`onboard-project-${p.tempId}`}
             >
@@ -167,6 +182,7 @@ export function OnboardReview() {
               <div class="project-head">
                 {/* not in mockup — project-level drag handle */}
                 <span
+                  {...projectDrag.handleProps(pIdx)}
                   class="drag-handle or-project-drag"
                   aria-label="Drag project to reorder"
                   data-testid={`onboard-project-drag-${p.tempId}`}
@@ -233,50 +249,11 @@ export function OnboardReview() {
               )}
 
               {expanded && (
-                <div id={`onboard-project-body-${p.tempId}`} class="or-project-body">
-                  {(p.tasks || []).map((t, tIdx) => (
-                    <div
-                      key={t.tempId}
-                      class={`task-row${t.urgent ? ' urgent' : ''}`}
-                      data-testid={`onboard-task-${t.tempId}`}
-                    >
-                      <span
-                        class="drag-handle"
-                        aria-label="Drag task to reorder"
-                        data-testid={`onboard-task-drag-${t.tempId}`}
-                      />
-                      <div class="task-text">{t.text}</div>
-                      <div class="task-actions">
-                        <button
-                          type="button"
-                          class="btn-icon edit"
-                          aria-label="Edit task"
-                          onClick={() => { /* R5b-6b — focus contentEditable */ }}
-                          data-testid={`onboard-task-edit-${t.tempId}`}
-                        >
-                          ✎
-                        </button>
-                        <button
-                          type="button"
-                          class="btn-icon delete"
-                          aria-label="Delete task"
-                          onClick={() => deleteTask(pIdx, tIdx)}
-                          data-testid={`onboard-task-delete-${t.tempId}`}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    class="add-task-ghost"
-                    onClick={() => addTask(pIdx)}
-                    data-testid={`onboard-add-task-${p.tempId}`}
-                  >
-                    + ADD TASK
-                  </button>
-                </div>
+                <ExpandedProjectBody
+                  pIdx={pIdx}
+                  projectTempId={p.tempId}
+                  tasks={p.tasks || []}
+                />
               )}
             </div>
           );
@@ -404,5 +381,69 @@ export function OnboardReview() {
         </button>
       </div>
     </>
+  );
+}
+
+// Per-project task list. Owns its own drag controller so each expanded
+// project gets an independent reorder context. The controller is keyed
+// to pIdx — if the parent project moves (project-list reorder) or a
+// sibling project is deleted, pIdx may shift and the controller is
+// rebuilt against the new index. Cheap per drag.js docstring §4.
+function ExpandedProjectBody({ pIdx, projectTempId, tasks }) {
+  const taskDrag = useMemo(
+    () => createListDragController({
+      onReorder: (from, to) => reorderTasks(pIdx, from, to),
+    }),
+    [pIdx]
+  );
+  useEffect(() => () => taskDrag.destroy(), [taskDrag]);
+
+  return (
+    <div id={`onboard-project-body-${projectTempId}`} class="or-project-body">
+      {tasks.map((t, tIdx) => (
+        <div
+          key={t.tempId}
+          {...taskDrag.itemProps(tIdx)}
+          class={`task-row${t.urgent ? ' urgent' : ''}`}
+          data-testid={`onboard-task-${t.tempId}`}
+        >
+          <span
+            {...taskDrag.handleProps(tIdx)}
+            class="drag-handle"
+            aria-label="Drag task to reorder"
+            data-testid={`onboard-task-drag-${t.tempId}`}
+          />
+          <div class="task-text">{t.text}</div>
+          <div class="task-actions">
+            <button
+              type="button"
+              class="btn-icon edit"
+              aria-label="Edit task"
+              onClick={() => { /* R5b-6b₂ — focus contentEditable */ }}
+              data-testid={`onboard-task-edit-${t.tempId}`}
+            >
+              ✎
+            </button>
+            <button
+              type="button"
+              class="btn-icon delete"
+              aria-label="Delete task"
+              onClick={() => deleteTask(pIdx, tIdx)}
+              data-testid={`onboard-task-delete-${t.tempId}`}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        class="add-task-ghost"
+        onClick={() => addTask(pIdx)}
+        data-testid={`onboard-add-task-${projectTempId}`}
+      >
+        + ADD TASK
+      </button>
+    </div>
   );
 }

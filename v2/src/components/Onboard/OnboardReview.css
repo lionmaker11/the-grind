@@ -324,6 +324,30 @@
   box-shadow: 0 0 6px var(--amber-glow);
 }
 
+/* ── Drag affordance — drag.js CSS contract (R5b-6b₁) ──
+   Inline transform written by drag.js wins over class transforms,
+   so .dragging uses box-shadow + z-index for visual lift only — no
+   transform: scale (would be overridden by the inline translateY).
+   Scoped to .or-project / .or-viewport .task-row so the transition
+   does not leak into Board's main-surface .project-card / .task-row
+   (shared class names, no drag wired there yet). */
+.or-project {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.or-project.dragging {
+  transition: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+.or-viewport .task-row {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.or-viewport .task-row.dragging {
+  transition: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+
 /* ── + ADD TASK ghost ── */
 .add-task-ghost {
   display: flex;
