@@ -61,6 +61,16 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** R5b. This is the bulk of R5b's scope.
 
+### 8. Latent parallel-write race in api/backlog.js op:add
+
+**Surface:** api/backlog.js op:add, after writeBacklog + touchRegistry.
+
+**Concern:** `Promise.all([writeBacklog(...), touchRegistry(...)])` is the same pattern that caused the 899c02d parallel-write race in api/project.js. Two Contents API writes against the same branch ref, independent tree computations, GitHub silently dropping one under load. api/backlog.js hasn't produced an observable bug yet — likely because its writes are less frequent than onboarding's project-creation burst — but the shape is identical.
+
+**Fix if it surfaces:** serialize — backlog first, registry touch second, registry only if backlog landed. Mirror the api/project.js fix pattern.
+
+**Schedule:** Not fixed in R5b. Watch during phone test and dogfooding. If any write loss surfaces, dedicated commit.
+
 ## SCHEDULED — Planned fixes
 
 ### 3. Unmount/abort race patterns (partially addressed)
