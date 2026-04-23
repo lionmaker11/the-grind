@@ -83,16 +83,6 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** R5b-3c.
 
-### 10. OnboardError variant routing not yet wired
-
-**Surface:** v2/src/components/Onboard/OnboardError.jsx.
-
-**Concern:** Current OnboardError renders one generic message + fixed button labels. The copy manifest (phase4-flow-redesign.md) specifies three distinct error variants keyed by `error.step` origin: transcription-failed (TRY AGAIN → returns to capture-ask), empty-extraction (TAKE ANOTHER PASS → returns to intro), partial-commit (RETRY ▶ with N-failed interpolation → returns to review). Variant routing is new logic — out of scope for the copy-only R5b-3 pass. Implementation needs: a marker on the error object distinguishing empty-extraction from generic parsing failure (probably a flag set by setError or receiveExtraction), a variant resolver in OnboardError, and access to commitProgress.failed.length for the partial-commit interpolation.
-
-**Fix:** R5b-3b dedicated prompt before R5b-4 (OrphanPicker) lands, so error paths are real by the time Review stress-tests them.
-
-**Schedule:** R5b-3b, immediately after R5b-3.
-
 ### 14. Playwright spec is stale across the R5 rewrite
 
 **Surface:** v2/tests/onboard-flow.spec.js.
@@ -163,6 +153,18 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 **Schedule:** Polish pass post-Phase-4, or whenever this surfaces in dogfooding.
 
 ## RESOLVED — Fixed during rebuild
+
+### 10. OnboardError variant routing not yet wired
+
+Resolved in commits d439c46 (state store + call-site migration) and 582a784 (component variant resolver).
+
+**Surface:** v2/src/components/Onboard/OnboardError.jsx.
+
+**Concern:** Current OnboardError renders one generic message + fixed button labels. The copy manifest (phase4-flow-redesign.md) specifies three distinct error variants keyed by `error.step` origin: transcription-failed (TRY AGAIN → returns to capture-ask), empty-extraction (TAKE ANOTHER PASS → returns to intro), partial-commit (RETRY ▶ with N-failed interpolation → returns to review). Variant routing is new logic — out of scope for the copy-only R5b-3 pass. Implementation needs: a marker on the error object distinguishing empty-extraction from generic parsing failure (probably a flag set by setError or receiveExtraction), a variant resolver in OnboardError, and access to commitProgress.failed.length for the partial-commit interpolation.
+
+**Fix:** R5b-3b dedicated prompt before R5b-4 (OrphanPicker) lands, so error paths are real by the time Review stress-tests them.
+
+**Schedule:** R5b-3b, immediately after R5b-3.
 
 ### R6. Schema gap between R3 and R2 backend (resolved in R2.5)
 
