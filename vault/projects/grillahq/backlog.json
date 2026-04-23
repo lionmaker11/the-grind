@@ -15,6 +15,17 @@
       "order": 0
     },
     {
+      "id": "gh-004",
+      "text": "Run text message testing",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 1
+    },
+    {
       "id": "gh-001",
       "text": "Check A2P / 10DLC registration status",
       "done_condition": "Carrier registration confirmed approved OR blocker identified",
