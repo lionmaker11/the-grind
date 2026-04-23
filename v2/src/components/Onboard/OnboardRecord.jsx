@@ -62,7 +62,7 @@ export function OnboardRecord() {
         handleRef.current = handle;
       } catch (err) {
         if (cancelled) return;
-        setError(step, err?.message || 'microphone unavailable', true);
+        setError(step, err?.message || 'microphone unavailable', 'transcription', true);
       }
     })();
     return () => {
@@ -104,7 +104,7 @@ export function OnboardRecord() {
       }
     } catch (err) {
       if (unmountedRef.current) return;
-      setError(step, err?.message || 'transcription failed', true);
+      setError(step, err?.message || 'transcription failed', 'transcription', true);
     } finally {
       setStopping(false);
     }

@@ -59,7 +59,13 @@ export function OnboardParsing() {
         });
       } catch (err) {
         if (unmountedRef.current) return;
-        setError('parsing', err?.message || 'extraction failed', true);
+        // First-pass parsing failure → 'empty-extraction' (recovery is
+        // re-record from intro since there's no extracted data to fall back
+        // on). Second-pass failure → 'generic' (recovery is review with the
+        // first-pass extracted data preserved).
+        const isFirstPass = onboardStore.get().clarify === null;
+        const variant = isFirstPass ? 'empty-extraction' : 'generic';
+        setError('parsing', err?.message || 'extraction failed', variant, true);
       }
     })();
     return () => {

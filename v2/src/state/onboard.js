@@ -84,8 +84,10 @@ const VALID_EDGES = {
 };
 
 // When user taps RETRY on error, map origin step → recovery step.
-// Special-case: parsing-with-empty-extraction recovers to 'intro'
-// (no data to review) — handled inline in clearError.
+// Used by clearError() for variants whose recovery is "go back and retry the
+// same step" (transcription, partial-commit, second-pass generic). The
+// 'empty-extraction' variant bypasses this and calls recoverToIntro()
+// directly from OnboardError, since there's no extracted data to return to.
 const ERROR_RECOVERY_STEP = {
   'capture-record': 'capture-ask',
   'clarify-record': 'clarify-ask',
@@ -297,6 +299,7 @@ export function receiveExtraction(payload) {
       error: {
         step: 'parsing',
         message: 'No projects detected. Try again?',
+        variant: 'empty-extraction',
         recoverable: true
       }
     });
@@ -686,6 +689,8 @@ export function finishCommit() {
       error: {
         step: 'committing',
         message: `${failed.length} item${failed.length === 1 ? '' : 's'} failed to commit. Retry?`,
+        variant: 'partial-commit',
+        failedCount: failed.length,
         recoverable: true
       }
     });
@@ -694,10 +699,31 @@ export function finishCommit() {
 
 // ─── Error lifecycle ──────────────────────────────────────────────────
 
-export function setError(step, message, recoverable = true) {
+// Known error variants. Drives copy + button label + recovery routing in
+// OnboardError. New variants must be added here AND handled in OnboardError's
+// resolver. See vault/build/phase4-flow-redesign.md § Failure-mode handling.
+const ERROR_VARIANTS = Object.freeze([
+  'transcription',
+  'empty-extraction',
+  'partial-commit',
+  'generic'
+]);
+
+export function setError(step, message, variant, recoverable = true) {
+  if (!ERROR_VARIANTS.includes(variant)) {
+    throw new TypeError(
+      `setError: variant is required and must be one of [${ERROR_VARIANTS.join(', ')}]; ` +
+      `got ${JSON.stringify(variant)} (step=${JSON.stringify(step)})`
+    );
+  }
   patch({
     step: 'error',
-    error: { step, message: message || 'Something went wrong.', recoverable: Boolean(recoverable) },
+    error: {
+      step,
+      message: message || 'Something went wrong.',
+      variant,
+      recoverable: Boolean(recoverable)
+    },
     isRecording: false,
     isTranscribing: false,
     isExtracting: false,
@@ -710,13 +736,8 @@ export function clearError() {
   if (cur.step !== 'error' || !cur.error) return;
   const origin = cur.error.step;
   const recovery = ERROR_RECOVERY_STEP[origin] || 'intro';
-  // Parsing error with nothing extracted: no review data to return to;
-  // send the user back to intro to retry the whole capture.
-  const noExtracted = origin === 'parsing' && (!cur.extracted || (
-    cur.extracted.projects.length === 0 && cur.extracted.orphanTasks.length === 0
-  ));
   patch({
-    step: noExtracted ? 'intro' : recovery,
+    step: recovery,
     error: null
   });
 }
