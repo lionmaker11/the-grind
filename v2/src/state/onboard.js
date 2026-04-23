@@ -797,6 +797,22 @@ export async function commitOnboardingResults() {
   const cur = onboardStore.get();
   if (cur.step !== 'committing') return;
 
+  // [DIAG] temporary — remove once commit-failure root cause is identified.
+  console.log('[commit][start]', {
+    step: cur.step,
+    projects: (cur.extracted?.projects || []).map(p => ({
+      name: p.name,
+      matched_existing_id: p.matched_existing_id,
+      match_confidence: p.match_confidence,
+      backendId: p.backendId,
+      committed: p.committed,
+      merge: cur.matches[p.tempId]?.merge,
+      taskCount: p.tasks.length
+    })),
+    orphans: (cur.extracted?.orphanTasks || []).length,
+    assignments: cur.orphanAssignments
+  });
+
   let completed = cur.commitProgress.completed;
   const failed = [];
   const bump = () => updateCommitProgress(completed, [...failed]);
@@ -853,6 +869,8 @@ export async function commitOnboardingResults() {
         completed++;
         bump();
       } catch (err) {
+        // [DIAG] temporary
+        console.error('[commit][pass2][project]', { name, err: err?.message, status: err?.status, response: err?.response });
         failed.push({ kind: 'project', name, reason: err?.message || 'unknown' });
         for (const t of p.tasks) {
           if (!t.committed) {
@@ -902,6 +920,8 @@ export async function commitOnboardingResults() {
           completed++;
           bump();
         } catch (err) {
+          // [DIAG] temporary
+          console.error('[commit][pass3][task]', { project: p.name, projectId: p.backendId, text, err: err?.message, status: err?.status });
           failed.push({
             kind: 'task',
             project: p.name,
@@ -961,6 +981,8 @@ export async function commitOnboardingResults() {
           throw new Error(`unknown assignment kind: ${assignment.kind}`);
         }
       } catch (err) {
+        // [DIAG] temporary
+        console.error('[commit][pass4][orphan-resolve]', { text, assignment, err: err?.message });
         failed.push({ kind: 'orphan', text, reason: err?.message || 'unknown' });
         bump();
         continue;
@@ -980,6 +1002,8 @@ export async function commitOnboardingResults() {
         completed++;
         bump();
       } catch (err) {
+        // [DIAG] temporary
+        console.error('[commit][pass4][orphan-attach]', { text, projectId, projectLabel, err: err?.message });
         failed.push({
           kind: 'orphan',
           text,

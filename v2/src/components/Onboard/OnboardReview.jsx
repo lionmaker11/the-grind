@@ -24,6 +24,7 @@ export function OnboardReview() {
   const projects = extracted?.projects || [];
   const orphans = extracted?.orphanTasks || [];
   const { total, completed, failed } = commitProgress;
+  const hasFailures = failed && failed.length > 0;
   const inProgress = step === 'committing';
   const isDone = step === 'done';
   const isError = step === 'error';
@@ -82,6 +83,17 @@ export function OnboardReview() {
             {failed.length > 0 && (
               <span> · {failed.length} failed</span>
             )}
+          </div>
+        )}
+
+        {hasFailures && (
+          <div class="or-placeholder-failures" data-testid="onboard-commit-failures">
+            <div>// FAILURES ({failed.length})</div>
+            {failed.map((f, i) => (
+              <div key={i} class="or-placeholder-failure-line">
+                [{f.kind}] {f.project ? `${f.project} · ` : ''}{f.name ? `${f.name} · ` : ''}{f.text ? `"${f.text}" · ` : ''}{f.reason}
+              </div>
+            ))}
           </div>
         )}
 

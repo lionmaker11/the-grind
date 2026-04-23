@@ -50,6 +50,8 @@ export function OnboardParsing() {
         const message = buildTranscriptMessage(capture, clarify);
         const res = await postChief({ mode: 'onboard', message });
         if (unmountedRef.current) return;
+        // [DIAG] temporary — remove once commit-failure root cause is identified.
+        console.log('[onboard][extraction][raw]', JSON.stringify(res, null, 2));
         const extract = (res.actions || []).find((a) => a.type === 'extract_onboarding');
         const payload = extract && typeof extract === 'object' ? extract : {};
         receiveExtraction({
