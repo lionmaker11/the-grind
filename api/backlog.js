@@ -234,10 +234,13 @@ export default async function handler(req, res) {
     }
     let explicitOrder = null;
     if (task.order !== undefined) {
-      if (!Number.isInteger(task.order) || task.order < 0) {
-        return res.status(400).json({ error: 'task.order must be a non-negative integer' });
+      if (task.order === 'append') {
+        explicitOrder = 'append';
+      } else if (Number.isInteger(task.order) && task.order >= 0) {
+        explicitOrder = task.order;
+      } else {
+        return res.status(400).json({ error: "task.order must be 'append' or a non-negative integer" });
       }
-      explicitOrder = task.order;
     }
 
     const newTask = {
@@ -250,15 +253,20 @@ export default async function handler(req, res) {
       created: today(),
       ...(pri !== null ? { priority: pri } : {}),
       ...(urgentFlag !== null ? { urgent: urgentFlag } : {}),
-      ...(explicitOrder !== null ? { order: explicitOrder } : {})
+      ...(Number.isInteger(explicitOrder) ? { order: explicitOrder } : {})
     };
 
     // Explicit `order` short-circuits priority-bucketed insertion: splice
     // at the requested position (clamped to array length; out-of-range
-    // values append). Old-flow callers without `order` still go through
+    // values append). The 'append' sentinel resolves to the current end
+    // of the task list — used by the onboarding commit orchestrator for
+    // merged projects so extraction-time indices don't push existing
+    // tasks down. Old-flow callers without `order` still go through
     // insertSorted via task.priority.
     if (explicitOrder !== null) {
-      const pos = Math.min(explicitOrder, backlog.tasks.length);
+      const pos = explicitOrder === 'append'
+        ? backlog.tasks.length
+        : Math.min(explicitOrder, backlog.tasks.length);
       backlog.tasks.splice(pos, 0, newTask);
     } else {
       backlog.tasks = insertSorted(backlog.tasks, newTask);
