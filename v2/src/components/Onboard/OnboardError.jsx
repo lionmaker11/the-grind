@@ -11,9 +11,10 @@ import { OnboardFooter } from './OnboardFooter.jsx';
 import './OnboardError.css';
 
 export function OnboardError() {
-  const { step, error } = useStore(onboardStore);
+  const { step, error, commitProgress } = useStore(onboardStore);
   const message = error?.message || 'Something went wrong.';
   const recoverable = error?.recoverable !== false;
+  const failed = commitProgress?.failed || [];
 
   return (
     <>
@@ -42,6 +43,16 @@ export function OnboardError() {
               START FRESH
             </button>
           </div>
+          {failed.length > 0 && (
+            <div class="or-placeholder-failures" data-testid="onboard-error-failures">
+              <div>// FAILURES ({failed.length})</div>
+              {failed.map((f, i) => (
+                <div key={i} class="or-placeholder-failure-line">
+                  [{f.kind}] {f.project || f.name || ''} {f.text ? `"${f.text}"` : ''} — {f.reason}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>
