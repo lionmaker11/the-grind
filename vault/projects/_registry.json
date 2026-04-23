@@ -143,6 +143,14 @@
       "status": "inactive",
       "folder": "vault/projects/mcd-agent-org",
       "note": "Python companion to MCDCommand, stalled since 2026-03-17"
+    },
+    {
+      "id": "personal",
+      "name": "Personal",
+      "status": "active",
+      "priority": 11,
+      "folder": "vault/projects/personal",
+      "aliases": []
     }
   ]
 }
