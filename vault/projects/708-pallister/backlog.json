@@ -4,6 +4,16 @@
   "project_name": "708 Pallister",
   "tasks": [
     {
+      "id": "pal-018",
+      "text": "R5b-2 verify integer",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "order": 0
+    },
+    {
       "id": "pal-015",
       "text": "Check that windows at 708 Pallister were installed properly",
       "done_condition": null,
