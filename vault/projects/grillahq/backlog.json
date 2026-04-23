@@ -4,6 +4,17 @@
   "project_name": "GrillaHQ",
   "tasks": [
     {
+      "id": "gh-007",
+      "text": "Verify A2P was accepted for GrillaHQ",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-04-23",
+      "urgent": false,
+      "order": 0
+    },
+    {
       "id": "gh-006",
       "text": "Check on A2P compliance for the GrillaHQ app",
       "done_condition": null,
