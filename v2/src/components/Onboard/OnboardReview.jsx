@@ -29,24 +29,28 @@
 // component unmounts. Not fixing in R5b-5 — pre-existing issue, revisit
 // when commit orchestrator wiring lands in R5b-6 or later.
 //
-// ─── R5b-6 open wiring ────────────────────────────────────────────────────
+// ─── R5b-6 wiring status ──────────────────────────────────────────────────
 // - project expand chevron (R5b-6a ✓)
-// - project drag handle (createListDragController + reorderProjects) — R5b-6b
-// - project × (R5b-6a ✓ — calls existing deleteProject; orphan-conversion per open #17 is R5b-6b)
-// - project-name inline edit — R5b-6b
-// - urgent-count long-press — R5b-6b
+// - project drag handle (createListDragController + reorderProjects) (R5b-6b₁ ✓)
+// - project × — orphan-conversion per open #17 option (c) (R5b-6b₂ ✓)
+// - project-name inline edit (editProjectName) (R5b-6b₂ ✓)
 // - match-row toggle (setMatchDecision) (R5b-6a ✓)
-// - task drag handle (reorderTasks) — R5b-6b
-// - task text inline edit (editTaskText) — R5b-6b
-// - task edit ✎ (focus contentEditable) — R5b-6b
+// - task drag handle (reorderTasks) (R5b-6b₁ ✓)
+// - task text inline edit (editTaskText) (R5b-6b₂ ✓)
+// - task edit ✎ — opens inline editor on .task-text (R5b-6b₂ ✓)
+// - task urgent long-press (toggleTaskUrgent) (R5b-6b₂ ✓)
 // - task delete × (deleteTask) (R5b-6a ✓)
 // - + ADD TASK (addTask) (R5b-6a ✓)
 // - + ADD PROJECT (addProject) (R5b-6a ✓)
-// - orphan ASSIGN → (opens OrphanPicker) — R5b-6b
-// - orphan UNDO (assignOrphan undefined? or re-open picker) — R5b-6b
+// - orphan ASSIGN → (opens OrphanPicker) (R5b-6b₂ ✓)
+// - orphan assigned × — re-opens OrphanPicker (R5b-6b₂ ✓)
+// - orphan discarded ↺ — unassignOrphan back to pending (R5b-6b₂ ✓)
 // - LOCK IT IN (startCommit + commitOnboardingResults) — R5b-6c (depends on order:'append' wiring)
+//
+// Out of scope for R5b-6b₂: project-level urgent toggle (no spec
+// gesture defined — urgent-count pill is display-only).
 
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import {
   onboardStore,
@@ -60,10 +64,16 @@ import {
   deleteProject,
   reorderProjects,
   reorderTasks,
+  editProjectName,
+  editTaskText,
+  toggleTaskUrgent,
+  unassignOrphan,
 } from '../../state/onboard.js';
 import { boardStore } from '../../state/board.js';
 import { createListDragController } from '../../lib/drag.js';
+import { createLongPress } from '../../lib/longpress.js';
 import { OnboardFooter } from './OnboardFooter.jsx';
+import { OrphanPicker } from './OrphanPicker.jsx';
 import './OnboardReview.css';
 
 function urgentCountFor(project) {
@@ -91,6 +101,8 @@ export function OnboardReview() {
   const { summary } = useStore(boardStore);
 
   const [expandedTempIds, setExpandedTempIds] = useState(() => new Set());
+  const [pickerOpenForOrphan, setPickerOpenForOrphan] = useState(null);
+  const [editingProjectTempId, setEditingProjectTempId] = useState(null);
 
   const projects = extracted?.projects || [];
   const orphans = extracted?.orphanTasks || [];
@@ -187,9 +199,22 @@ export function OnboardReview() {
                   aria-label="Drag project to reorder"
                   data-testid={`onboard-project-drag-${p.tempId}`}
                 />
-                <span class="project-name or-project-name-static">
-                  {p.name || '(unnamed)'}
-                </span>
+                {editingProjectTempId === p.tempId ? (
+                  <ProjectNameEditor
+                    pIdx={pIdx}
+                    projectTempId={p.tempId}
+                    initialValue={p.name || ''}
+                    onDone={() => setEditingProjectTempId(null)}
+                  />
+                ) : (
+                  <span
+                    class="project-name or-project-name-static"
+                    onClick={() => setEditingProjectTempId(p.tempId)}
+                    data-testid={`onboard-project-name-${p.tempId}`}
+                  >
+                    {p.name || '(unnamed)'}
+                  </span>
+                )}
                 {nTotal > 0 && (
                   <span
                     class={`urgent-count${nUrgent === 0 ? ' urgent-count--zero' : ''}`}
@@ -304,7 +329,7 @@ export function OnboardReview() {
                     <button
                       type="button"
                       class="or-orphan-assign"
-                      onClick={() => { /* R5b-6b — open OrphanPicker */ }}
+                      onClick={() => setPickerOpenForOrphan(o.tempId)}
                       data-testid={`onboard-orphan-assign-${o.tempId}`}
                     >
                       ASSIGN →
@@ -319,7 +344,7 @@ export function OnboardReview() {
                         type="button"
                         class="or-orphan-undo"
                         aria-label="Change assignment"
-                        onClick={() => { /* R5b-6b */ }}
+                        onClick={() => setPickerOpenForOrphan(o.tempId)}
                         data-testid={`onboard-orphan-undo-${o.tempId}`}
                       >
                         ×
@@ -333,7 +358,7 @@ export function OnboardReview() {
                         type="button"
                         class="or-orphan-undo"
                         aria-label="Undo discard"
-                        onClick={() => { /* R5b-6b */ }}
+                        onClick={() => unassignOrphan(o.tempId)}
                         data-testid={`onboard-orphan-undo-${o.tempId}`}
                       >
                         ↺
@@ -380,6 +405,13 @@ export function OnboardReview() {
           )}
         </button>
       </div>
+
+      {pickerOpenForOrphan && (
+        <OrphanPicker
+          orphanTempId={pickerOpenForOrphan}
+          onClose={() => setPickerOpenForOrphan(null)}
+        />
+      )}
     </>
   );
 }
@@ -390,6 +422,8 @@ export function OnboardReview() {
 // sibling project is deleted, pIdx may shift and the controller is
 // rebuilt against the new index. Cheap per drag.js docstring §4.
 function ExpandedProjectBody({ pIdx, projectTempId, tasks }) {
+  const [editingTaskTempId, setEditingTaskTempId] = useState(null);
+
   const taskDrag = useMemo(
     () => createListDragController({
       onReorder: (from, to) => reorderTasks(pIdx, from, to),
@@ -401,40 +435,16 @@ function ExpandedProjectBody({ pIdx, projectTempId, tasks }) {
   return (
     <div id={`onboard-project-body-${projectTempId}`} class="or-project-body">
       {tasks.map((t, tIdx) => (
-        <div
+        <TaskRow
           key={t.tempId}
-          {...taskDrag.itemProps(tIdx)}
-          class={`task-row${t.urgent ? ' urgent' : ''}`}
-          data-testid={`onboard-task-${t.tempId}`}
-        >
-          <span
-            {...taskDrag.handleProps(tIdx)}
-            class="drag-handle"
-            aria-label="Drag task to reorder"
-            data-testid={`onboard-task-drag-${t.tempId}`}
-          />
-          <div class="task-text">{t.text}</div>
-          <div class="task-actions">
-            <button
-              type="button"
-              class="btn-icon edit"
-              aria-label="Edit task"
-              onClick={() => { /* R5b-6b₂ — focus contentEditable */ }}
-              data-testid={`onboard-task-edit-${t.tempId}`}
-            >
-              ✎
-            </button>
-            <button
-              type="button"
-              class="btn-icon delete"
-              aria-label="Delete task"
-              onClick={() => deleteTask(pIdx, tIdx)}
-              data-testid={`onboard-task-delete-${t.tempId}`}
-            >
-              ×
-            </button>
-          </div>
-        </div>
+          pIdx={pIdx}
+          tIdx={tIdx}
+          task={t}
+          isEditing={editingTaskTempId === t.tempId}
+          onStartEdit={() => setEditingTaskTempId(t.tempId)}
+          onStopEdit={() => setEditingTaskTempId(null)}
+          taskDrag={taskDrag}
+        />
       ))}
       <button
         type="button"
@@ -445,5 +455,209 @@ function ExpandedProjectBody({ pIdx, projectTempId, tasks }) {
         + ADD TASK
       </button>
     </div>
+  );
+}
+
+// Per-task row. Owns its own long-press controller (one per task,
+// keyed to [pIdx, tIdx] so reorders/inserts rebuild against the
+// current indices). Long-press target is .task-text only — drag
+// pointer events live on the drag-handle child, so no conflict.
+//
+// Edit-trigger discipline: the ✎ button is the ONLY way into
+// edit mode. .task-text intentionally has NO onClick. Reason:
+// after a successful long-press, the browser still synthesizes
+// a native click event from the same pointerdown+pointerup pair,
+// so an onClick on .task-text would race with toggleTaskUrgent
+// and drop the user into edit mode immediately after marking
+// urgent. Routing edit through the ✎ button (a separate element
+// from the long-press target) eliminates the race. Mirrors the
+// × delete-button pattern.
+//
+// Long-press onTap is intentionally left undefined: per
+// longpress.js line 82 (`if (fireTap && !fired && !moved &&
+// onTap) onTap()`), undefined onTap is a silent no-op. Combined
+// with the no-onClick rule above, .task-text dispatches nothing
+// on a quick tap — it's a display-only element except for the
+// long-press hold gesture.
+function TaskRow({ pIdx, tIdx, task, isEditing, onStartEdit, onStopEdit, taskDrag }) {
+  const longpress = useMemo(
+    () => createLongPress({
+      onLongPress: () => toggleTaskUrgent(pIdx, tIdx),
+    }),
+    [pIdx, tIdx]
+  );
+
+  return (
+    <div
+      {...taskDrag.itemProps(tIdx)}
+      class={`task-row${task.urgent ? ' urgent' : ''}`}
+      data-testid={`onboard-task-${task.tempId}`}
+    >
+      <span
+        {...taskDrag.handleProps(tIdx)}
+        class="drag-handle"
+        aria-label="Drag task to reorder"
+        data-testid={`onboard-task-drag-${task.tempId}`}
+      />
+      {isEditing ? (
+        <TaskTextEditor
+          pIdx={pIdx}
+          tIdx={tIdx}
+          taskTempId={task.tempId}
+          initialValue={task.text || ''}
+          onDone={onStopEdit}
+        />
+      ) : (
+        <div
+          class="task-text"
+          {...longpress.props()}
+          data-testid={`onboard-task-text-${task.tempId}`}
+        >
+          {task.text}
+        </div>
+      )}
+      <div class="task-actions">
+        <button
+          type="button"
+          class="btn-icon edit"
+          aria-label="Edit task"
+          onClick={onStartEdit}
+          data-testid={`onboard-task-edit-${task.tempId}`}
+        >
+          ✎
+        </button>
+        <button
+          type="button"
+          class="btn-icon delete"
+          aria-label="Delete task"
+          onClick={() => deleteTask(pIdx, tIdx)}
+          data-testid={`onboard-task-delete-${task.tempId}`}
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Inline project-name editor. Mounted in place of the static
+// .project-name span when editingProjectTempId === p.tempId.
+//
+// Edit semantics:
+//   - Mount: focus + select-all so quick re-typing replaces the
+//     existing name without manual highlight.
+//   - Enter: blur the input, which triggers commit via onBlur.
+//   - Escape: set cancelledRef, then blur — onBlur sees the flag
+//     and skips commit, preserving the prior value.
+//   - Blur (Enter, tab-away, click-elsewhere): if trimmed value
+//     is non-empty, commit via editProjectName. If trimmed-empty,
+//     revert silently (close the editor, leave the prior name in
+//     place). Does NOT delete the project — the × button is the
+//     only deletion path. isReadyToCommit() already blocks LOCK
+//     IT IN on empty project names, so a reverted empty can't
+//     escape review unnoticed.
+//   - onClick stopPropagation on the input prevents the parent
+//     span's onClick (which re-enters edit mode) from re-firing
+//     and stealing focus mid-typing.
+function ProjectNameEditor({ pIdx, projectTempId, initialValue, onDone }) {
+  const inputRef = useRef(null);
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  function handleBlur() {
+    if (cancelledRef.current) {
+      onDone();
+      return;
+    }
+    const trimmed = (inputRef.current?.value || '').trim();
+    if (!trimmed) {
+      onDone();
+      return;
+    }
+    editProjectName(pIdx, trimmed);
+    onDone();
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      inputRef.current?.blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelledRef.current = true;
+      inputRef.current?.blur();
+    }
+  }
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      class="or-project-name-input"
+      defaultValue={initialValue}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      onClick={(e) => e.stopPropagation()}
+      data-testid={`onboard-project-name-input-${projectTempId}`}
+    />
+  );
+}
+
+// Inline task-text editor. Same shape as ProjectNameEditor —
+// see that header for the Enter/Escape/blur semantics. Trimmed-
+// empty on blur reverts to the prior value (close editor, keep
+// prior text). Does NOT delete the task — the × button is the
+// only deletion path. Avoids surprising hostile delete on an
+// accidental clear; LOCK IT IN's commit pass also drops empty-
+// text tasks defensively (commitOnboardingResults Pass 3).
+function TaskTextEditor({ pIdx, tIdx, taskTempId, initialValue, onDone }) {
+  const inputRef = useRef(null);
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  function handleBlur() {
+    if (cancelledRef.current) {
+      onDone();
+      return;
+    }
+    const trimmed = (inputRef.current?.value || '').trim();
+    if (!trimmed) {
+      onDone();
+      return;
+    }
+    editTaskText(pIdx, tIdx, trimmed);
+    onDone();
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      inputRef.current?.blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelledRef.current = true;
+      inputRef.current?.blur();
+    }
+  }
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      class="or-task-text-input"
+      defaultValue={initialValue}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      onClick={(e) => e.stopPropagation()}
+      data-testid={`onboard-task-text-input-${taskTempId}`}
+    />
   );
 }

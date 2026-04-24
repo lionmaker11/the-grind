@@ -420,6 +420,28 @@ export function deleteProject(idx) {
   const target = cur.extracted.projects[idx];
   if (!target) return;
   const tempId = target.tempId;
+  const childTasks = target.tasks || [];
+
+  // Per open item #17 option (c): always convert child tasks to
+  // orphans; let the user discard them individually if they don't
+  // want them. Built BEFORE the splice so target.tasks is still
+  // valid (the snapshot above is by-reference into store state, but
+  // mutateExtractedProjects works on a deep copy — no aliasing risk).
+  // The new orphans land in unassigned-pending state (no entries in
+  // orphanAssignments), so LOCK IT IN re-blocks until the user
+  // assigns or discards each one.
+  if (childTasks.length > 0) {
+    const stamp = Date.now();
+    const newOrphans = childTasks.map((t, i) => ({
+      tempId: `o-${stamp}-${idx}-${i}`,
+      text: t.text || '',
+      urgent: Boolean(t.urgent),
+      category: t.category || null,
+      suggestedProjectName: null,
+      committed: false
+    }));
+    mutateExtractedOrphans(orphans => [...orphans, ...newOrphans]);
+  }
 
   mutateExtractedProjects(projects => {
     projects.splice(idx, 1);
@@ -590,6 +612,19 @@ export function assignOrphan(orphanTempId, assignment) {
 
 export function deleteOrphan(orphanTempId) {
   assignOrphan(orphanTempId, { kind: 'deleted' });
+}
+
+// Return an orphan to the unassigned-pending state (UNDO from
+// assigned-pill or discarded-strikethrough). Re-blocks LOCK IT IN
+// because pendingOrphanAssignments() will count it again.
+// mutateOrphanAssignments already guards step==='review'; bail if no
+// entry to remove so we don't trigger a no-op patch.
+export function unassignOrphan(orphanTempId) {
+  mutateOrphanAssignments(a => {
+    if (!(orphanTempId in a)) return null;
+    delete a[orphanTempId];
+    return a;
+  });
 }
 
 // ─── Commit markers (module-private) ──────────────────────────────────

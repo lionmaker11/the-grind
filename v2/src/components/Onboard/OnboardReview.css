@@ -348,6 +348,67 @@
   z-index: 10;
 }
 
+/* ── Inline editors (R5b-6b₂) ──
+   Project-name and task-text editors swap an <input> in for the
+   static element. Typography is mirrored so the swap doesn't
+   reflow the row; the only visual change is the dashed border
+   (idle) → solid cyan (focus), matching .op-new-input:focus in
+   OrphanPicker.css. Both inputs are scoped: .or-project-name-input
+   sits in .project-head (flex), .or-task-text-input sits in the
+   .task-row grid column 2. */
+.or-project-name-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 2.5px;
+  color: var(--text);
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.or-project-name-input:focus {
+  border-color: var(--cyan);
+  border-style: solid;
+}
+
+.or-viewport .task-row .or-task-text-input {
+  grid-column: 2;
+  width: 100%;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.or-viewport .task-row .or-task-text-input:focus {
+  border-color: var(--cyan);
+  border-style: solid;
+}
+
+/* ── Long-press affordance on .task-text (R5b-6b₂) ──
+   longpress.js applies the default activeClass='longpress-active'
+   to the bound element while the hold is in progress. Scoped to
+   .or-viewport .task-row .task-text so the rule does not leak
+   into Board's shared .task-row .task-text selectors. Amber
+   matches the urgent accent the long-press resolves into. */
+.or-viewport .task-row .task-text.longpress-active {
+  outline: 2px solid var(--amber-glow);
+  outline-offset: 2px;
+  transition: outline-color 80ms ease-out;
+}
+
 /* ── + ADD TASK ghost ── */
 .add-task-ghost {
   display: flex;
