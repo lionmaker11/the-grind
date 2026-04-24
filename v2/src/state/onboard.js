@@ -848,6 +848,16 @@ export function isReadyToCommit() {
 // api/backlog.js add op is expected to accept these (see phase4 redesign
 // spec § Backend change required). R2.5 extends the backend add op; until
 // then unknown fields round-trip silently on the current handler.
+//
+// All task writes use order:'append' — merged-project commits do NOT
+// overwrite existing backlog positions (fixes open item #1). For fresh
+// projects this is invariant-equivalent to order:0,1,2,...; for merged
+// projects it's the fix.
+//
+// Between-pass abort guards: if the user cancels mid-commit (step !==
+// 'committing'), the orchestrator exits at the next pass boundary.
+// In-flight API calls for the current pass still complete to the backend;
+// their committed-flag writes land on a reset store and are silent no-ops.
 
 export async function commitOnboardingResults() {
   const cur = onboardStore.get();
@@ -859,6 +869,11 @@ export async function commitOnboardingResults() {
 
   // ─── Pass 1: accept matched-merge decisions (no API call) ─────────
   {
+    if (onboardStore.get().step !== 'committing') {
+      updateCommitProgress(completed, [...failed]);
+      finishCommit();
+      return;
+    }
     const snapshot = onboardStore.get().extracted?.projects || [];
     const matches = onboardStore.get().matches || {};
     for (let pIdx = 0; pIdx < snapshot.length; pIdx++) {
@@ -875,6 +890,11 @@ export async function commitOnboardingResults() {
 
   // ─── Pass 2: create non-matched (or create-new-override) projects ─
   {
+    if (onboardStore.get().step !== 'committing') {
+      updateCommitProgress(completed, [...failed]);
+      finishCommit();
+      return;
+    }
     const snapshot = onboardStore.get().extracted?.projects || [];
     for (let pIdx = 0; pIdx < snapshot.length; pIdx++) {
       const p = onboardStore.get().extracted.projects[pIdx];
@@ -927,6 +947,11 @@ export async function commitOnboardingResults() {
 
   // ─── Pass 3: attach tasks under each committed project ────────────
   {
+    if (onboardStore.get().step !== 'committing') {
+      updateCommitProgress(completed, [...failed]);
+      finishCommit();
+      return;
+    }
     const snapshot = onboardStore.get().extracted?.projects || [];
     for (let pIdx = 0; pIdx < snapshot.length; pIdx++) {
       const p = onboardStore.get().extracted.projects[pIdx];
@@ -950,7 +975,7 @@ export async function commitOnboardingResults() {
             task: {
               text,
               urgent: t.urgent,
-              order: tIdx,
+              order: 'append',
               ...(t.category ? { category: t.category } : {})
             }
           });
@@ -972,6 +997,11 @@ export async function commitOnboardingResults() {
 
   // ─── Pass 4: orphan tasks ─────────────────────────────────────────
   {
+    if (onboardStore.get().step !== 'committing') {
+      updateCommitProgress(completed, [...failed]);
+      finishCommit();
+      return;
+    }
     const orphans = onboardStore.get().extracted?.orphanTasks || [];
     for (const orphan of orphans) {
       if (orphan.committed) continue;
@@ -1029,6 +1059,7 @@ export async function commitOnboardingResults() {
           task: {
             text,
             urgent: orphan.urgent,
+            order: 'append',
             ...(orphan.category ? { category: orphan.category } : {})
           }
         });

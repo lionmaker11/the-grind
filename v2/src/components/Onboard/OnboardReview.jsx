@@ -45,7 +45,7 @@
 // - orphan ASSIGN → (opens OrphanPicker) (R5b-6b₂ ✓)
 // - orphan assigned × — re-opens OrphanPicker (R5b-6b₂ ✓)
 // - orphan discarded ↺ — unassignOrphan back to pending (R5b-6b₂ ✓)
-// - LOCK IT IN (startCommit + commitOnboardingResults) — R5b-6c (depends on order:'append' wiring)
+// - LOCK IT IN (startCommit + commitOnboardingResults) — R5b-6c ✓
 //
 // Out of scope for R5b-6b₂: project-level urgent toggle (no spec
 // gesture defined — urgent-count pill is display-only).
@@ -68,6 +68,8 @@ import {
   editTaskText,
   toggleTaskUrgent,
   unassignOrphan,
+  startCommit,
+  commitOnboardingResults,
 } from '../../state/onboard.js';
 import { boardStore } from '../../state/board.js';
 import { createListDragController } from '../../lib/drag.js';
@@ -390,7 +392,10 @@ export function OnboardReview() {
           type="button"
           class="review-lock"
           disabled={lockDisabled}
-          onClick={() => { /* R5b-6c — startCommit + commitOnboardingResults */ }}
+          onClick={() => {
+            startCommit();
+            commitOnboardingResults();
+          }}
           data-testid="onboard-lock-in"
         >
           {inProgress ? (
