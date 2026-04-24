@@ -24,6 +24,10 @@ in any new Claude Code session before touching code.
 
 Stack is locked per DESIGN.md: Preact + Vite + nanostores + vanilla CSS. No React, no TypeScript, no Tailwind, no component libraries, no additional state libraries. If tempted to reach for any, stop and ask.
 
+## Review routine
+
+This project uses the audit-flow plugin for lifecycle review. Run `/audit` after any shipped phase. Full rationale: the plugin's `references/playbook.md`.
+
 ## Owner
 
 T.J. Typinski. Solo operator, one-user product, single-tenant.
