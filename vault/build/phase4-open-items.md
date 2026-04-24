@@ -210,6 +210,21 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** Phase 5a or 5b.
 
+### 21. Match-toggle button label is the toggle target, not the current intent
+
+**Surface:** v2/src/components/Onboard/OnboardReview.jsx match-row toggle button (lines ~256-275).
+
+**Concern:** From undecided state (low-confidence match, matches[tempId] === undefined), the match-row displays "DECIDE: MERGE OR CREATE" with a button labeled "CREATE NEW". Tapping "CREATE NEW" calls `setMatchDecision(p.tempId, !(undefined === true))` which evaluates to `setMatchDecision(p.tempId, true)` — flipping state to merge:TRUE. The button label was the toggle target ("clicking will go to CREATE NEW") but in undecided state there is no current state to toggle from, so the label promises one outcome and the click delivers the opposite. Reaching actual merge:false (CREATE NEW) requires TWO taps from undecided.
+
+**Discovered:** R5b-8b test 9 (low-confidence match). Test comments the behavior. Logged here so phone test catches whether it's confusing in practice.
+
+**Fix options:**
+- (a) Re-label undecided state's button to "CREATE NEW" but make a single click flip directly to merge:false (treat undecided as if it were merge:true for toggle purposes).
+- (b) Render two distinct buttons in undecided state: "MERGE" and "CREATE NEW", each setting state directly.
+- (c) Leave as-is and accept the two-tap UX as the cost of a single-button toggle.
+
+**Schedule:** Phase 8 polish unless phone test (R5b-9b) finds it actively confusing — then promote to a Phase 5 fix.
+
 ## RESOLVED — Fixed during rebuild
 
 ### 10. OnboardError variant routing not yet wired
