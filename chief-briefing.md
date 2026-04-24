@@ -1,218 +1,95 @@
-# Chief Briefing — 2026-04-22
+# Chief Briefing — 2026-04-24
 
 ## Active Ventures
-- **708 Pallister** (P1): Sam check-in needed. Countertop follow-up marked done 4/21. New task: verify windows installed, reach out to Sam. Push daily.
-- **Fitness** (P2): Daily 30-min workout. Wednesday = workout day (6:15 AM).
-- **FastTrack UIG** (P2): Module/lesson completion + liquidity wallet setup pending.
-- **Lionmaker Kettlebell App** (P3): Nearly done — remaining screens, App Store prep, beta test on device.
-- **Lionmaker Systems** (P4): Consulting page polish active (11 commits Apr 19). Execution checklist Tasks 1-3 pending (T.J. to provide checklist).
+- **708 Pallister** (P1): Last touched Apr 23. Daily Sam check-in — verify countertop timeline and windows status. Push daily. Goal: DONE, not perfect.
+- **Fitness** (P2): Friday = workout day (6:15 AM). Don't skip — 3rd workout this week.
+- **FastTrack UIG** (P2): Module/lesson completion + liquidity wallet setup pending. Check DeFi cockpit overlap.
+- **Lionmaker Kettlebell App** (P3): Nearly done — remaining screens, App Store prep. Needs a push.
+- **Lionmaker Systems** (P4): 4 commits yesterday (blog fixes, crawler access). Active. Execution checklist Tasks 1-3 pending.
 - **VA Disability** (P5): Appeal 60-120 days out. Financial hardship expedite request pending.
 - **GrillaHQ** (P6): A2P/10DLC registration — waiting for approval. Check status.
-- **Alex Buildium Bot** (P7): Buildium integration setup, workflow automation, test & deploy.
-- **TheGrind** (lightweight): V2 Phase 3 completed + merged yesterday (47 commits!). Muse is sole operator.
-- **lionview** (NEW): Crypto order-book intelligence platform. 7 commits yesterday, Railway deployment active. Needs classification — is this Marcusv2 production or separate?
+- **Alex Buildium Bot** (P7): Buildium integration + workflow automation. Needs delivery push.
+- **TheGrind** (lightweight): Muse is sole operator. V2 Phase 3 completed. See escalation below.
+- **defi-cockpit** (NEW): 37 commits Apr 23 — DeFi ops room for LP/lending monitoring. Classification deadline May 1.
+- **lionview**: Crypto order-book platform. Classification deadline Apr 29 (T-5 days).
+- **AgentSideHustle**: Day 24/30 Sprint 1. Kill deadline Apr 29. s03-05/06 still not on Gumroad (Apr 30 deadline).
+
+## 🔴 GRIND DARK — Escalation
+vault/conversations has returned 404 for 4 consecutive days (Apr 21-24). Muse has not logged a single session since the V2 launch. The new app may not be working as expected, or it's not being opened. T.J., this needs your attention — check if the app is functional and if Muse is receiving/logging conversations.
 
 ## Financial Position
-- Month income: ~$10,000 (VA $5K + MCD variable)
+- Month income: ~$10,000 ($5K VA + ~$5K MCD variable)
 - Pace: Behind — $15K/month gap to $25K target
-- Outstanding: VA appeal pending (check early May), T.J.'s credit cards maxed
-- Water bills: PAID (confirmed Apr 6)
-- Vendor bills: PAID (confirmed Apr 2)
+- Outstanding: VA appeal pending, T.J.'s credit cards maxed
 - Mortgage: $3,400/month — current
+- Water bills: PAID (Apr 6) | Vendor bills: PAID (Apr 2)
+- 💰 No new revenue deals logged this month. MCD pipeline unclear.
+
+## Repo Activity (Apr 24)
+- **agentsidehustle**: 1 commit — kill check, 39 products audited, 0 kills
+- **lionmaker-systems**: 4 commits — blog bugfixes + crawler access (agent-assisted)
+- **defi-cockpit**: 37 commits ⚡ NEW REPO — DeFi operations room, heavy build session
+- 🟡 **MCDCommand**: 8 days silent — first 7-day flag
+- 🟡 **Marcusv2**: 10 days silent — flagged at 7 days (Apr 21), next threshold 14 days (Apr 28)
 
 ## Patterns to Watch
-- 🟡 Marcusv2: 8.3 days silent — flagged at 7 days. Next escalation at 14 (Apr 28)
-- ⚠️ MCDCommand: 5.5 days silent — approaching 7-day flag Thursday
-- 📐 Wednesday = Power Day + Strategy Block — protect "On the Business" time
-- 💰 No new revenue logged this month. MCD is "inactive" in registry — is deal flow still happening?
-- 🏋️ Workout day — don't skip
+- 🔴 Grind app dark 4 days — investigate immediately
+- 🟡 MCDCommand 8 days silent — is MCD still generating deals?
+- 🟡 Marcusv2 10 days — approaching red at 14 days
+- 📐 Friday = deep work day. Protect the block.
+- 🆕 defi-cockpit needs classification (May 1) + lionview (Apr 29)
+- ⚠️ AgentSideHustle: s03-05/06 Gumroad upload overdue (Apr 30 deadline)
+- 💰 Credit cards maxed. No new revenue logged April. Financial pressure building.
 
 ## This Week's Commitments
-1. TheGrind V2 Phase 3 — COMPLETED ✅ (merged yesterday)
-2. 708 Pallister — daily Sam check-in, verify windows
-3. Lionmaker Systems — consulting page polish, get execution checklist from T.J.
-4. FastTrack UIG — complete current module
-5. Kettlebell App — push toward App Store submission
-6. GrillaHQ — check A2P registration status
-7. Classify lionview repo
+1. 708 Pallister — daily Sam check-in ✅ (ongoing)
+2. Lionmaker Systems — blog fixes ✅ done yesterday
+3. defi-cockpit — 37-commit build session ✅ done yesterday
+4. Classify lionview (deadline Apr 29) and defi-cockpit (deadline May 1)
+5. AgentSideHustle Gumroad uploads (s03-05/06 by Apr 30)
 
 ## Family / Schedule
-- **Week A** — Aurelia drop-off 7:30 AM, pickup 2:30-3:15 PM
-- Wednesday Power Day — strategy block protected
-- Family dinner every evening (non-negotiable)
-- 9:30 PM reading time, 10 PM bed
+- Friday — workout day, deep work day
+- Week A/B: Confirm with T.J. — affects Aurelia's 7:30 AM drop-off
+- Sofia (born Apr 9) — 15 days old. Andrea physically exhausted.
+- Family dinner: non-negotiable
 
 ---QUEUE---
 {
-  "date": "2026-04-22",
+  "date": "2026-04-24",
   "day_type": "deep_work",
-  "finances": {
-    "month_income": 10000,
-    "month_target": 25000
-  },
+  "finances": { "month_income": 10000, "month_target": 25000 },
   "projects": [
-    {
-      "id": "708-pallister",
-      "health": "green",
-      "days_silent": 0
-    },
-    {
-      "id": "fitness",
-      "health": "green",
-      "days_silent": 0
-    },
-    {
-      "id": "fast-track-uig",
-      "health": "green",
-      "days_silent": 0
-    },
-    {
-      "id": "lionmaker-kettlebell",
-      "health": "green",
-      "days_silent": 0
-    },
-    {
-      "id": "lionmaker-systems",
-      "health": "green",
-      "days_silent": 0
-    },
-    {
-      "id": "grillahq",
-      "health": "green",
-      "days_silent": 0
-    },
-    {
-      "id": "mcdcommand",
-      "health": "yellow",
-      "days_silent": 5.5
-    },
-    {
-      "id": "marcusv2",
-      "health": "yellow",
-      "days_silent": 8.3
-    }
+    {"id": "708-pallister", "health": "green", "days_silent": 1},
+    {"id": "fitness", "health": "green", "days_silent": 0},
+    {"id": "lionmaker-systems", "health": "green", "days_silent": 1},
+    {"id": "defi-cockpit", "health": "green", "days_silent": 1, "note": "NEW - needs classification by May 1"},
+    {"id": "mcdcommand", "health": "yellow", "days_silent": 8},
+    {"id": "marcusv2", "health": "yellow", "days_silent": 10},
+    {"id": "agentsidehustle", "health": "green", "days_silent": 1},
+    {"id": "lionview", "health": "green", "note": "needs classification by Apr 29"},
+    {"id": "grillahq", "health": "yellow", "days_silent": 14},
+    {"id": "lionmaker-kettlebell", "health": "yellow", "days_silent": 14}
   ],
   "tasks": [
-    {
-      "id": "t1",
-      "text": "Workout \u2014 30 min minimum",
-      "project": "fitness",
-      "type": "pomodoro",
-      "sprints": 1,
-      "priority": 1,
-      "time_slot": "6:15 AM",
-      "category": "Physical"
-    },
-    {
-      "id": "t2",
-      "text": "Aurelia school drop-off",
-      "project": "family",
-      "type": "quick",
-      "priority": 2,
-      "time_slot": "7:30 AM",
-      "category": "Relationships"
-    },
-    {
-      "id": "t3",
-      "text": "Sam check-in \u2014 verify windows installed, get update",
-      "project": "708-pallister",
-      "type": "quick",
-      "priority": 3,
-      "time_slot": "9:00 AM",
-      "category": "In Business"
-    },
-    {
-      "id": "t4",
-      "text": "Lionmaker Systems \u2014 consulting page polish + execution checklist",
-      "project": "lionmaker-systems",
-      "type": "pomodoro",
-      "sprints": 3,
-      "priority": 4,
-      "time_slot": "9:30 AM",
-      "category": "On Business"
-    },
-    {
-      "id": "t5",
-      "text": "FastTrack UIG \u2014 complete current module/lesson",
-      "project": "fast-track-uig",
-      "type": "pomodoro",
-      "sprints": 2,
-      "priority": 5,
-      "time_slot": "11:30 AM",
-      "category": "Mental"
-    },
-    {
-      "id": "t6",
-      "text": "Kettlebell App \u2014 finish remaining screens, prep App Store submission",
-      "project": "lionmaker-kettlebell",
-      "type": "pomodoro",
-      "sprints": 2,
-      "priority": 6,
-      "time_slot": "1:00 PM",
-      "category": "On Business"
-    },
-    {
-      "id": "t7",
-      "text": "Aurelia school pickup",
-      "project": "family",
-      "type": "quick",
-      "priority": 7,
-      "time_slot": "2:30 PM",
-      "category": "Relationships"
-    },
-    {
-      "id": "t8",
-      "text": "GrillaHQ \u2014 check A2P/10DLC registration status",
-      "project": "grillahq",
-      "type": "quick",
-      "priority": 8,
-      "time_slot": "3:30 PM",
-      "category": "On Business"
-    },
-    {
-      "id": "t9",
-      "text": "Review finances \u2014 log April revenue, check mortgage status",
-      "project": "finances",
-      "type": "quick",
-      "priority": 9,
-      "time_slot": "4:00 PM",
-      "category": "Finances"
-    },
-    {
-      "id": "t10",
-      "text": "Plants + evening wind-down",
-      "project": "personal",
-      "type": "quick",
-      "priority": 10,
-      "time_slot": "7:30 PM",
-      "category": "Spiritual"
-    }
+    {"id": "t1", "text": "Workout — 30 min (Mon/Wed/Fri anchor)", "project": "fitness", "type": "pomodoro", "sprints": 1, "slot": "morning", "priority": 1, "done_condition": "30-min session logged"},
+    {"id": "t2", "text": "Sam check-in — 708 Pallister status (windows, countertops, timeline)", "project": "708-pallister", "type": "quick", "sprints": 0, "slot": "morning", "priority": 2, "done_condition": "Sam contacted, update logged"},
+    {"id": "t3", "text": "Check Grind app — is Muse receiving conversations? Test a session.", "project": "the-grind", "type": "quick", "sprints": 0, "slot": "mid-morning", "priority": 3, "done_condition": "App opened, conversation logged or bug identified"},
+    {"id": "t4", "text": "Classify defi-cockpit and lionview — active project or experiment?", "project": "lionmaker-systems", "type": "pomodoro", "sprints": 1, "slot": "mid-morning", "priority": 4, "done_condition": "Both repos classified in registry"},
+    {"id": "t5", "text": "Upload s03-05/06 to Gumroad (AgentSideHustle deadline Apr 30)", "project": "agentsidehustle", "type": "pomodoro", "sprints": 2, "slot": "mid-morning", "priority": 5, "done_condition": "Products live on Gumroad"},
+    {"id": "t6", "text": "Lionmaker Kettlebell App — remaining screens + App Store prep", "project": "lionmaker-kettlebell", "type": "pomodoro", "sprints": 2, "slot": "afternoon", "priority": 6, "done_condition": "At least 2 screens completed or App Store submission started"},
+    {"id": "t7", "text": "GrillaHQ — check A2P/10DLC approval status", "project": "grillahq", "type": "quick", "sprints": 0, "slot": "afternoon", "priority": 7, "done_condition": "Status checked and logged"},
+    {"id": "t8", "text": "Review finances — any April MCD deals closing? Update FINANCES.md", "project": "finances", "type": "pomodoro", "sprints": 1, "slot": "afternoon", "priority": 8, "done_condition": "April revenue status confirmed with Ali or independently"}
   ],
   "needs_you": [
-    {
-      "id": "ny1",
-      "text": "Classify lionview repo \u2014 Marcusv2 production or separate project?",
-      "project": "lionmaker-systems",
-      "due": "2026-04-22"
-    },
-    {
-      "id": "ny2",
-      "text": "MCDCommand approaching 7-day silence \u2014 any blockers?",
-      "project": "mcdcommand",
-      "due": "2026-04-24"
-    }
+    {"id": "ny1", "text": "Grind app dark 4 days — test if Muse is working", "project": "the-grind", "due": "2026-04-24"},
+    {"id": "ny2", "text": "Classify lionview repo (deadline Apr 29)", "project": "lionmaker-systems", "due": "2026-04-29"},
+    {"id": "ny3", "text": "Classify defi-cockpit repo (deadline May 1)", "project": "lionmaker-systems", "due": "2026-05-01"},
+    {"id": "ny4", "text": "Upload s03-05/06 to Gumroad (deadline Apr 30)", "project": "agentsidehustle", "due": "2026-04-30"}
   ],
   "falling_through_cracks": [
-    {
-      "project": "Marcusv2",
-      "days_silent": 8.3,
-      "note": "Flagged at 7 days. Next escalation Apr 28."
-    },
-    {
-      "project": "MCDCommand",
-      "days_silent": 5.5,
-      "note": "Will cross 7-day threshold Thursday."
-    }
+    {"id": "ftc1", "text": "MCDCommand — 8 days silent, first 7-day flag", "project": "mcdcommand", "days_silent": 8},
+    {"id": "ftc2", "text": "Marcusv2 — 10 days silent, approaching red (14 days Apr 28)", "project": "marcusv2", "days_silent": 10}
   ]
 }
 ---END QUEUE---
