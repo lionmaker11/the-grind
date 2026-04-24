@@ -1,414 +1,364 @@
-// Phase 4 E2E — onboarding flow.
+// Phase 4 E2E — onboarding flow (R5b rewrite).
 //
-// Mocks /api/* so no network credentials are required. Stubs MediaRecorder +
-// getUserMedia so mic taps produce deterministic blobs. Covers intro through
-// LOCK IT IN, review-screen edits, empty extraction, transcription failure,
-// and partial-commit-then-selective-retry (validates the committed-skip fix).
+// This suite replaces the R3-era three-question flow tests. It exercises the
+// current single-capture + optional-clarify state machine defined in
+// phase4-flow-redesign.md, asserting through helpers in tests/helpers and
+// fixtures in tests/fixtures.
+//
+// Spec reference: vault/build/phase4-redesign-spec.md § Playwright Test Plan.
+// Six tests — happy path, review edits, empty extraction, transcribe
+// failure, partial commit + selective retry, clarify path. Merge/orphan
+// tests (6–10 in the spec) deferred to R5b-8b.
 
 import { test, expect } from '@playwright/test';
+import { installMediaRecorderStub } from './helpers/media-recorder.js';
+import { setupMockBackend } from './helpers/mock-backend.js';
+import {
+  drivePastIntro,
+  driveCapture,
+  driveClarify,
+  driveThroughParsingToReview,
+  driveLockIn
+} from './helpers/drive-flow.js';
+import { EMPTY_REGISTRY } from './fixtures/empty-registry.js';
+// POPULATED_REGISTRY intentionally unused in this batch — reserved for
+// R5b-8b merge/orphan tests.
 
-const EMPTY_BOARD = { summary: [] };
+// ─── Shared scenario constants ─────────────────────────────────────────────
 
-const Q1_TRANSCRIPT = "I'm running Lionmaker Systems and a Pallister consulting gig.";
-const Q2_TRANSCRIPT = 'V2 launch deadline Friday. Pallister invoice needs reconciliation.';
-const Q3_TRANSCRIPT = 'Close the V2 launch.';
+const HAPPY_TRANSCRIPT = 'Running Lionmaker Systems and Pallister Consulting.';
 
-const EXTRACTED_TWO = [
-  {
-    name: 'Lionmaker Systems',
-    category: 'In Business',
-    priority: 1,
-    note: '',
-    tasks: [
-      { text: 'Launch V2', priority: 1, category: 'In Business' },
-      { text: 'Write design doc', priority: 2, category: 'In Business' }
-    ]
-  },
-  {
-    name: 'Pallister Consulting',
-    category: 'On Business',
-    priority: 2,
-    note: '',
-    tasks: [
-      { text: 'Reconcile invoice', priority: 1, category: 'On Business' }
-    ]
-  }
-];
-
-const EXTRACTED_THREE_NO_TASKS = [
-  { name: 'ProjA', category: 'In Business', priority: 2, note: '', tasks: [] },
-  { name: 'ProjB', category: 'In Business', priority: 2, note: '', tasks: [] },
-  { name: 'ProjC', category: 'In Business', priority: 2, note: '', tasks: [] }
-];
-
-async function installMediaRecorderStub(page) {
-  await page.addInitScript(() => {
-    // Suppress CSS animations so Playwright's actionability checks don't wait
-    // on the mic-pulse / hero-pulse loops that would otherwise time out.
-    const disableAnim = () => {
-      const style = document.createElement('style');
-      style.textContent = `*, *::before, *::after { animation: none !important; transition: none !important; }`;
-      document.head.appendChild(style);
-    };
-    if (document.head) disableAnim();
-    else document.addEventListener('DOMContentLoaded', disableAnim);
-
-    const fakeStream = { getTracks: () => [{ stop: () => {} }] };
-    Object.defineProperty(navigator, 'mediaDevices', {
-      configurable: true,
-      value: { getUserMedia: async () => fakeStream }
-    });
-    class FakeMediaRecorder {
-      constructor() {
-        this.state = 'inactive';
-        this.ondataavailable = null;
-        this.onstop = null;
-        this.onerror = null;
-      }
-      static isTypeSupported() { return true; }
-      start() { this.state = 'recording'; }
-      stop() {
-        this.state = 'inactive';
-        // ≥200B payload so postTranscribe's empty-blob guard doesn't short-circuit.
-        const bytes = new Uint8Array(512);
-        bytes[0] = 0x1a; bytes[1] = 0x45; bytes[2] = 0xdf; bytes[3] = 0xa3;
-        const blob = new Blob([bytes], { type: 'audio/webm' });
-        queueMicrotask(() => {
-          if (this.ondataavailable) this.ondataavailable({ data: blob });
-          if (this.onstop) this.onstop();
-        });
-      }
+const HAPPY_EXTRACTION = {
+  projects: [
+    {
+      name: 'Lionmaker Systems',
+      category: 'In Business',
+      tasks: [
+        { text: 'Ship V2 onboarding' },
+        { text: 'Write design doc' }
+      ]
+    },
+    {
+      name: 'Pallister Consulting',
+      category: 'On Business',
+      tasks: [
+        { text: 'Reconcile April invoice' }
+      ]
     }
-    window.MediaRecorder = FakeMediaRecorder;
-  });
-}
+  ],
+  orphan_tasks: []
+};
 
-async function routeEmptyBoard(page) {
-  await page.route('**/api/backlog', async (route) => {
-    const req = route.request();
-    if (req.method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(EMPTY_BOARD)
-      });
-      return;
+const EDITS_EXTRACTION = {
+  projects: [
+    {
+      name: 'Alpha',
+      tasks: [
+        { text: 'alpha-task-original-1' },
+        { text: 'alpha-task-to-delete' }
+      ]
+    },
+    {
+      name: 'Beta',
+      tasks: [
+        { text: 'beta-task-single' }
+      ]
     }
-    await route.fallback();
-  });
+  ],
+  orphan_tasks: []
+};
+
+const THREE_EMPTY_PROJECTS = {
+  projects: [
+    { name: 'ProjA', tasks: [] },
+    { name: 'ProjB', tasks: [] },
+    { name: 'ProjC', tasks: [] }
+  ],
+  orphan_tasks: []
+};
+
+// ─── Local helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Read the trailing tempId off a project card's data-testid attribute so
+ * tests can address the card's named sub-testids without knowing the tempId
+ * at test-write time. Card root selector is `.or-project`; its testid is
+ * `onboard-project-${tempId}`.
+ */
+async function readProjectTempId(card) {
+  const raw = await card.getAttribute('data-testid');
+  return raw?.replace(/^onboard-project-/, '') || '';
 }
 
-async function routeSequentialTranscribe(page, texts) {
-  let i = 0;
-  await page.route('**/api/transcribe', async (route) => {
-    const text = texts[Math.min(i, texts.length - 1)];
-    i++;
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ text })
-    });
-  });
+/**
+ * Same pattern for task rows. Row selector is `.task-row`; its testid is
+ * `onboard-task-${tempId}`.
+ */
+async function readTaskTempId(row) {
+  const raw = await row.getAttribute('data-testid');
+  return raw?.replace(/^onboard-task-/, '') || '';
 }
 
-async function routeChiefExtraction(page, projects) {
-  await page.route('**/api/chief', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        text: '',
-        actions: [{ type: 'extract_onboarding', projects }]
-      })
-    });
-  });
-}
-
-async function drivePastIntro(page) {
-  await expect(page.getByTestId('onboard-root')).toBeVisible();
-  await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'intro');
-  await page.getByTestId('onboard-begin').click();
-}
-
-async function driveThroughQuestion(page, qNum) {
-  await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', `q${qNum}-ask`);
-  await page.getByTestId('onboard-mic-armed').click();
-  await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', `q${qNum}-record`);
-  await page.getByTestId('onboard-mic-recording').click();
-}
-
-test.describe('Onboarding flow — E2E', () => {
+test.describe('Phase 4 onboarding — R5b', () => {
   test.beforeEach(async ({ page }) => {
     await installMediaRecorderStub(page);
   });
 
-  // ── Test 1 — Happy path ────────────────────────────────────────────────
-  test('1. Happy path — intro through LOCK IT IN done', async ({ page }) => {
-    await routeEmptyBoard(page);
-    await routeSequentialTranscribe(page, [Q1_TRANSCRIPT, Q2_TRANSCRIPT, Q3_TRANSCRIPT]);
-    await routeChiefExtraction(page, EXTRACTED_TWO);
-
-    let projectSeq = 0;
-    const projectCalls = [];
-    await page.route('**/api/project', async (route) => {
-      projectSeq++;
-      const body = route.request().postDataJSON();
-      projectCalls.push(body.name);
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, project: { id: `proj_${projectSeq}`, name: body.name } })
-      });
-    });
-
-    const taskCalls = [];
-    await page.route('**/api/backlog', async (route) => {
-      const req = route.request();
-      if (req.method() === 'POST') {
-        taskCalls.push(req.postDataJSON());
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ ok: true, task_id: `t_${taskCalls.length}` })
-        });
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(EMPTY_BOARD)
-      });
+  // ─── Test 1 — Happy path (deep) ──────────────────────────────────────
+  test('1 happy: capture → review → lock in commits every project and task', async ({ page }) => {
+    const capture = await setupMockBackend(page, {
+      registry: EMPTY_REGISTRY,
+      transcripts: [HAPPY_TRANSCRIPT],
+      extraction: HAPPY_EXTRACTION
     });
 
     await page.goto('/');
-
     await drivePastIntro(page);
-    await driveThroughQuestion(page, 1);
-    await driveThroughQuestion(page, 2);
-    await driveThroughQuestion(page, 3);
+    await driveCapture(page);
+    await driveThroughParsingToReview(page);
 
-    // parsing → review
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'review', { timeout: 10_000 });
+    await expect(page.getByText('Lionmaker Systems')).toBeVisible();
+    await expect(page.getByText('Pallister Consulting')).toBeVisible();
 
-    // Two project panels rendered with extracted data
-    await expect(page.getByTestId('onboard-project-name-0')).toHaveValue('Lionmaker Systems');
-    await expect(page.getByTestId('onboard-project-name-1')).toHaveValue('Pallister Consulting');
+    await driveLockIn(page);
 
-    // LOCK IT IN → commit → done → onboard closes
-    await page.getByTestId('onboard-lock-in').click();
-    await expect(page.getByTestId('onboard-root')).toHaveCount(0, { timeout: 10_000 });
+    // Pass 2 — two projects created, in extraction order.
+    expect(capture.projects).toHaveLength(2);
+    expect(capture.projects[0].name).toBe('Lionmaker Systems');
+    expect(capture.projects[1].name).toBe('Pallister Consulting');
 
-    // Two projects + three tasks committed
-    expect(projectCalls).toEqual(['Lionmaker Systems', 'Pallister Consulting']);
-    expect(taskCalls).toHaveLength(3);
+    // Pass 3 — three tasks total, all with order:'append' (R5b-6c invariant).
+    expect(capture.backlog).toHaveLength(3);
+    expect(capture.backlog.every((b) => b.task?.order === 'append')).toBe(true);
+
+    // Task grouping — 2 tasks under Lionmaker, 1 under Pallister.
+    const byProject = capture.backlog.reduce((acc, b) => {
+      acc[b.project_id] = (acc[b.project_id] || 0) + 1;
+      return acc;
+    }, {});
+    expect(byProject['lionmaker-systems']).toBe(2);
+    expect(byProject['pallister-consulting']).toBe(1);
   });
 
-  // ── Test 2 — Review-screen edits commit edited state ──────────────────
-  test('2. Review edits — rename/delete/add committed, not original extraction', async ({ page }) => {
-    await routeEmptyBoard(page);
-    await routeSequentialTranscribe(page, [Q1_TRANSCRIPT, Q2_TRANSCRIPT, Q3_TRANSCRIPT]);
-    await routeChiefExtraction(page, EXTRACTED_TWO);
-
-    const projectCalls = [];
-    await page.route('**/api/project', async (route) => {
-      const body = route.request().postDataJSON();
-      projectCalls.push(body);
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, project: { id: `proj_${projectCalls.length}`, name: body.name } })
-      });
-    });
-
-    const taskCalls = [];
-    await page.route('**/api/backlog', async (route) => {
-      const req = route.request();
-      if (req.method() === 'POST') {
-        taskCalls.push(req.postDataJSON());
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ ok: true, task_id: `t_${taskCalls.length}` })
-        });
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(EMPTY_BOARD)
-      });
+  // ─── Test 2 — Review edits (deep) ────────────────────────────────────
+  test('2 review edits: rename + delete + add + long-press urgent flow to commit', async ({ page }) => {
+    const capture = await setupMockBackend(page, {
+      registry: EMPTY_REGISTRY,
+      transcripts: ['two projects'],
+      extraction: EDITS_EXTRACTION
     });
 
     await page.goto('/');
     await drivePastIntro(page);
-    await driveThroughQuestion(page, 1);
-    await driveThroughQuestion(page, 2);
-    await driveThroughQuestion(page, 3);
+    await driveCapture(page);
+    await driveThroughParsingToReview(page);
 
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'review', { timeout: 10_000 });
+    const cards = page.locator('.or-project');
+    const card0 = cards.first();
+    const p0 = await readProjectTempId(card0);
 
-    // 1. Rename project 0
-    const p0Name = page.getByTestId('onboard-project-name-0');
-    await p0Name.fill('');
-    await p0Name.fill('Renamed Project');
+    // Rename project 0: tap name → fill inline input → Enter.
+    await page.getByTestId(`onboard-project-name-${p0}`).click();
+    const nameInput = page.getByTestId(`onboard-project-name-input-${p0}`);
+    await nameInput.fill('Alpha Renamed');
+    await nameInput.press('Enter');
+    await expect(page.getByText('Alpha Renamed')).toBeVisible();
 
-    // 2. Raise project 0's priority (P1 → clamps at 1; was 1 → still 1).
-    //    Instead, lower it: click Lower priority (▼) in project head.
-    await page.getByTestId('onboard-project-0').getByLabel('Lower priority').first().click();
-    // Priority was 1 → now 2. Verify via store by proxy: the commit payload.
+    // Expand project so task rows become interactive.
+    await page.getByTestId(`onboard-project-expand-${p0}`).click();
 
-    // 3. Delete task[1] of project 0 ("Write design doc")
-    await page.getByTestId('onboard-project-0').getByLabel('Delete task').nth(1).click();
+    // Delete the task whose text is 'alpha-task-to-delete'.
+    const taskRows = card0.locator('.task-row');
+    const rowCount = await taskRows.count();
+    let deletedTempId = null;
+    for (let i = 0; i < rowCount; i++) {
+      const row = taskRows.nth(i);
+      const rowTid = await readTaskTempId(row);
+      const text = await page.getByTestId(`onboard-task-text-${rowTid}`).textContent();
+      if ((text || '').includes('alpha-task-to-delete')) {
+        await page.getByTestId(`onboard-task-delete-${rowTid}`).click();
+        deletedTempId = rowTid;
+        break;
+      }
+    }
+    expect(deletedTempId).not.toBeNull();
 
-    // 4. Add a new task to project 0
-    await page.getByTestId('onboard-add-task-0').click();
-    const newTaskInput = page.getByTestId('onboard-task-0-1');
-    await newTaskInput.fill('Added task from review');
+    // Wait for Preact's re-render to commit the delete before proceeding.
+    // Without this, the subsequent .task-row locators still see the deleted row.
+    await expect(taskRows).toHaveCount(rowCount - 1);
 
-    // LOCK IT IN
-    await page.getByTestId('onboard-lock-in').click();
-    await expect(page.getByTestId('onboard-root')).toHaveCount(0, { timeout: 10_000 });
+    // Long-press the first remaining task to toggle urgent. longpress.js
+    // fires on 500ms hold without movement, and the handlers bind to
+    // .task-text (not .task-row) — Playwright mouse.down → 650ms → mouse.up
+    // on the .task-text bounding box is the reliable stand-in.
+    const firstRemaining = card0.locator('.task-row').first();
+    const longPressTextEl = firstRemaining.locator('[data-testid^="onboard-task-text-"]');
+    const longPressedText = ((await longPressTextEl.textContent()) || '').trim();
+    const textBox = await longPressTextEl.boundingBox();
+    if (textBox) {
+      await page.mouse.move(textBox.x + textBox.width / 2, textBox.y + textBox.height / 2);
+      await page.mouse.down();
+      await page.waitForTimeout(650);
+      await page.mouse.up();
+    }
 
-    // Assertions against captured payloads
-    expect(projectCalls).toHaveLength(2);
-    expect(projectCalls[0].name).toBe('Renamed Project');
-    expect(projectCalls[0].priority).toBe(2); // raised from 1 via Lower button
-    expect(projectCalls[1].name).toBe('Pallister Consulting');
+    // Add a new task to project 0 — the review surface creates an empty
+    // .task-row on add-task click; entering its text requires tapping the
+    // ✎ edit affordance to reveal the inline input.
+    const taskRowsForAdd = card0.locator('.task-row');
+    const beforeAddCount = await taskRowsForAdd.count();
 
-    // Tasks: project 0 had 2 → deleted 1 → added 1 → commits 2 tasks
-    // Project 1 had 1 task → commits 1 task. Total 3.
-    expect(taskCalls).toHaveLength(3);
-    const p0Tasks = taskCalls.filter(c => c.project_id === 'proj_1');
-    const p1Tasks = taskCalls.filter(c => c.project_id === 'proj_2');
+    await page.getByTestId(`onboard-add-task-${p0}`).click();
+
+    // Wait for the new empty .task-row to materialize in the DOM.
+    await expect(taskRowsForAdd).toHaveCount(beforeAddCount + 1);
+
+    const newTaskRow = taskRowsForAdd.last();
+    const newTid = await readTaskTempId(newTaskRow);
+    await page.getByTestId(`onboard-task-edit-${newTid}`).click();
+    const newTaskInput = page.getByTestId(`onboard-task-text-input-${newTid}`);
+    await newTaskInput.fill('alpha-task-newly-added');
+    await newTaskInput.press('Enter');
+
+    // Drag-to-reorder is explicitly SKIPPED in this test. drag.js uses
+    // pointermove thresholds Playwright's drag helpers don't trigger
+    // reliably. Ordering is covered manually in phone test (Pattern 3)
+    // and re-evaluated under R5b-7 if defects surface.
+
+    await driveLockIn(page);
+
+    // Renamed name flows through Pass 2.
+    expect(capture.projects.find((p) => p.name === 'Alpha Renamed')).toBeDefined();
+    expect(capture.projects.find((p) => p.name === 'Alpha')).toBeUndefined();
+
+    // Project 0 net task count unchanged (-1 delete + 1 add).
+    const p0Tasks = capture.backlog.filter((b) => b.project_id === 'alpha-renamed');
+    const p1Tasks = capture.backlog.filter((b) => b.project_id === 'beta');
     expect(p0Tasks).toHaveLength(2);
     expect(p1Tasks).toHaveLength(1);
-    const p0TaskTexts = p0Tasks.map(c => c.task.text).sort();
-    expect(p0TaskTexts).toEqual(['Added task from review', 'Launch V2']);
-    // Deleted "Write design doc" is not in any commit
-    expect(taskCalls.some(c => c.task?.text === 'Write design doc')).toBe(false);
+
+    // Deleted task never POSTed; added task did.
+    const allText = capture.backlog.map((b) => b.task?.text);
+    expect(allText).not.toContain('alpha-task-to-delete');
+    expect(allText).toContain('alpha-task-newly-added');
+
+    // Long-press marked at least one task urgent, including the one we pressed.
+    const urgent = capture.backlog.filter((b) => b.task?.urgent === true);
+    expect(urgent.length).toBeGreaterThanOrEqual(1);
+    expect(urgent.some((b) => (b.task?.text || '').trim() === longPressedText)).toBe(true);
   });
 
-  // ── Test 3 — Empty extraction ──────────────────────────────────────────
-  test('3. Empty extraction — error screen with retry and restart', async ({ page }) => {
-    await routeEmptyBoard(page);
-    await routeSequentialTranscribe(page, [Q1_TRANSCRIPT, Q2_TRANSCRIPT, Q3_TRANSCRIPT]);
-    await routeChiefExtraction(page, []); // empty projects list
-
-    await page.goto('/');
-    await drivePastIntro(page);
-    await driveThroughQuestion(page, 1);
-    await driveThroughQuestion(page, 2);
-    await driveThroughQuestion(page, 3);
-
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'error', { timeout: 10_000 });
-    await expect(page.getByText('No projects detected', { exact: false })).toBeVisible();
-
-    // RETRY on empty extraction routes back to intro (no extracted data → intro path).
-    await page.getByTestId('onboard-error-retry').click();
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'intro');
-
-    // Navigate back to error state via a second full run to test START FRESH.
-    await drivePastIntro(page);
-    await driveThroughQuestion(page, 1);
-    await driveThroughQuestion(page, 2);
-    await driveThroughQuestion(page, 3);
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'error', { timeout: 10_000 });
-
-    await page.getByTestId('onboard-error-restart').click();
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'intro');
-  });
-
-  // ── Test 4 — Transcription failure on Q2 ───────────────────────────────
-  test('4. Transcription failure on Q2 — error then retry returns to q2-ask', async ({ page }) => {
-    await routeEmptyBoard(page);
-
-    let transcribeCalls = 0;
-    await page.route('**/api/transcribe', async (route) => {
-      transcribeCalls++;
-      if (transcribeCalls === 2) {
-        await route.fulfill({
-          status: 500,
-          contentType: 'application/json',
-          body: JSON.stringify({ error: 'whisper unavailable' })
-        });
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ text: transcribeCalls === 1 ? Q1_TRANSCRIPT : Q2_TRANSCRIPT })
-      });
+  // ─── Test 3 — Empty extraction (shallow) ─────────────────────────────
+  test('3 empty extraction: chief returns nothing → error, empty-extraction variant', async ({ page }) => {
+    await setupMockBackend(page, {
+      registry: EMPTY_REGISTRY,
+      transcripts: ['rambling with no projects']
+      // extraction left default → { projects: [], orphan_tasks: [] }
     });
 
     await page.goto('/');
     await drivePastIntro(page);
-    await driveThroughQuestion(page, 1);
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'q2-ask');
+    await driveCapture(page);
+
+    await expect(page.getByTestId('onboard-root'))
+      .toHaveAttribute('data-step', 'error', { timeout: 10_000 });
+    await expect(page.getByTestId('onboard-error-empty-extraction')).toBeVisible();
+  });
+
+  // ─── Test 4 — Transcription failure (shallow) ────────────────────────
+  test('4 transcribe failure on capture → error, transcription variant', async ({ page }) => {
+    await setupMockBackend(page, {
+      registry: EMPTY_REGISTRY,
+      transcripts: [''],
+      transcribeFailOn: [0]
+    });
+
+    await page.goto('/');
+    await drivePastIntro(page);
+
+    // Inline — driveCapture would assert step transitions we expect to bail.
     await page.getByTestId('onboard-mic-armed').click();
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'q2-record');
+    await expect(page.getByTestId('onboard-root'))
+      .toHaveAttribute('data-step', 'capture-record');
     await page.getByTestId('onboard-mic-recording').click();
 
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'error', { timeout: 10_000 });
-
-    // Retry → back to q2-ask; Q1 answer still in history
-    await page.getByTestId('onboard-error-retry').click();
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'q2-ask');
-    await expect(page.getByText(Q1_TRANSCRIPT)).toBeVisible();
+    await expect(page.getByTestId('onboard-root'))
+      .toHaveAttribute('data-step', 'error', { timeout: 10_000 });
+    await expect(page.getByTestId('onboard-error-transcription')).toBeVisible();
   });
 
-  // ── Test 5 — Partial commit failure + selective retry ──────────────────
-  test('5. Partial commit — selective retry skips already-committed projects', async ({ page }) => {
-    await routeEmptyBoard(page);
-    await routeSequentialTranscribe(page, [Q1_TRANSCRIPT, Q2_TRANSCRIPT, Q3_TRANSCRIPT]);
-    await routeChiefExtraction(page, EXTRACTED_THREE_NO_TASKS);
-
-    const projectCalls = [];
-    await page.route('**/api/project', async (route) => {
-      const body = route.request().postDataJSON();
-      projectCalls.push(body.name);
-      const priorAttempts = projectCalls.filter(n => n === body.name).length;
-      if (body.name === 'ProjC' && priorAttempts === 1) {
-        // First attempt on ProjC fails.
-        await route.fulfill({
-          status: 500,
-          contentType: 'application/json',
-          body: JSON.stringify({ error: 'registry write failed' })
-        });
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, project: { id: `proj_${body.name}`, name: body.name } })
-      });
+  // ─── Test 5 — Partial commit → selective retry (deep) ────────────────
+  test('5 partial commit: ProjC fails once, A/B committed-skipped on retry', async ({ page }) => {
+    // Requires mock-backend.js amendment: fail-first-only per name. See
+    // addendum below this file proposal.
+    const capture = await setupMockBackend(page, {
+      registry: EMPTY_REGISTRY,
+      transcripts: ['three projects'],
+      extraction: THREE_EMPTY_PROJECTS,
+      projectAddFailOnName: 'ProjC'
     });
 
     await page.goto('/');
     await drivePastIntro(page);
-    await driveThroughQuestion(page, 1);
-    await driveThroughQuestion(page, 2);
-    await driveThroughQuestion(page, 3);
+    await driveCapture(page);
+    await driveThroughParsingToReview(page);
 
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'review', { timeout: 10_000 });
-
-    // First LOCK IT IN — 2 succeed, 1 fails.
+    // First LOCK IT IN — orchestrator commits A and B, then 500s on C.
     await page.getByTestId('onboard-lock-in').click();
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'error', { timeout: 10_000 });
-    await expect(page.getByText('1 item failed', { exact: false })).toBeVisible();
-    expect(projectCalls).toEqual(['ProjA', 'ProjB', 'ProjC']);
+    await expect(page.getByTestId('onboard-root'))
+      .toHaveAttribute('data-step', 'error', { timeout: 10_000 });
+    await expect(page.getByTestId('onboard-error-partial-commit')).toBeVisible();
 
-    // RETRY → back to review (committing origin recovers to review).
-    await page.getByTestId('onboard-error-retry').click();
-    await expect(page.getByTestId('onboard-root')).toHaveAttribute('data-step', 'review');
+    // RETRY → clearError → ERROR_RECOVERY_STEP['committing'] === 'review'.
+    // The partial-commit variant's testid is on the button itself
+    // (OnboardError.jsx:74), so clicking this testid fires clearError.
+    await page.getByTestId('onboard-error-partial-commit').click();
+    await expect(page.getByTestId('onboard-root'))
+      .toHaveAttribute('data-step', 'review');
 
-    // LOCK IT IN again — ProjA and ProjB must be skipped; only ProjC retried.
-    await page.getByTestId('onboard-lock-in').click();
-    await expect(page.getByTestId('onboard-root')).toHaveCount(0, { timeout: 10_000 });
+    // Second LOCK IT IN — only ProjC re-attempted (A, B flagged committed).
+    // Fail-first-only amendment makes the second attempt succeed.
+    await driveLockIn(page);
 
-    // Selective-retry invariant: A and B called once, C called twice, total 4.
-    expect(projectCalls.filter(n => n === 'ProjA')).toHaveLength(1);
-    expect(projectCalls.filter(n => n === 'ProjB')).toHaveLength(1);
-    expect(projectCalls.filter(n => n === 'ProjC')).toHaveLength(2);
-    expect(projectCalls).toHaveLength(4);
+    const names = capture.projects.map((p) => p.name);
+    expect(names.filter((n) => n === 'ProjA')).toHaveLength(1);
+    expect(names.filter((n) => n === 'ProjB')).toHaveLength(1);
+    expect(names.filter((n) => n === 'ProjC')).toHaveLength(2);
+    expect(capture.projects).toHaveLength(4);
+  });
+
+  // ─── Test 6 — Clarify path (shallow) ─────────────────────────────────
+  test('6 clarify path: first chief triggers clarify-ask, second chief resolves', async ({ page }) => {
+    const capture = await setupMockBackend(page, {
+      registry: EMPTY_REGISTRY,
+      transcripts: ['vague capture', 'clarifying detail'],
+      // First call: at least one project (empty-extraction guard runs before
+      // clarify check; both-empty would route to error instead of clarify-ask).
+      extraction: {
+        projects: [{ name: 'Pending Project', tasks: [] }],
+        orphan_tasks: [],
+        clarification_needed: { question: 'Which project is highest priority?' }
+      },
+      // Second call: the real extraction after clarify.
+      extractionClarifyThenResolve: {
+        projects: [
+          { name: 'Resolved Project', tasks: [{ text: 'Resolved task' }] }
+        ],
+        orphan_tasks: []
+      }
+    });
+
+    await page.goto('/');
+    await drivePastIntro(page);
+    await driveCapture(page);
+    await expect(page.getByTestId('onboard-root'))
+      .toHaveAttribute('data-step', 'clarify-ask', { timeout: 10_000 });
+    await driveClarify(page);
+    await driveThroughParsingToReview(page);
+
+    await expect(page.getByText('Resolved Project')).toBeVisible();
+    await expect(page.getByText('Pending Project')).not.toBeVisible();
+
+    expect(capture.chief).toHaveLength(2);
   });
 });
