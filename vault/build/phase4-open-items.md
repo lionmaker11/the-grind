@@ -198,6 +198,18 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** R5b-6 reviews these surfaces naturally. No standalone action.
 
+### 20. Board has no manual-entry affordance for onboarding
+
+**Surface:** v2/src/components/Board/Board.jsx and the empty-state CTA path.
+
+**Concern:** App.jsx line 12 comment claims "Manual entry from Board's '+ NEW PROJECT' button (and the empty state CTA) is wired in Board.jsx via openOnboard" — but this wiring does not exist. The only paths into onboarding are (a) auto-open on empty registry via useAutoOnboard, and (b) the dev/test `?force-onboard=1` query-param override. Once a user has onboarded once and the vault is populated, there is no in-app way to onboard a new batch of projects from voice capture.
+
+**Status:** Discovered during R5b-8b test wiring. The dev override is sufficient for testing the merge/orphan paths against POPULATED_REGISTRY. Production gap remains.
+
+**Fix:** Phase 5 work (Board interactions). Wire openOnboard to a Board affordance — most likely the "+ NEW PROJECT" button or a hamburger-menu item. Update the App.jsx comment when wiring lands.
+
+**Schedule:** Phase 5a or 5b.
+
 ## RESOLVED — Fixed during rebuild
 
 ### 10. OnboardError variant routing not yet wired
