@@ -289,7 +289,18 @@ export function OnboardReview() {
         <button
           type="button"
           class="add-project-ghost"
-          onClick={() => addProject()}
+          onClick={() => {
+            addProject();
+            // Open the inline name editor on the just-created project
+            // so the user can type immediately, instead of discovering
+            // that tapping the (unnamed) placeholder reveals the input.
+            // addProject mutates synchronously and appends at the end
+            // of extracted.projects, so the newest tempId is the last
+            // one in the store right after the call returns.
+            const next = onboardStore.get().extracted?.projects || [];
+            const newest = next[next.length - 1];
+            if (newest) setEditingProjectTempId(newest.tempId);
+          }}
           data-testid="onboard-add-project"
         >
           + ADD PROJECT
