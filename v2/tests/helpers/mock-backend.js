@@ -104,21 +104,24 @@ export async function setupMockBackend(page, options = {}) {
     if (req.method() === 'POST') {
       const body = safeJson(req.postData());
       capture.backlog.push(body);
-      if (backlogFail && body?.text === backlogFail) {
+      // Real client wraps task fields under body.task — see api/backlog.js
+      // op:add and the orchestrator in v2/src/state/onboard.js. The
+      // failure hook and synthesized response must read the same shape.
+      const t = body?.task || {};
+      if (backlogFail && t.text === backlogFail) {
         await route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"mock task fail"}' });
         return;
       }
       const task = {
         id: `task-${capture.backlog.length}`,
-        text: body?.text || '',
+        text: t.text || '',
         done_condition: '',
-        category: body?.category || '',
+        category: t.category || '',
         estimated_pomodoros: 0,
         status: 'pending',
         created: '2026-04-23T00:00:00Z',
-        ...(body?.priority !== undefined ? { priority: body.priority } : {}),
-        ...(body?.urgent !== undefined ? { urgent: body.urgent } : {}),
-        ...(body?.order !== undefined ? { order: body.order } : {})
+        ...(t.urgent !== undefined ? { urgent: t.urgent } : {}),
+        ...(t.order !== undefined ? { order: t.order } : {})
       };
       await route.fulfill({
         status: 200,
