@@ -8,6 +8,7 @@
 
 import { map } from 'nanostores';
 import { projectOp, backlogOp } from '../lib/api.js';
+import { clear as clearFocus } from './focus.js';
 
 // ─── Constants ────────────────────────────────────────────────────────
 
@@ -176,6 +177,10 @@ export function openOnboard() {
 }
 
 export function closeOnboard(force = false) {
+  // Treat onboard close as a hard reset of UI surfaces. Clear any
+  // stale Focus session so the user lands on Board (not a re-mounted
+  // Focus from before onboarding interrupted).
+  clearFocus();
   const cur = onboardStore.get();
   if (force || cur.step === 'intro' || cur.step === 'idle' || cur.step === 'done') {
     reset();

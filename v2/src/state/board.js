@@ -29,6 +29,7 @@
 
 import { map } from 'nanostores';
 import { getBacklog, backlogOp } from '../lib/api.js';
+import { setActive as setFocusActive } from './focus.js';
 
 export const boardStore = map({
   summary: [],
@@ -163,4 +164,24 @@ export async function reorderTopThree(projectId, newOrderIds) {
     });
     fetchBoard();
   }
+}
+
+// ─── launchTask — non-mutating; routes to Focus stub ──────────────
+//
+// Looks up task text from current boardStore summary by (projectId,
+// taskId) and dispatches focusStore.setActive. No backend call. No
+// boardStore mutation. App.jsx render switch picks up the focusStore
+// change and mounts <Focus />.
+//
+// Defensive bail-out if project or task not found (stale state from
+// concurrent fetchBoard or component-render race). Caller (TaskRow's
+// ▶ button, Board.jsx's EXECUTE button) is expected to pass valid
+// IDs from current render state.
+export function launchTask(projectId, taskId) {
+  const { summary } = boardStore.get();
+  const project = summary.find(p => p.project_id === projectId);
+  if (!project) return;
+  const task = (project.top || []).find(t => t.id === taskId);
+  if (!task) return;
+  setFocusActive(taskId, task.text, projectId);
 }

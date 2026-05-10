@@ -1,0 +1,47 @@
+.focus {
+  min-height: 100vh;
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.focus-back {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--t-base);
+  cursor: pointer;
+  padding: var(--s-2);
+  align-self: flex-start;
+  margin-bottom: var(--s-6);
+}
+
+.focus-back:hover {
+  color: var(--cyan);
+}
+
+.focus-stub-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4);
+  text-align: center;
+}
+
+.focus-task-text {
+  font-family: var(--font-body);
+  font-size: var(--t-lg);
+  color: var(--text);
+  max-width: 600px;
+}
+
+.focus-stub-note {
+  font-family: var(--font-mono);
+  font-size: var(--t-base);
+  color: var(--text-dim);
+}
