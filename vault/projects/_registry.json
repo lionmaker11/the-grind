@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-04-22",
+  "updated": "2026-05-09",
   "projects": [
     {
       "id": "708-pallister",
@@ -152,6 +152,15 @@
       "priority": 11,
       "folder": "vault/projects/personal",
       "aliases": []
+    },
+    {
+      "id": "defi-cockpit",
+      "name": "DeFi Cockpit",
+      "status": "active",
+      "priority": 12,
+      "folder": "vault/projects/defi-cockpit",
+      "aliases": [],
+      "note": "Two or three remaining tasks to finish."
     }
   ]
 }
