@@ -47,6 +47,16 @@
       "priority": 4,
       "status": "pending",
       "created": "2026-04-21"
+    },
+    {
+      "id": "va-006",
+      "text": "Sign paperwork from lawyer for VA appeal",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-10",
+      "urgent": false
     }
   ]
 }
