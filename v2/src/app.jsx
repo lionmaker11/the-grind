@@ -8,8 +8,11 @@ import { boardStore, fetchBoard } from './state/board.js';
 import { onboardStore, openOnboard, closeOnboard } from './state/onboard.js';
 
 // Auto-open onboarding when the board finishes loading and registry
-// shows zero active projects. Manual entry from Board's "+ NEW PROJECT"
-// button (and the empty state CTA) is wired in Board.jsx via openOnboard.
+// shows zero active projects. There is no manual launcher from Board —
+// post-onboarding new-project entry routes through Muse (Board.jsx:67-72
+// wires + NEW PROJECT to museOpen with the right prefill, per mockup
+// 02-board-empty.html). The only paths into Onboard are this hook (empty
+// registry) and ?force-onboard=1 (dev/test override, see effect below).
 function useAutoOnboard() {
   const { summary, loading, error, lastFetchAt } = useStore(boardStore);
   const { isActive, step } = useStore(onboardStore);
