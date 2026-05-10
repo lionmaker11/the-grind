@@ -198,18 +198,6 @@ Option (a) keeps backend clean but adds a network round-trip per merge. Option (
 
 **Schedule:** R5b-6 reviews these surfaces naturally. No standalone action.
 
-### 20. Board has no manual-entry affordance for onboarding
-
-**Surface:** v2/src/components/Board/Board.jsx and the empty-state CTA path.
-
-**Concern:** App.jsx line 12 comment claims "Manual entry from Board's '+ NEW PROJECT' button (and the empty state CTA) is wired in Board.jsx via openOnboard" — but this wiring does not exist. The only paths into onboarding are (a) auto-open on empty registry via useAutoOnboard, and (b) the dev/test `?force-onboard=1` query-param override. Once a user has onboarded once and the vault is populated, there is no in-app way to onboard a new batch of projects from voice capture.
-
-**Status:** Discovered during R5b-8b test wiring. The dev override is sufficient for testing the merge/orphan paths against POPULATED_REGISTRY. Production gap remains.
-
-**Fix:** Phase 5 work (Board interactions). Wire openOnboard to a Board affordance — most likely the "+ NEW PROJECT" button or a hamburger-menu item. Update the App.jsx comment when wiring lands.
-
-**Schedule:** Phase 5a or 5b.
-
 ### 21. Match-toggle button label is the toggle target, not the current intent
 
 **Surface:** v2/src/components/Onboard/OnboardReview.jsx match-row toggle button (lines ~256-275).
@@ -262,3 +250,23 @@ Three orphan registry entries from broken parallel-write test runs (`personal`, 
 ### R8. Onboard.jsx done-state teardown (resolved in R5a)
 
 After successful commit, `step === 'done'` needed something to call `closeOnboard`. R5a's OnboardReview placeholder wires a 1-second-delay `useEffect` for this. Real OnboardReview in R5b will carry forward the same pattern.
+
+### 20. Board has no manual-entry affordance for onboarding
+
+Resolved in Phase 5a-2 as no-fix. Item was based on a misread of the spec.
+
+**Resolution:** The "missing affordance" was never a real gap. Mockup `02-board-empty.html` shows the empty-Board CTA as "Tell Muse what's next" (OPEN MUSE button, not an onboarding launcher). Board.jsx:67-72 already wires `+ NEW PROJECT` to `museOpen({prefill:'new project: '})` — voice-filing through Muse is the design intent for new-project entry from a populated state. The Onboard surface is for first-time setup (empty registry, useAutoOnboard) or explicit dev/test re-entry (`?force-onboard=1`). Post-onboarding new-project flow never went through Onboard by design.
+
+The original concern traced to a stale `App.jsx:12` comment that incorrectly described Board as having `openOnboard` wiring. 5a-2 corrects the comment to accurately describe the actual entry paths into Onboard. No code logic change.
+
+**Note on the original framing below:** the "Status" sub-section's claim of a "production gap" reflects the misread, not the actual product state. Preserved verbatim for audit trail; superseded by the Resolution above.
+
+**Surface:** v2/src/components/Board/Board.jsx and the empty-state CTA path.
+
+**Concern:** App.jsx line 12 comment claims "Manual entry from Board's '+ NEW PROJECT' button (and the empty state CTA) is wired in Board.jsx via openOnboard" — but this wiring does not exist. The only paths into onboarding are (a) auto-open on empty registry via useAutoOnboard, and (b) the dev/test `?force-onboard=1` query-param override. Once a user has onboarded once and the vault is populated, there is no in-app way to onboard a new batch of projects from voice capture.
+
+**Status:** Discovered during R5b-8b test wiring. The dev override is sufficient for testing the merge/orphan paths against POPULATED_REGISTRY. Production gap remains.
+
+**Fix:** Phase 5 work (Board interactions). Wire openOnboard to a Board affordance — most likely the "+ NEW PROJECT" button or a hamburger-menu item. Update the App.jsx comment when wiring lands.
+
+**Schedule:** Phase 5a or 5b.
