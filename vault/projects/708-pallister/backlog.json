@@ -175,6 +175,16 @@
       "priority": 3,
       "status": "pending",
       "created": "2026-04-21"
+    },
+    {
+      "id": "pal-017",
+      "text": "Check in with contractor on 708 Pallister status",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-10",
+      "urgent": false
     }
   ]
 }
