@@ -63,13 +63,28 @@ export function getAllProjectIds(registry) {
   return ((registry?.projects) || []).map(p => p.id);
 }
 
-// Sort backlog tasks by priority ascending (1 = highest). Tasks without a
-// priority sink to the bottom. Stable within equal priorities by preserving
-// original array order.
+// Sort backlog tasks for display order. Urgent-flagged tasks float to the
+// top (April 2026 simplification pass — `urgent` is the universal priority
+// signal). Within each urgent grouping, sort by priority ascending (1 =
+// highest); tasks without a priority sink to the bottom of their grouping.
+// Stable within equal urgent+priority by preserving original array order.
+//
+// Boolean(t.urgent) coerces undefined / null / missing-field to false so
+// legacy vault tasks (pre-simplification, no urgent field) sort as
+// non-urgent without crashing.
+//
+// Function name kept as sortByPriority because all 6 call sites already
+// import it and the urgent-first behavior is universal by design (see
+// phase5a-spec.md Decision 3 and the per-call-site analysis in 5a-3
+// reading: Board, Muse op:load, op:set_priority resort, and chief.js
+// registry-tail context all want urgent-first).
 export function sortByPriority(tasks) {
   return [...(tasks || [])]
     .map((t, i) => ({ t, i }))
     .sort((a, b) => {
+      const ua = Boolean(a.t.urgent);
+      const ub = Boolean(b.t.urgent);
+      if (ua !== ub) return ua ? -1 : 1;
       const pa = a.t.priority == null ? 99 : a.t.priority;
       const pb = b.t.priority == null ? 99 : b.t.priority;
       if (pa !== pb) return pa - pb;

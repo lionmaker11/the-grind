@@ -149,7 +149,7 @@ export default async function handler(req, res) {
         priority: p.priority,
         task_count: (bl.tasks || []).length,
         last_touched: p.last_touched || null,
-        top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority }))
+        top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) }))
       };
     }));
     const summary = rows.filter(Boolean);
@@ -174,7 +174,7 @@ export default async function handler(req, res) {
           priority: 999,
           task_count: (bl.tasks || []).length,
           last_touched: null,
-          top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority })),
+          top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) })),
           unregistered: true
         });
       }
