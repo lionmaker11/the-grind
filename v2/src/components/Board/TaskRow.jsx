@@ -18,12 +18,10 @@ import './TaskRow.css';
 // microseconds — trivial vs the alternative of a stale-closure bug
 // where rapid double-taps would all dispatch the same boolean.
 //
-// taskDrag prop is optional (5a-6 → 5a-7 wiring gap). Until 5a-7
-// updates ProjectCard to create the drag controller and pass it
-// down, the drag handle renders but doesn't function. The defensive
-// `taskDrag ? ... : {}` spread keeps this file shippable in
-// isolation per the buildability discipline through 5a-1 to 5a-5.
-// 5a-7 closes the gap and the guards become unconditional.
+// taskDrag is now always provided by ProjectCard (gap closed in
+// 5a-7); spreads are unconditional. Component assumes a valid
+// controller and would throw if rendered without one — that's a
+// programming error, not a runtime case.
 export function TaskRow({ projectId, task, tIdx, taskDrag }) {
   const longpress = useMemo(
     () => createLongPress({
@@ -34,12 +32,12 @@ export function TaskRow({ projectId, task, tIdx, taskDrag }) {
 
   return (
     <div
-      {...(taskDrag ? taskDrag.itemProps(tIdx) : {})}
+      {...taskDrag.itemProps(tIdx)}
       class={`task-row wrap2${task.urgent ? ' urgent' : ''}`}
       data-testid={`board-task-${task.id}`}
     >
       <span
-        {...(taskDrag ? taskDrag.handleProps(tIdx) : {})}
+        {...taskDrag.handleProps(tIdx)}
         class="drag-handle"
         aria-label="Drag task to reorder"
         data-testid={`board-task-drag-${task.id}`}

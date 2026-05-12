@@ -79,12 +79,23 @@ export async function completeTask(projectId, taskId) {
   const before = boardStore.get();
   const snapshot = before.summary;
 
+  // Capture whether the completed task was urgent so the optimistic
+  // update can keep urgent_count in sync. urgent_count is rendered
+  // in ProjectCard's header (5a-7); without this delta the header
+  // would show stale urgent counts between optimistic mutation and
+  // the next fetchBoard. Defensive lookup: project/task may be
+  // absent if the caller passed stale IDs.
+  const project = snapshot.find(p => p.project_id === projectId);
+  const task = project?.top?.find(t => t.id === taskId);
+  const taskWasUrgent = Boolean(task?.urgent);
+
   const optimistic = snapshot.map(p =>
     p.project_id === projectId
       ? {
           ...p,
           top: (p.top || []).filter(t => t.id !== taskId),
-          task_count: Math.max(0, (p.task_count || 0) - 1)
+          task_count: Math.max(0, (p.task_count || 0) - 1),
+          urgent_count: Math.max(0, (p.urgent_count || 0) - (taskWasUrgent ? 1 : 0))
         }
       : p
   );
@@ -107,10 +118,22 @@ export async function toggleTaskUrgent(projectId, taskId, urgent) {
   const before = boardStore.get();
   const snapshot = before.summary;
 
+  // urgent_count delta: only changes if this is an actual flip, not
+  // a redundant "set to same value" call. ProjectCard's header
+  // displays urgent_count (5a-7); without this delta the header
+  // would diverge from the row-level urgent class between optimistic
+  // mutation and the next fetchBoard.
+  const project = snapshot.find(p => p.project_id === projectId);
+  const task = project?.top?.find(t => t.id === taskId);
+  const wasUrgent = Boolean(task?.urgent);
+  const willBeUrgent = Boolean(urgent);
+  const urgentDelta = wasUrgent === willBeUrgent ? 0 : (willBeUrgent ? 1 : -1);
+
   const optimistic = snapshot.map(p =>
     p.project_id === projectId
       ? {
           ...p,
+          urgent_count: Math.max(0, (p.urgent_count || 0) + urgentDelta),
           top: sortTopUrgentFirst(
             (p.top || []).map(t =>
               t.id === taskId ? { ...t, urgent: Boolean(urgent) } : t

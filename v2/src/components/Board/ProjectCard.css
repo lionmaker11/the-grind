@@ -33,16 +33,6 @@
   text-overflow: ellipsis;
 }
 
-/* Days/pending meta label */
-.project-meta {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 1.5px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
 /* Empty-tasks fallback inside a card */
 .task-empty {
   font-family: var(--font-mono);
@@ -51,4 +41,31 @@
   color: var(--text-muted);
   text-transform: uppercase;
   padding: var(--s-2) 0;
+}
+
+/* ── Urgent count header — Mirrored from OnboardReview.css for
+   self-containment (5a-7 mirrors 5a-6's TaskRow.css pattern).
+   If OnboardReview's rules change, this file does NOT auto-update.
+   Replaces the old .project-meta "{daysLabel} · {pending} PENDING"
+   display per mockup 01-board-default.html. */
+.urgent-count {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.urgent-count .n-urgent {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-glow);
+}
+.urgent-count .slash {
+  color: var(--text-muted);
+  margin: 0 3px;
+}
+.urgent-count--zero .n-urgent {
+  color: var(--text-dim);
+  text-shadow: none;
 }

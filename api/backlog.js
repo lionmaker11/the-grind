@@ -147,7 +147,8 @@ export default async function handler(req, res) {
         project_id: p.id,
         project_name: bl.project_name || p.name,
         priority: p.priority,
-        task_count: (bl.tasks || []).length,
+        task_count: pending.length,
+        urgent_count: pending.filter(t => Boolean(t.urgent)).length,
         last_touched: p.last_touched || null,
         top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) }))
       };
@@ -172,7 +173,8 @@ export default async function handler(req, res) {
           project_id: folder,
           project_name: bl.project_name || folder,
           priority: 999,
-          task_count: (bl.tasks || []).length,
+          task_count: pending.length,
+          urgent_count: pending.filter(t => Boolean(t.urgent)).length,
           last_touched: null,
           top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) })),
           unregistered: true
