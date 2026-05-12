@@ -84,9 +84,17 @@ Rationale: ships interaction completeness for 5a without doing Phase 6 work earl
 
 **Decision:** during drag, render a "← DROP ZONE" indicator above the row position the dragged item would land in if released now. Visual affordance only. Matches frame B of `33-reorder-animation.html` ("ROW LIFTED · OTHERS REFLOW" + drop-zone marker).
 
-Implementation reuses `lib/drag.js` infrastructure. Add an indicator element to TaskRow that's normally `display:none` and toggled visible during drag based on the controller's pointer-position state. **Implementation approach: CSS-only first, using `:has()` + the existing `.dragging` class to render the drop indicator on the hovered sibling. iOS Safari 16+ has good `:has()` support; T.J. is on iOS 17+. If CSS-only fails to render the indicator at the right position for some edge case, fall back to a small drag.js extension that exposes hovered-slot index via the controller. Default is CSS-only.**
+**Implementation approach: DEFERRED post-5a-8 reading.** The original decision called for CSS-only via `:has()` + `.dragging` class, with drag.js extension as fallback. The 5a-8 reading surfaced two issues:
 
-Rationale: small UX polish, makes drag feel deterministic. Mockup explicitly shows it.
+(1) The spec prose ("indicator above the row position the dragged item would land in if released now") describes pointer-following behavior. CSS has no access to drag.js's runtime toIdx, so CSS-only cannot satisfy the prose intent.
+
+(2) Mockup 33-reorder-animation.html implements a different affordance: a stationary ghost-slot at the dragged row's vacated origin position, labeled "← DROP ZONE." This is option (b) — implementable but doesn't match the prose intent.
+
+For a 3-row Board top-3 list, existing drag feedback (lifted-row cyan visual + sibling-row inline-transform shift) already communicates drop target adequately. Phone test (5a-10) will verify whether a separate drop indicator is actually needed in real use. If yes, implement the affordance that addresses the observed user confusion — likely option (a) pointer-following with a small drag.js extension. If no, the spec item closes as no-fix.
+
+Updated sub-step plan: 5a-8 reading completed and deferred; remaining 5a sub-steps renumbered (see "Phase 5a sub-step plan" below).
+
+Rationale: small UX polish, makes drag feel deterministic. Mockup explicitly shows it — but with affordance ambiguity that should resolve via phone-test evidence, not arbitrary picks at the spec stage.
 
 ### 7. Long-press for urgent on Board
 
@@ -155,15 +163,15 @@ Reuse `setupMockBackend` from R5b helpers — extend with handlers for `op:compl
 
 ## Phase 5a sub-step plan (reference, not committed scope)
 
-- **5a-1** — this spec doc
-- **5a-2** — fix `App.jsx:12` stale comment, formally close open #20 in phase4-open-items.md
-- **5a-3** — backend tweak: extend GET top entries with `urgent`, update `sortByPriority` for urgent-first
-- **5a-4** — boardStore mutators (`completeTask`, `reorderTopThree`, `toggleTaskUrgent`, `launchTask`)
-- **5a-5** — `state/focus.js` + `Focus/Focus.jsx` stub
-- **5a-6** — TaskRow rebuild (drag, longpress, urgent visual, launch + check buttons)
-- **5a-7** — ProjectCard header rewrite (urgent count) + Board.jsx EXECUTE wiring
-- **5a-8** — Ghost-row drop indicator (CSS-only `:has()` default; drag.js extension fallback)
-- **5a-9** — Playwright board-flow.spec.js
-- **5a-10** — pre-merge status report (`vault/build/phase5a-status.md`, mirrors phase4-r5b-status.md format)
-- **5a-11** — phone test (T.J.)
-- **5a-12** — merge `v2-phase4` to `main` (R5b + 5a together; refresh PHASES.md, archive phase4 docs)
+- **5a-1** — spec doc ✓
+- **5a-2** — App.jsx comment + open #20 closure ✓
+- **5a-3** — backend urgent-first sort ✓
+- **5a-4** — boardStore mutators ✓
+- **5a-5** — focusStore + Focus stub + launchTask + closeOnboard cleanup ✓
+- **5a-6** — TaskRow rebuild ✓
+- **5a-7** — ProjectCard + Board EXECUTE + backend pending-count fix ✓
+- **5a-8** — Playwright board-flow.spec.js (was 5a-9)
+- **5a-9** — pre-merge status report (was 5a-10)
+- **5a-10** — phone test (was 5a-11)
+- **5a-11** — merge v2-phase4 to main (was 5a-12)
+- **Ghost-row** — deferred from original 5a-8, verify need via 5a-10 phone test
