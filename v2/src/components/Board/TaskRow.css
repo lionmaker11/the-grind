@@ -1,41 +1,149 @@
 /* ============================================================
-   TaskRow.css — single task row layout + text truncation
-   .p-badge, .btn-icon, .task-actions are Sonnet B primitives.
+   TaskRow.css — Board task row (5a-6 rebuild)
+   Self-contained: mirrors OnboardReview.css's task-row vocabulary
+   so the two surfaces stay visually consistent without invisible
+   global-scope coupling. If OnboardReview.css's task-row primitives
+   change, this file does NOT auto-update — that's by design.
+   Phase 5b or later may promote shared rules to global.css.
    ============================================================ */
 
-/* Task row — flex layout, 44px min touch target */
+/* Drag affordance — drag.js CSS contract. Inline transform written
+   by drag.js wins over class transforms; .dragging uses background
+   + shadow + border for visual lift only (no transform: scale —
+   the inline translateY would override it). Transition on the base
+   .task-row lets displaced sibling rows ease into their new
+   positions during drag. */
 .task-row {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
   gap: 10px;
-  padding: 6px 0;
-  min-height: var(--touch-min);
+  padding: 10px 10px 10px 0;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  min-height: 56px;
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.task-row.dragging {
+  transition: none;
+  background: rgba(0, 240, 255, 0.04);
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px var(--cyan-dim);
+  z-index: 5;
 }
 
-/* Flex body that holds text (and optional meta line) */
-.task-body {
-  flex: 1;
-  min-width: 0; /* allow ellipsis to work */
+/* Drag handle — empty span decorated via ::before glyph ≡. Cursor
+   grab/grabbing on hover; touch-action: none disables native
+   vertical scroll on touch so finger-drag reorders. Color
+   transition is separate from the .task-row transform transition
+   so hover/grab color changes feel responsive on touch (iOS). */
+.task-row .drag-handle {
+  grid-column: 1;
+  width: 32px;
+  height: 100%;
+  min-height: 100%;
+  align-self: stretch;
+  margin: 0;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  border-right: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: color 120ms ease-out;
 }
+.task-row .drag-handle::before { content: '≡'; }
+.task-row .drag-handle:hover { color: var(--cyan); }
+.task-row.dragging .drag-handle { color: var(--cyan); cursor: grabbing; }
 
-/* Primary task text — ellipsis on overflow */
-.task-text {
+/* Task text — middle column, body font. wrap2 modifier clamps to 2
+   lines with ellipsis (mockup 35). The longpress-active class is
+   added by lib/longpress.js during hold (0–500ms) and cleared on
+   fire/cancel/release — amber outline provides feedback. */
+.task-row .task-text {
+  grid-column: 2;
+  padding: 2px 0;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: var(--t-base);
-  color: var(--text);
+  font-size: 0.9rem;
   line-height: 1.35;
-  white-space: nowrap;
+  color: var(--text);
+  text-wrap: pretty;
+  word-break: break-word;
+}
+.task-text.wrap2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+.task-text.longpress-active {
+  outline: 2px solid var(--amber-glow);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+  transition: outline-color 80ms ease-out;
 }
 
-/* Action button group — keep together, no shrink */
-.task-actions {
+/* Action buttons — .btn-icon base in global.css (44x44, transparent,
+   cyan/green color variants for .launch/.check). wrap2 mode shrinks
+   to 36x36 per mockup 35 for the taller two-line row. */
+.task-row .task-actions {
+  grid-column: 3;
   display: flex;
-  gap: 6px;
-  flex-shrink: 0;
+  gap: 4px;
+  padding-right: 2px;
+}
+.task-row.wrap2 .task-actions .btn-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 0.82rem;
+}
+
+/* Urgent state — amber left rail ON the card + amber-tinted handle
+   border. Background gradient washes amber → transparent across the
+   first 30% of the row width. */
+.task-row.urgent {
+  border-color: var(--amber-glow);
+  background: linear-gradient(90deg, var(--amber-wash), rgba(255, 255, 255, 0.02) 30%);
+}
+.task-row.urgent .drag-handle {
+  border-right: 1px solid var(--amber-glow);
+  color: var(--amber);
+}
+.task-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--amber);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--amber-glow);
+}
+
+/* wrap2 modifier — taller row to accommodate 2-line text without
+   crowding. Applied always on Board per phase5a-spec.md 5a-6
+   decisions. */
+.task-row.wrap2 {
+  min-height: 72px;
+  align-items: stretch;
+}
+.task-row.wrap2 .task-text {
+  align-self: center;
+}
+.task-row.wrap2 .task-actions {
+  align-self: center;
 }
