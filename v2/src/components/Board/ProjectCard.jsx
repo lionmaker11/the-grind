@@ -54,7 +54,7 @@ export function ProjectCard({ project }) {
   useEffect(() => () => taskDrag.destroy(), [taskDrag]);
 
   return (
-    <div class="panel project-card">
+    <div class="panel project-card" data-testid={`board-project-${project.project_id}`}>
       <span class="corner tl" />
       <span class="corner tr" />
       <span class="corner bl" />

@@ -35,6 +35,7 @@ export const POPULATED_REGISTRY = {
       project_name: 'Lionmaker Systems',
       priority: 1,
       task_count: 3,
+      urgent_count: 1,
       last_touched: '2026-04-20',
       top: [
         // Pre-sorted urgent-first to match what api/backlog.js GET returns
@@ -51,6 +52,7 @@ export const POPULATED_REGISTRY = {
       project_name: '708 Pallister',
       priority: 2,
       task_count: 1,
+      urgent_count: 0,
       last_touched: '2026-04-18',
       top: [
         { id: 't-pall-1', text: 'Reconcile April invoice', priority: 1, urgent: false }
@@ -61,7 +63,27 @@ export const POPULATED_REGISTRY = {
       project_name: 'Motor City Deals',
       priority: 3,
       task_count: 0,
+      urgent_count: 0,
       last_touched: '2026-04-15',
+      top: []
+    }
+  ]
+};
+
+// Board-flow test 7 (Empty Board): every project's top[] is empty,
+// so Board.jsx's allEmpty short-circuit fires and renders EmptyState.
+// Cannot use EMPTY_REGISTRY (summary: []) for this — that triggers
+// useAutoOnboard in App.jsx, routing the user into Onboard instead
+// of letting Board render its empty branch.
+export const BOARD_EMPTY_TOP_REGISTRY = {
+  summary: [
+    {
+      project_id: 'empty-project',
+      project_name: 'Empty Project',
+      priority: 1,
+      task_count: 0,
+      urgent_count: 0,
+      last_touched: '2026-05-01',
       top: []
     }
   ]

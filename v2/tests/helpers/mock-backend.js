@@ -1,12 +1,14 @@
-// Shared Playwright mock backend for onboarding tests.
+// Shared Playwright mock backend for onboarding AND Board tests.
 //
-// Mounts page.route handlers for every /api/* endpoint onboarding touches.
-// Returns a `capture` object whose arrays accumulate request payloads in
-// call order so tests can assert "chief was called twice with X then Y"
-// or "backlog got 3 POSTs for project A and 1 for B".
+// Mounts page.route handlers for every /api/* endpoint these surfaces
+// touch. Returns a `capture` object whose arrays accumulate request
+// payloads in call order so tests can assert "chief was called twice
+// with X then Y" or "backlog got 3 POSTs for project A and 1 for B".
 //
 // Response shapes mirror the real handlers EXACTLY — see:
-//   - api/backlog.js (GET summary, POST op:add)
+//   - api/backlog.js (GET summary, POST op:add / op:complete / op:reorder
+//                     / op:toggle_urgent — POST handler branches on body.op
+//                     since 5a-8 added Board mutators)
 //   - api/project.js (POST op:add)
 //   - api/chief.js   (POST returns { actions: [...] }; onboarding action has
 //                     type:'extract_onboarding' with { projects, orphan_tasks,
@@ -104,7 +106,44 @@ export async function setupMockBackend(page, options = {}) {
     if (req.method() === 'POST') {
       const body = safeJson(req.postData());
       capture.backlog.push(body);
-      // Real client wraps task fields under body.task — see api/backlog.js
+      const op = body?.op;
+
+      // Board mutators (5a-4 → 5a-7). Real handler shapes match
+      // api/backlog.js POST branches; tests filter capture.backlog
+      // by op to assert per-mutator behavior.
+      if (op === 'complete') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ok: true,
+            task: { id: body.task_id, status: 'done', completed: '2026-05-12' }
+          })
+        });
+        return;
+      }
+      if (op === 'reorder') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: true })
+        });
+        return;
+      }
+      if (op === 'toggle_urgent') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ok: true,
+            task: { id: body.task_id, urgent: body.urgent }
+          })
+        });
+        return;
+      }
+
+      // op:add — existing path (onboarding commit orchestrator). Real
+      // client wraps task fields under body.task — see api/backlog.js
       // op:add and the orchestrator in v2/src/state/onboard.js. The
       // failure hook and synthesized response must read the same shape.
       const t = body?.task || {};
