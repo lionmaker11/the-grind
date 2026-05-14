@@ -170,6 +170,14 @@
       "folder": "vault/projects/great-lakes-landscaping",
       "aliases": [],
       "note": "New website build, phase one kickoff"
+    },
+    {
+      "id": "lionflow",
+      "name": "Lionflow",
+      "status": "active",
+      "priority": 14,
+      "folder": "vault/projects/lionflow",
+      "aliases": []
     }
   ]
 }
