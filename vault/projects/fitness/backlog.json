@@ -11,7 +11,8 @@
       "priority": 1,
       "status": "pending",
       "recurring": "daily",
-      "created": "2026-04-21"
+      "created": "2026-04-21",
+      "last_completed": "2026-05-14"
     }
   ]
 }
