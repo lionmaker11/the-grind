@@ -2,5 +2,16 @@
   "schema_version": 1,
   "project_id": "great-lakes-landscaping",
   "project_name": "Great Lakes Landscaping",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "gre-001",
+      "text": "Send Great Lakes Landscaping kickoff email for phase one website",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
+    }
+  ]
 }
