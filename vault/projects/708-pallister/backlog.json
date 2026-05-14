@@ -4,17 +4,6 @@
   "project_name": "708 Pallister",
   "tasks": [
     {
-      "id": "pal-004",
-      "text": "Verify windows are installed properly",
-      "done_condition": null,
-      "category": null,
-      "estimated_pomodoros": null,
-      "priority": 1,
-      "status": "pending",
-      "created": "2026-04-21",
-      "urgent": true
-    },
-    {
       "id": "pal-015",
       "text": "Check that windows at 708 Pallister were installed properly",
       "done_condition": null,
@@ -25,6 +14,17 @@
       "urgent": false,
       "order": 0,
       "priority": 1
+    },
+    {
+      "id": "pal-004",
+      "text": "Verify windows are installed properly",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21",
+      "urgent": true
     },
     {
       "id": "pal-016",
