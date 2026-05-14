@@ -195,6 +195,16 @@
       "status": "pending",
       "created": "2026-05-14",
       "urgent": false
+    },
+    {
+      "id": "pal-019",
+      "text": "Flag Sam Amon to push contractor if no response",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
     }
   ]
 }
