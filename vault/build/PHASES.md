@@ -4,21 +4,23 @@ Authoritative record of phase-by-phase state, approved exceptions, and patterns
 observed during the rebuild. Read this file first in any new Claude Code
 session before touching code.
 
-## Current state (23 April 2026)
+## Current state (14 May 2026)
 
-- Production: the-grind-gold.vercel.app (main branch, HEAD 73c7dd2)
-- Active branch: v2-phase4 (HEAD 892ff9b, 41 commits ahead of main — mid-rebuild)
+- Production: the-grind-gold.vercel.app (main branch, HEAD 02e4ece — Phase 5a-11 merge)
+- Active branch: main (v2-phase4 merged + scheduled for deletion post-verification)
 - Architecture: V2 served at `/` via Vite build at `v2/dist/`, `/api/*` same-origin, all Vercel serverless functions
 - Lighthouse accessibility baseline: 100/100 (Phase 2 close, holds)
 
-Phase 4 onboarding is mid-rebuild. The initial 3-question implementation (commits f4fc3ba through c928abf) was phone-tested on 22 April 2026 and surfaced blocking issues: 4× POST /api/project returned 409 on LOCK IT IN (slug collisions between Opus-extracted project names and the existing vault registry); weak question phrasing producing poor extraction quality; broken project-task coupling across Q1/Q2/Q3 turns.
+Phase 4 (Onboarding rebuild — R5b flow) and Phase 5a (Board interactions) shipped together via the v2-phase4 → main merge on 14 May 2026 (73 commits, 98 files). The merge bundled R5b's onboarding rebuild (capture/clarify/parsing/review + error states + OnboardExitConfirm + OrphanPicker) with Phase 5a's full Board interactivity (TaskRow rebuild, drag-reorder controller, long-press gestures, complete/urgent/launch ops, optimistic-update + rollback store convention, Focus stub surface, EXECUTE button wiring, urgent-first sort on backend). Two `/api/*` exceptions consumed within Pattern-1 budget: backlog.js (urgent-first sort + urgent flag in GET payload) and project.js (pending-count fix in 5a-7).
 
-A design council (Council 1: David_Allen_Methodologist, Julie_Zhuo_Designer, Ryan_Singer_Scope, Tobi_Lütke_Operator, Voice_UX_Researcher) redesigned the flow: single capture question + optional clarify + extended review with MATCH indicators and orphan handling. A second council (Council 2) produced the R5b flow redesign governing the current review-surface rebuild. Concurrent with the redesigns, a simplification pass removed P1/P2/P3 priority badges app-wide, removed aspirational due-date/overdue meta chips, and replaced the 1-5 priority scale with a binary urgent flag + universal drag-to-reorder ordering.
+Original Phase 4 starter commits 5448a95, 05ceba8, 285b1c9, c928abf preserved as branch archaeology — no force-push, no history rewrite.
 
-Canonical rebuild specs: /vault/build/phase4-redesign-spec.md (Council 1, landed in 03fe71a) and /vault/build/phase4-flow-redesign.md (Council 2). Living open-items register: /vault/build/phase4-open-items.md. Session handoff doc: /vault/build/phase4-session-handoff.md.
-Design asset set: /design/mockups/ (full replacement in f56f5e0 — 30 active screens + shared.css + tokens.css + 3 assets, reflecting the simplification pass).
+Phase 5a-10 phone test surfaced two issues, both resolved before merge: Focus blank-screen blocker (resolved with `position: fixed` overlay in commit 86b4dd4) and iOS Safari long-press text-selection conflict (resolved with `user-select` / `-webkit-touch-callout` suppression on long-press targets in b675ca7). Phase 5a-7 Codex review flagged a drag-reorder vs concurrent fetchBoard race; deferred to phase 6+ pending real-use signal (logged below under Phase 5a roadmap).
 
-Current step: R5b OnboardReview rebuild underway. R5b-1 through R5b-6a landed (see Phase 4 roadmap bullet). Next: R5b-6b₁ (drag wiring). Original commits 5448a95, 05ceba8, 285b1c9, c928abf preserved as branch archaeology. No force-push, no history rewrite.
+Canonical specs from this band: /vault/build/phase4-redesign-spec.md (Council 1), /vault/build/phase4-flow-redesign.md (Council 2), /vault/build/phase5a-spec.md (Phase 5a 7-decision spec, Decision 6 ghost-row deferred). Pre-merge status: /vault/build/phase4-r5b-status.md and /vault/build/phase5a-status.md. Working docs (phase4-open-items.md, phase4-session-handoff.md) archived to /vault/build/archive/ post-merge.
+Design asset set: /design/mockups/ (full replacement landed in f56f5e0; 5a additions: 22-board-with-cta, 23-backlog-detail, 24-pomodoro-glyph-study, 33-reorder-animation, 34-board-returning, 35-board-task-wrap).
+
+Current step: Phase 5b (Backlog detail + pomodoro glyphs) is the next planned phase. Mockups 23 + 24 + 33 govern the visual + interaction spec. Council planning + spec authoring is the first move when Phase 5b begins.
 
 ## April 2026 simplification pass
 
