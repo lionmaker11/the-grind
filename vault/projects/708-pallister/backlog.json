@@ -153,7 +153,8 @@
       "estimated_pomodoros": null,
       "priority": 1,
       "status": "pending",
-      "created": "2026-04-21"
+      "created": "2026-04-21",
+      "urgent": true
     },
     {
       "id": "pal-002",
