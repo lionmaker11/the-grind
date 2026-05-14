@@ -34,7 +34,7 @@
       "estimated_pomodoros": null,
       "status": "pending",
       "created": "2026-04-23",
-      "urgent": false,
+      "urgent": true,
       "order": 1,
       "priority": 1
     },
