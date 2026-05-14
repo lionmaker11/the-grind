@@ -2,5 +2,16 @@
   "schema_version": 1,
   "project_id": "lionflow",
   "project_name": "Lionflow",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "lio-001",
+      "text": "Set up Anthropic API for Lionflow",
+      "done_condition": null,
+      "category": "On Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
+    }
+  ]
 }
