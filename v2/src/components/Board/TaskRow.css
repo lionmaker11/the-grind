@@ -79,6 +79,14 @@
   color: var(--text);
   text-wrap: pretty;
   word-break: break-word;
+  /* Suppress iOS Safari's tap-and-hold text-selection menu
+     (Copy / Look Up / Share). longpress.js still fires its
+     gesture; this just prevents the native popup from layering
+     on top of it. -webkit-touch-callout specifically kills the
+     iOS context menu that user-select alone doesn't suppress. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .task-text.wrap2 {
   display: -webkit-box;

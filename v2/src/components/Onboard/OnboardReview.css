@@ -280,6 +280,14 @@
   color: var(--text);
   text-wrap: pretty;
   word-break: break-word;
+  /* Suppress iOS Safari's tap-and-hold text-selection menu —
+     same fix as Board's TaskRow.css per 5a-10 phone test
+     finding. R5b-9b didn't catch this gap on the OnboardReview
+     surface but the root cause is identical: long-press target
+     must opt out of the native iOS context menu. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .task-row .task-actions {
   grid-column: 3;

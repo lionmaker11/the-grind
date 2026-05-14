@@ -23,6 +23,33 @@
 // or until release (tap / cancel). Component owns the visual; the
 // utility only toggles the class.
 //
+// ── iOS Safari requirement on long-press targets ─────────────────────
+//
+// The long-press target element MUST suppress iOS Safari's native
+// tap-and-hold text-selection menu (Copy / Look Up / Share), which
+// otherwise fires concurrently with the longpress gesture and overlays
+// the urgent-toggle (or whatever the consumer's onLongPress dispatches)
+// with an intrusive popup. The gesture itself fires correctly; only
+// the visual UX breaks.
+//
+// Add these three properties to the long-press target element:
+//
+//   .your-longpress-target {
+//     user-select: none;
+//     -webkit-user-select: none;
+//     -webkit-touch-callout: none;
+//   }
+//
+// `-webkit-touch-callout: none` is the critical one — it kills iOS's
+// context menu that `user-select: none` alone does NOT suppress. All
+// three together provide the full iOS Safari opt-out.
+//
+// Both Board's TaskRow.css and OnboardReview.css apply this pattern
+// on their `.task-row .task-text` rules — see those files for working
+// reference. Discovered during phase 5a-10 phone test (Board surface);
+// retrofitted onto OnboardReview at the same time even though R5b-9b
+// hadn't caught it.
+//
 // ── Coexistence with drag.js ─────────────────────────────────────────
 //
 // Spread both prop objects on the handle:
