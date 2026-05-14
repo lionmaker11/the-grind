@@ -29,6 +29,16 @@
       "priority": 3,
       "status": "pending",
       "created": "2026-04-21"
+    },
+    {
+      "id": "ab-004",
+      "text": "Check on Buildium skill",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
     }
   ]
 }
