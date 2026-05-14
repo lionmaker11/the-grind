@@ -152,9 +152,10 @@
       "category": null,
       "estimated_pomodoros": null,
       "priority": 1,
-      "status": "pending",
+      "status": "done",
       "created": "2026-04-21",
-      "urgent": true
+      "urgent": true,
+      "completed": "2026-05-14"
     },
     {
       "id": "pal-002",
