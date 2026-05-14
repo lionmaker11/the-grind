@@ -29,8 +29,9 @@
       "done_condition": null,
       "category": "Learning",
       "priority": 3,
-      "status": "pending",
-      "created": "2026-04-21"
+      "status": "done",
+      "created": "2026-04-21",
+      "completed": "2026-05-14"
     },
     {
       "id": "uig-004",
