@@ -12,6 +12,16 @@
       "status": "pending",
       "created": "2026-05-10",
       "urgent": false
+    },
+    {
+      "id": "def-002",
+      "text": "Spend one hour on DeFi Cockpit development",
+      "done_condition": null,
+      "category": "On Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
     }
   ]
 }
