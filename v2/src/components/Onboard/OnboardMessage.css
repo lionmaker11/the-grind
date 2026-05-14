@@ -1,0 +1,73 @@
+.om-row {
+  display: flex;
+  gap: 8px;
+  max-width: 88%;
+  align-items: flex-end;
+}
+.om-row--muse {
+  align-self: flex-start;
+}
+.om-row--user {
+  align-self: flex-end;
+  justify-content: flex-end;
+}
+
+.om-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 0, 222, 0.4);
+  background: #0a0a12;
+  color: var(--magenta);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.om-bubble {
+  padding: 14px 16px;
+  border: 1px solid;
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.om-bubble--muse {
+  background: rgba(255, 0, 222, 0.08);
+  border-color: rgba(255, 0, 222, 0.35);
+}
+.om-bubble--user {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+
+/* Dashed variant — live transcript during recording */
+.om-row--dashed .om-bubble--user {
+  border-style: dashed;
+  border-color: rgba(0, 240, 255, 0.45);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+/* Finalized variant — solid border, transcript locked in */
+.om-row--finalized .om-bubble--user {
+  border-style: solid;
+}
+
+.om-caret {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--cyan);
+  margin-left: 4px;
+  vertical-align: -2px;
+  animation: caret-blink 1s steps(2) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}

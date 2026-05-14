@@ -50,17 +50,26 @@
     letter-spacing: 4px;
     color: var(--text-dim);
     text-transform: uppercase;
-    margin: 32px 0 16px;
+    margin: 40px 0 14px;
+    display: flex; align-items: center; gap: 12px;
   }
   .section::before { content:'// '; color: var(--cyan); }
+  .section .count {
+    font-family: var(--font-mono);
+    font-size: .58rem;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+  .section .count::before { content:'// '; color: var(--magenta); }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 20px;
+    gap: 16px;
   }
   a.card {
     display: block;
-    padding: 16px;
+    padding: 14px 16px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: var(--r-md);
@@ -77,9 +86,22 @@
     content:''; position:absolute; top:-1px; left:20px; right:20px; height:1px;
     background: linear-gradient(90deg, transparent, var(--cyan), transparent);
   }
+  a.card.new::after {
+    content: 'NEW';
+    position: absolute;
+    top: 10px; right: 12px;
+    font-family: var(--font-mono);
+    font-size: .5rem;
+    letter-spacing: 1.2px;
+    padding: 2px 5px;
+    background: rgba(255,0,222,.1);
+    border: 1px solid var(--magenta);
+    color: var(--magenta);
+    border-radius: 2px;
+  }
   .idx {
     font-family: var(--font-mono);
-    font-size: .6rem;
+    font-size: .58rem;
     letter-spacing: 2px;
     color: var(--cyan);
     text-transform: uppercase;
@@ -87,36 +109,49 @@
   .name {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: .82rem;
+    font-size: .78rem;
     letter-spacing: 2.5px;
     color: var(--text);
     text-transform: uppercase;
-    margin-top: 6px;
-    margin-bottom: 8px;
+    margin-top: 4px;
+    margin-bottom: 6px;
   }
   .desc {
     font-family: var(--font-body);
-    font-size: .78rem;
+    font-size: .76rem;
     color: var(--text-dim);
     line-height: 1.4;
   }
+  .note {
+    font-family: var(--font-mono);
+    font-size: .58rem;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+    padding: 12px 14px;
+    border: 1px dashed rgba(0,240,255,.15);
+    border-radius: var(--r-sm);
+  }
+  .note a { color: var(--cyan); text-decoration: underline; text-underline-offset: 2px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>THEGRIND · V2 · MOCKUPS</h1>
-  <div class="sub">15 STATIC HTML · 390×844 · PHONE-FIRST</div>
+  <div class="sub">STATIC HTML · 390×844 · PHONE-FIRST</div>
 
-  <div class="section">BOARD SURFACE</div>
+  <div class="section">BOARD SURFACE <span class="count">6 SCREENS</span></div>
   <div class="grid">
-    <a class="card" href="01-board-default.html"><div class="idx">01</div><div class="name">Board — Default</div><div class="desc">Three projects, heartbeats green/yellow/red, EXECUTE bottom, Muse FAB.</div></a>
+    <a class="card" href="01-board-default.html"><div class="idx">01</div><div class="name">Board — Default</div><div class="desc">Three projects, heartbeats green/yellow/red, drag rail + urgent accent, urgent counts in head.</div></a>
     <a class="card" href="02-board-empty.html"><div class="idx">02</div><div class="name">Board — Empty</div><div class="desc">Zero pending. Last-closed line, AWAITING INPUT, large Muse CTA.</div></a>
-    <a class="card" href="03-board-reentry.html"><div class="idx">03</div><div class="name">Board — Re-entry 48h</div><div class="desc">Soft Muse prompt row above projects. Mic glyph, magenta dot.</div></a>
-    <a class="card" href="04-board-undo.html"><div class="idx">04</div><div class="name">Board — Undo Active</div><div class="desc">TopBar rotating status shows cyan "filed to Pallister (P2) [undo]".</div></a>
+    <a class="card" href="04-board-undo.html"><div class="idx">04</div><div class="name">Board — Undo Active</div><div class="desc">TopBar undo toast + just-filed row highlight in cyan.</div></a>
     <a class="card" href="05-board-offline.html"><div class="idx">05</div><div class="name">Board — Offline</div><div class="desc">Cached state. "// offline" in muted red, Muse FAB dimmed.</div></a>
+    <a class="card" href="22-board-with-cta.html"><div class="idx">22</div><div class="name">Board — With CTA</div><div class="desc">Variant w/ full-width dock CTA pinned to bottom.</div></a>
+    <a class="card" href="34-board-returning.html"><div class="idx">34</div><div class="name">Board — Returning</div><div class="desc">Multi-day return; zero-urgent state on a project.</div></a>
   </div>
 
-  <div class="section">FOCUS SURFACE</div>
+  <div class="section">FOCUS SURFACE <span class="count">4 SCREENS</span></div>
   <div class="grid">
     <a class="card" href="06-focus-work.html"><div class="idx">06</div><div class="name">Focus — Work, 13:42</div><div class="desc">Sam task from Pallister. Running, pulse ring, 1/4 dots.</div></a>
     <a class="card" href="07-focus-paused.html"><div class="idx">07</div><div class="name">Focus — Paused</div><div class="desc">Same task, RESUME button, static ring, "// paused_" label.</div></a>
@@ -124,7 +159,7 @@
     <a class="card" href="09-focus-reboot.html"><div class="idx">09</div><div class="name">Focus — Reboot 15:00</div><div class="desc">Magenta theme, all 4 dots filled.</div></a>
   </div>
 
-  <div class="section">MUSE OVERLAY</div>
+  <div class="section">MUSE OVERLAY <span class="count">5 SCREENS</span></div>
   <div class="grid">
     <a class="card" href="10-muse-empty.html"><div class="idx">10</div><div class="name">Muse — Empty</div><div class="desc">Sheet just opened. Greeting, idle input, mic idle.</div></a>
     <a class="card" href="11-muse-conversation.html"><div class="idx">11</div><div class="name">Muse — Conversation</div><div class="desc">Voice dump → two filed tasks → Muse reply → priority follow-up.</div></a>
@@ -133,9 +168,35 @@
     <a class="card" href="14-muse-sunday.html"><div class="idx">14</div><div class="name">Muse — Sunday Recap</div><div class="desc">Structured week recap. Under 100 words, terse.</div></a>
   </div>
 
-  <div class="section">CHROME</div>
+  <div class="section">ONBOARDING · V2 <span class="count">7 SCREENS</span></div>
+  <div class="grid">
+    <a class="card" href="41-onboard-intro.html"><div class="idx">41</div><div class="name">Intro</div><div class="desc">Eyes logo + wordmark, warm hand-off to Muse capture.</div></a>
+    <a class="card new" href="36-onboard-capture-ask.html"><div class="idx">36</div><div class="name">Capture — Ask</div><div class="desc">Single big question, armed mic, footer listening strip, × close.</div></a>
+    <a class="card new" href="37-onboard-capture-recording.html"><div class="idx">37</div><div class="name">Capture — Recording</div><div class="desc">Live dashed cyan transcript + escalated mic with ring-expand.</div></a>
+    <a class="card new" href="38-onboard-clarify-ask.html"><div class="idx">38</div><div class="name">Clarify — Ask</div><div class="desc">Compressed prior answer + targeted Opus question + SKIP →.</div></a>
+    <a class="card new" href="39-onboard-parsing.html"><div class="idx">39</div><div class="name">Parsing</div><div class="desc">Capture + clarify thread then extraction spinner.</div></a>
+    <a class="card new" href="40-onboard-review.html"><div class="idx">40</div><div class="name">Review</div><div class="desc">MATCH badges, CREATE NEW toggle, view-only P-badges, orphan panel, slim LOCK IT IN dock.</div></a>
+    <a class="card new" href="42-onboard-exit-modal.html"><div class="idx">42</div><div class="name">Exit Confirmation</div><div class="desc">Terminal-panel modal · capture-progress line · clarify-state backdrop.</div></a>
+  </div>
+
+  <div class="section">ONBOARDING · ERRORS <span class="count">3 SCREENS</span></div>
+  <div class="grid">
+    <a class="card" href="29-onboard-err-transcription.html"><div class="idx">29</div><div class="name">Error — Transcription</div><div class="desc">Whisper failed. Retry or type manually.</div></a>
+    <a class="card" href="30-onboard-err-empty.html"><div class="idx">30</div><div class="name">Error — Empty</div><div class="desc">Capture returned nothing. Try again or skip.</div></a>
+    <a class="card" href="31-onboard-err-partial.html"><div class="idx">31</div><div class="name">Error — Partial Commit</div><div class="desc">3 of 5 filed. 2 failed. Retry failed or continue.</div></a>
+  </div>
+
+  <div class="section">STUDIES &amp; SHOWCASES <span class="count">3 SCREENS</span></div>
   <div class="grid">
     <a class="card" href="15-topbar-showcase.html"><div class="idx">15</div><div class="name">TopBar — 3 Variants</div><div class="desc">Default · Undo · Offline, isolated for review.</div></a>
+    <a class="card" href="23-backlog-detail.html"><div class="idx">23</div><div class="name">Backlog — Detail</div><div class="desc">Project drill-in. Urgent-grouped, drag rail, 2-line wraps.</div></a>
+    <a class="card" href="24-pomodoro-glyph-study.html"><div class="idx">24</div><div class="name">Pomodoro Glyph Study</div><div class="desc">Production-size demo rows w/ drag rail + urgent accent.</div></a>
+    <a class="card" href="33-reorder-animation.html"><div class="idx">33</div><div class="name">Reorder &amp; Urgent Animation</div><div class="desc">Drag-to-reorder + long-press URGENT storyboard.</div></a>
+    <a class="card" href="35-board-task-wrap.html"><div class="idx">35</div><div class="name">Board — 2-Line Wrap</div><div class="desc">Long-text task row study with side drag rail.</div></a>
+  </div>
+
+  <div class="note">
+    PRIOR VERSIONS LIVE IN <code style="color:var(--cyan)">_archive/</code> IN THE PROJECT TREE — NOT SHIPPED IN EXPORT ZIPS. SEE README FOR CHANGE LOG.
   </div>
 </div>
 </body>

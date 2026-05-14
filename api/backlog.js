@@ -147,9 +147,10 @@ export default async function handler(req, res) {
         project_id: p.id,
         project_name: bl.project_name || p.name,
         priority: p.priority,
-        task_count: (bl.tasks || []).length,
+        task_count: pending.length,
+        urgent_count: pending.filter(t => Boolean(t.urgent)).length,
         last_touched: p.last_touched || null,
-        top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority }))
+        top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) }))
       };
     }));
     const summary = rows.filter(Boolean);
@@ -172,9 +173,10 @@ export default async function handler(req, res) {
           project_id: folder,
           project_name: bl.project_name || folder,
           priority: 999,
-          task_count: (bl.tasks || []).length,
+          task_count: pending.length,
+          urgent_count: pending.filter(t => Boolean(t.urgent)).length,
           last_touched: null,
-          top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority })),
+          top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) })),
           unregistered: true
         });
       }
@@ -187,7 +189,7 @@ export default async function handler(req, res) {
   // ── POST ─────────────────────────────────────────────────────────────────
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { op, project_id, task, task_id, priority, order, count } = req.body || {};
+  const { op, project_id, task, task_id, priority, order, count, urgent } = req.body || {};
 
   if (!op || !project_id) return res.status(400).json({ error: 'Missing op or project_id' });
 
@@ -213,22 +215,65 @@ export default async function handler(req, res) {
   // ── add ──────────────────────────────────────────────────────────────────
   if (op === 'add') {
     if (!task || !task.text) return res.status(400).json({ error: 'Missing task.text' });
-    if (!task.priority) return res.status(400).json({ error: 'Missing task.priority' });
-    const pri = parseInt(task.priority, 10);
-    if (!Number.isInteger(pri) || pri < 1 || pri > 5) {
-      return res.status(400).json({ error: 'priority must be an integer 1–5' });
+
+    // Optional fields — validate shape if present, otherwise skip. Per R2.5:
+    // store only what the client sends; do not synthesize priority from
+    // urgent. Old-flow callers still send priority; new-flow callers send
+    // urgent + order and skip priority entirely.
+    let pri = null;
+    if (task.priority !== undefined && task.priority !== null) {
+      pri = parseInt(task.priority, 10);
+      if (!Number.isInteger(pri) || pri < 1 || pri > 5) {
+        return res.status(400).json({ error: 'priority must be an integer 1–5' });
+      }
     }
+    let urgentFlag = null;
+    if (task.urgent !== undefined) {
+      if (typeof task.urgent !== 'boolean') {
+        return res.status(400).json({ error: 'task.urgent must be a boolean' });
+      }
+      urgentFlag = task.urgent;
+    }
+    let explicitOrder = null;
+    if (task.order !== undefined) {
+      if (task.order === 'append') {
+        explicitOrder = 'append';
+      } else if (Number.isInteger(task.order) && task.order >= 0) {
+        explicitOrder = task.order;
+      } else {
+        return res.status(400).json({ error: "task.order must be 'append' or a non-negative integer" });
+      }
+    }
+
     const newTask = {
       id: nextTaskId(project_id, backlog.tasks),
       text: String(task.text).slice(0, 200),
       done_condition: task.done_condition || null,
       category: task.category || null,
       estimated_pomodoros: task.estimated_pomodoros != null ? task.estimated_pomodoros : null,
-      priority: pri,
       status: 'pending',
-      created: today()
+      created: today(),
+      ...(pri !== null ? { priority: pri } : {}),
+      ...(urgentFlag !== null ? { urgent: urgentFlag } : {}),
+      ...(Number.isInteger(explicitOrder) ? { order: explicitOrder } : {})
     };
-    backlog.tasks = insertSorted(backlog.tasks, newTask);
+
+    // Explicit `order` short-circuits priority-bucketed insertion: splice
+    // at the requested position (clamped to array length; out-of-range
+    // values append). The 'append' sentinel resolves to the current end
+    // of the task list — used by the onboarding commit orchestrator for
+    // merged projects so extraction-time indices don't push existing
+    // tasks down. Old-flow callers without `order` still go through
+    // insertSorted via task.priority.
+    if (explicitOrder !== null) {
+      const pos = explicitOrder === 'append'
+        ? backlog.tasks.length
+        : Math.min(explicitOrder, backlog.tasks.length);
+      backlog.tasks.splice(pos, 0, newTask);
+    } else {
+      backlog.tasks = insertSorted(backlog.tasks, newTask);
+    }
+
     const msg = `backlog: add "${newTask.text.slice(0, 60)}" to ${project_id}`;
     const [result] = await Promise.all([
       writeBacklog(project_id, backlog, sha, msg),
@@ -267,6 +312,26 @@ export default async function handler(req, res) {
     taskObj.priority = pri;
     backlog.tasks = sortByPriority(backlog.tasks);
     const msg = `backlog: ${task_id} priority → P${pri}`;
+    const [result] = await Promise.all([
+      writeBacklog(project_id, backlog, sha, msg),
+      touchRegistry(project_id)
+    ]);
+    if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
+    return res.status(200).json({ ok: true, task: taskObj });
+  }
+
+  // ── toggle_urgent ────────────────────────────────────────────────────────
+  // Flip the binary urgent flag on a single task. Frontend passes the
+  // desired state explicitly (not a flip-current), so retries are idempotent.
+  // Pre-rebuild tasks without an `urgent` field are treated as urgent:false
+  // on read; this op writes the field explicitly. No backfill required.
+  if (op === 'toggle_urgent') {
+    if (!task_id) return res.status(400).json({ error: 'Missing task_id' });
+    if (typeof urgent !== 'boolean') return res.status(400).json({ error: 'urgent must be a boolean' });
+    const taskObj = backlog.tasks.find(t => t.id === task_id);
+    if (!taskObj) return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
+    taskObj.urgent = urgent;
+    const msg = `backlog: ${task_id} urgent → ${urgent ? 'on' : 'off'}`;
     const [result] = await Promise.all([
       writeBacklog(project_id, backlog, sha, msg),
       touchRegistry(project_id)

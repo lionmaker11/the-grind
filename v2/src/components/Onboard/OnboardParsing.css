@@ -1,0 +1,58 @@
+.parsing-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+  align-self: center;
+}
+.parsing-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 0, 222, 0.18);
+  border-top-color: var(--magenta);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.parsing-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 2.5px;
+  color: var(--magenta);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.parsing-dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--magenta);
+  margin: 0 2px;
+  animation: parse-dot 1.2s ease-in-out infinite;
+}
+.parsing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.parsing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes parse-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

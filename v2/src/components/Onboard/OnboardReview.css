@@ -1,0 +1,647 @@
+/* OnboardReview — R5b-5 structure styling. Ports design/mockups/40-onboard-review.html
+   and shared.css § Review additions, adapted to V2's token surface. Deliberately
+   avoids redeclaring globals that already live in v2/src/global.css:
+     .panel / .corner / .btn-icon / .add-project-ghost
+   Amber urgent accent uses --amber / --amber-glow from tokens.css. */
+
+/* ── Container — sit under TopBar (47 status + 56 topbar = 103) ── */
+.onboard-root[data-step='review'],
+.onboard-root[data-step='committing'],
+.onboard-root[data-step='done'] {
+  padding: 0;
+  background: var(--bg);
+}
+
+.or-viewport {
+  position: absolute;
+  top: 103px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  padding: 16px 16px calc(96px + env(safe-area-inset-bottom, 0px));
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+/* ── Eyebrow ── */
+.review-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: var(--magenta);
+  text-transform: uppercase;
+  line-height: 1.4;
+  padding: 4px 2px 18px;
+  text-wrap: pretty;
+}
+.review-eyebrow .line2 {
+  display: block;
+  color: var(--text-dim);
+  margin-top: 6px;
+  letter-spacing: 1.8px;
+}
+.review-eyebrow .or-eyebrow-sub {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+/* ── Empty state (no projects extracted) ── */
+.or-empty {
+  padding: 24px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-md);
+  margin-bottom: 12px;
+}
+
+/* ── Project card ── */
+.project-card {
+  padding: 16px 14px 10px;
+  margin-bottom: 14px;
+}
+.project-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.project-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 2.5px;
+  color: var(--text);
+  text-transform: uppercase;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+/* not in mockup — project-level drag handle sits at the LEFT of the head */
+.or-project-drag {
+  width: 22px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: grab;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  background: transparent;
+  border: none;
+}
+.or-project-drag::before { content: '≡'; }
+
+/* not in mockup — expand chevron */
+.or-expand-chevron {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.or-expand-chevron:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+.or-expand-chevron:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* not in mockup — project delete (× in head row, right after chevron) */
+.or-project-delete {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 0.9rem;
+}
+.or-project-delete:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* ── Urgent count ── */
+.urgent-count {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.urgent-count .n-urgent {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-glow);
+}
+.urgent-count .slash {
+  color: var(--text-muted);
+  margin: 0 3px;
+}
+.urgent-count--zero .n-urgent {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
+/* ── Match row (between head and body) ── */
+.match-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  border: 1px solid var(--border-bright);
+  background: rgba(0, 240, 255, 0.06);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.match-line-text {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.match-line-text .arrow {
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+.match-row .toggle {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 1.5px;
+  padding: 6px 10px;
+  min-height: 32px;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+  flex-shrink: 0;
+}
+.match-row .toggle:hover {
+  color: var(--magenta);
+  border-color: var(--magenta);
+}
+
+/* ── Project body (only when expanded) ── */
+.or-project-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Task row — card with flush drag rail. Overrides the legacy flat row. ── */
+.task-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 0;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  min-height: 56px;
+}
+.task-row .drag-handle {
+  grid-column: 1;
+  width: 32px;
+  height: 100%;
+  min-height: 100%;
+  align-self: stretch;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.task-row .drag-handle::before { content: '≡'; }
+.task-row .task-text {
+  grid-column: 2;
+  padding: 2px 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+  text-wrap: pretty;
+  word-break: break-word;
+  /* Suppress iOS Safari's tap-and-hold text-selection menu —
+     same fix as Board's TaskRow.css per 5a-10 phone test
+     finding. R5b-9b didn't catch this gap on the OnboardReview
+     surface but the root cause is identical: long-press target
+     must opt out of the native iOS context menu. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.task-row .task-actions {
+  grid-column: 3;
+  display: flex;
+  gap: 4px;
+  padding-right: 2px;
+}
+.task-row .task-actions .btn-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 0.82rem;
+}
+.task-row .task-actions .btn-icon.edit:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+.task-row .task-actions .btn-icon.delete:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* Urgent task — amber left rail ON the card */
+.task-row.urgent {
+  border-color: var(--amber-glow);
+  background: linear-gradient(90deg, var(--amber-wash), rgba(255, 255, 255, 0.02) 30%);
+}
+.task-row.urgent .drag-handle {
+  border-right: 1px solid var(--amber-glow);
+  color: var(--amber);
+}
+.task-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--amber);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--amber-glow);
+}
+
+/* ── Drag affordance — drag.js CSS contract (R5b-6b₁) ──
+   Inline transform written by drag.js wins over class transforms,
+   so .dragging uses box-shadow + z-index for visual lift only — no
+   transform: scale (would be overridden by the inline translateY).
+   Scoped to .or-project / .or-viewport .task-row so the transition
+   does not leak into Board's main-surface .project-card / .task-row
+   (shared class names, no drag wired there yet). */
+.or-project {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.or-project.dragging {
+  transition: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+.or-viewport .task-row {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.or-viewport .task-row.dragging {
+  transition: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+
+/* ── Inline editors (R5b-6b₂) ──
+   Project-name and task-text editors swap an <input> in for the
+   static element. Typography is mirrored so the swap doesn't
+   reflow the row; the only visual change is the dashed border
+   (idle) → solid cyan (focus), matching .op-new-input:focus in
+   OrphanPicker.css. Both inputs are scoped: .or-project-name-input
+   sits in .project-head (flex), .or-task-text-input sits in the
+   .task-row grid column 2. */
+.or-project-name-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 2.5px;
+  color: var(--text);
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.or-project-name-input:focus {
+  border-color: var(--cyan);
+  border-style: solid;
+}
+
+.or-viewport .task-row .or-task-text-input {
+  grid-column: 2;
+  width: 100%;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.or-viewport .task-row .or-task-text-input:focus {
+  border-color: var(--cyan);
+  border-style: solid;
+}
+
+/* ── Long-press affordance on .task-text (R5b-6b₂) ──
+   longpress.js applies the default activeClass='longpress-active'
+   to the bound element while the hold is in progress. Scoped to
+   .or-viewport .task-row .task-text so the rule does not leak
+   into Board's shared .task-row .task-text selectors. Amber
+   matches the urgent accent the long-press resolves into. */
+.or-viewport .task-row .task-text.longpress-active {
+  outline: 2px solid var(--amber-glow);
+  outline-offset: 2px;
+  transition: outline-color 80ms ease-out;
+}
+
+/* ── + ADD TASK ghost ── */
+.add-task-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 44px;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  margin-top: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+.add-task-ghost:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+
+/* ── Orphan panel ── */
+.orphan-panel {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px dashed rgba(255, 230, 0, 0.35);
+  background: rgba(255, 230, 0, 0.02);
+  border-radius: var(--r-md);
+  position: relative;
+}
+.orphan-panel .orphan-head {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.66rem;
+  letter-spacing: 2.5px;
+  color: var(--yellow);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.orphan-panel .orphan-sub {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.orphan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 230, 0, 0.12);
+}
+.orphan-row:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+.orphan-row .orphan-glyph {
+  width: 26px;
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+.orphan-row .orphan-text {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: var(--text);
+  word-break: break-word;
+}
+.or-orphan-assign {
+  flex-shrink: 0;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.or-orphan-assign:hover {
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.or-orphan-pill {
+  flex-shrink: 1;
+  padding: 6px 10px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--r-sm);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.or-orphan-pill--discarded {
+  color: var(--red);
+  background: rgba(255, 0, 60, 0.06);
+  border-color: rgba(255, 0, 60, 0.4);
+}
+.or-orphan-undo {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.or-orphan-undo:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+
+.orphan-row--discarded .orphan-text {
+  color: var(--text-dim);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 0, 60, 0.5);
+}
+
+/* ── Error banner (shown if step transitions to error during commit) ── */
+.or-error-banner {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--magenta);
+  border-radius: var(--r-sm);
+  background: rgba(255, 0, 222, 0.05);
+  color: var(--magenta);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.or-error-banner button {
+  align-self: flex-start;
+  padding: 6px 14px;
+  min-height: 36px;
+  background: transparent;
+  border: 1px solid var(--magenta);
+  color: var(--magenta);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+/* ── Sticky LOCK IT IN dock ── */
+.lock-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 18, 0) 0%,
+    rgba(10, 10, 18, 0.85) 40%,
+    rgba(10, 10, 18, 0.98) 100%
+  );
+}
+.lock-dock.slim {
+  padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0));
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 18, 0) 0%,
+    rgba(10, 10, 18, 0.92) 60%,
+    rgba(10, 10, 18, 0.98) 100%
+  );
+}
+.review-lock {
+  pointer-events: auto;
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--cyan), #00c8ff);
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.82rem;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--r-sm);
+  box-shadow: 0 0 24px var(--cyan-dim);
+  clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
+  min-height: 48px;
+  cursor: pointer;
+}
+.review-lock:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+  cursor: not-allowed;
+}

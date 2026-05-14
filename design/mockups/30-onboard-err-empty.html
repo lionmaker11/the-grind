@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>30 — Onboard Error: No Projects Detected</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  .onboard-dimmed { opacity: .35; pointer-events: none; }
+
+  .error-card {
+    margin: 0 -2px;
+    border: 1px solid var(--red);
+    border-radius: var(--r-md);
+    background: linear-gradient(180deg, rgba(255,0,60,.08), rgba(255,0,60,.03));
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,0,60,.2), 0 0 32px -8px rgba(255,0,60,.45);
+    animation: err-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes err-pulse {
+    0%,100% { box-shadow: 0 0 0 1px rgba(255,0,60,.2), 0 0 24px -8px rgba(255,0,60,.35); }
+    50%     { box-shadow: 0 0 0 1px rgba(255,0,60,.4), 0 0 40px -8px rgba(255,0,60,.7); }
+  }
+  .error-titlebar {
+    padding: 10px 14px;
+    background: rgba(255,0,60,.15);
+    border-bottom: 1px solid rgba(255,0,60,.3);
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: 2.5px;
+    color: var(--red);
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .error-titlebar::before {
+    content: '';
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+    animation: err-dot 1s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes err-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  .error-body { padding: 16px 16px 14px; }
+  .error-sub {
+    font-family: var(--font-body);
+    font-size: .95rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+  .error-actions { display: flex; gap: 10px; flex-direction: column; }
+  .error-btn {
+    min-height: 48px;
+    padding: 0 16px;
+    font-family: var(--font-display);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+  }
+  .error-btn.primary {
+    background: var(--red);
+    color: #fff;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    box-shadow: 0 0 20px -4px var(--red-glow);
+  }
+  .error-btn.secondary {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="30 Onboard Error No Projects Detected">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="onboard">
+      <!-- Dimmed parsing context -->
+      <div class="onboard-dimmed">
+        <div class="onboard-musehead">
+          <span class="muse-dot"></span>
+          <img src="assets/muse-portrait.png" class="muse-avatar" alt="Muse">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span class="muse-title">MUSE</span>
+            <span class="muse-status">// ONBOARDING · PARSING</span>
+          </div>
+        </div>
+
+        <div class="onboard-convo" style="gap:12px">
+          <div class="muse-row">
+            <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+            <div class="bubble muse">Close one thing this week — what is it?</div>
+          </div>
+          <div class="bubble user" style="max-width:88%">
+            Uh, I don't know, just like, things on my mind I guess.
+          </div>
+        </div>
+      </div>
+
+      <!-- Error card -->
+      <div style="margin-top:auto; padding-top: 12px">
+        <div class="error-card">
+          <div class="error-titlebar">// ERROR · NO PROJECTS DETECTED</div>
+          <div class="error-body">
+            <div class="error-sub">Nothing actionable found in your answers. Try again?</div>
+            <div class="error-actions">
+              <button class="error-btn primary">↻ RETRY</button>
+              <button class="error-btn secondary">← START FRESH</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="caption">30 / 35 — PARSING · ERROR · EMPTY EXTRACTION</div>
+</div>
+</body>
+</html>

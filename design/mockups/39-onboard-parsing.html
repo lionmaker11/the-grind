@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>39 — Onboard: Parsing</title>
+<link rel="stylesheet" href="shared.css?v=14">
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="39 Onboard Parsing">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <button class="onboard-close" aria-label="Exit onboarding">×</button>
+
+    <div class="onboard">
+      <div class="onboard-musehead">
+        <span class="muse-dot listening"></span>
+        <img src="assets/muse-portrait.png" class="muse-avatar" alt="Muse">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span class="muse-title">MUSE</span>
+          <span class="muse-status listening">// ONBOARDING · PARSING</span>
+        </div>
+      </div>
+
+      <div class="onboard-convo" style="justify-content:flex-start;gap:12px">
+        <!-- Capture answer, compressed conversation form -->
+        <div class="muse-row">
+          <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+          <div class="bubble muse" style="font-size:.95rem;line-height:1.4;padding:12px 14px">
+            Walk me through what's active. Every project, what's happening.
+          </div>
+        </div>
+        <div class="bubble user" style="font-size:.9rem;line-height:1.4;padding:11px 13px;max-width:88%">
+          Pallister's the commercial deal with Rick — easement stuff, countertop install Monday. Lionmaker V2, porting components. Marcus trading's been quiet. Gym tomorrow.
+        </div>
+
+        <!-- Clarify exchange, shown if it happened -->
+        <div class="muse-row">
+          <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+          <div class="bubble muse" style="font-size:.92rem;line-height:1.4;padding:11px 13px">
+            Is Rick a separate project, or tasks within Pallister?
+          </div>
+        </div>
+        <div class="bubble user" style="font-size:.88rem;line-height:1.4;padding:10px 13px;max-width:75%">
+          Tasks within Pallister.
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:24px">
+          <div class="parsing-spinner"></div>
+          <div class="parsing-label" style="padding:0;white-space:nowrap">
+            <span>// EXTRACTING PROJECTS + TASKS</span>
+            <span class="parsing-dots"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboard-footer-status">
+      <span class="dot"></span>PARSING
+    </div>
+
+  </div>
+  <div class="caption">39 / 42 — PARSING</div>
+</div>
+</body>
+</html>

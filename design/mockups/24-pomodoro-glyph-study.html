@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>24 — Pomodoro Glyph: Study</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  .study-wrap {
+    position: absolute;
+    inset: 56px 0 0 0;
+    padding: 28px 20px 32px;
+    padding-top: calc(44px + env(safe-area-inset-top, 0px) + 12px);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    overflow-y: auto;
+  }
+  .study-eyebrow {
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    opacity: .85;
+  }
+  .study-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    color: var(--text);
+    text-transform: uppercase;
+    margin-top: -8px;
+  }
+  .study-sub {
+    font-family: var(--font-body);
+    font-size: .9rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    max-width: 320px;
+  }
+
+  .glyph-states {
+    display: flex; flex-direction: column;
+    gap: 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 22px;
+  }
+  .state-row {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: center;
+    gap: 14px;
+  }
+  .state-label {
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .state-glyphs { display: flex; gap: 14px; justify-content: center; }
+  .state-note {
+    font-family: var(--font-mono);
+    font-size: .6rem;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .in-context-demo {
+    border-top: 1px solid var(--border);
+    padding-top: 22px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .in-context-demo .demo-label {
+    font-family: var(--font-mono);
+    font-size: .65rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .demo-task {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: rgba(0,240,255,.025);
+    position: relative;
+  }
+  .demo-task.urgent {
+    padding-left: 16px;
+  }
+  .demo-task.urgent::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 3px;
+    background: var(--amber);
+    border-radius: 1px;
+    box-shadow: 0 0 6px var(--amber-dim);
+  }
+  .demo-task .dt-text {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: .88rem;
+    color: var(--text);
+    line-height: 1.35;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="24 Pomodoro Glyph Study">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <div class="topbar">
+      <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+      <span class="wordmark">THEGRIND</span>
+      <span class="topbar-status">// GLYPH STUDY</span>
+    </div>
+
+    <div class="study-wrap">
+      <div>
+        <div class="study-eyebrow">➤ // COMPONENT</div>
+        <div class="study-title">POMODORO ESTIMATE</div>
+        <div class="study-sub">A four-count control. Tap glyph N to set the estimate to N. Tap the selected glyph to clear. Reads as both tomato and cyberpunk eye — iris ring, magenta leaf-notch, filled "pupil" when active.</div>
+      </div>
+
+      <div class="glyph-states">
+        <div class="state-row">
+          <span class="state-label">0 / 4</span>
+          <div class="state-glyphs">
+            <span class="pomo study"></span><span class="pomo study"></span><span class="pomo study"></span><span class="pomo study"></span>
+          </div>
+          <span class="state-note">UNSET</span>
+        </div>
+        <div class="state-row">
+          <span class="state-label">1 / 4</span>
+          <div class="state-glyphs">
+            <span class="pomo study filled"></span><span class="pomo study"></span><span class="pomo study"></span><span class="pomo study"></span>
+          </div>
+          <span class="state-note">QUICK</span>
+        </div>
+        <div class="state-row">
+          <span class="state-label">2 / 4</span>
+          <div class="state-glyphs">
+            <span class="pomo study filled"></span><span class="pomo study filled"></span><span class="pomo study"></span><span class="pomo study"></span>
+          </div>
+          <span class="state-note">50 MIN</span>
+        </div>
+        <div class="state-row">
+          <span class="state-label">3 / 4</span>
+          <div class="state-glyphs">
+            <span class="pomo study filled"></span><span class="pomo study filled"></span><span class="pomo study filled"></span><span class="pomo study"></span>
+          </div>
+          <span class="state-note">75 MIN</span>
+        </div>
+        <div class="state-row">
+          <span class="state-label">4 / 4</span>
+          <div class="state-glyphs">
+            <span class="pomo study filled"></span><span class="pomo study filled"></span><span class="pomo study filled"></span><span class="pomo study filled"></span>
+          </div>
+          <span class="state-note">MAX · SPLIT</span>
+        </div>
+      </div>
+
+      <!-- In-context demo at production size -->
+      <div class="in-context-demo">
+        <div class="demo-label">// IN CONTEXT · PRODUCTION SIZE</div>
+        <div class="demo-task urgent">
+          <span class="drag-handle"></span>
+          <span class="dt-text">Ship V2 DESIGN.md to repo</span>
+          <span class="pomo-row">
+            <span class="pomo filled"></span><span class="pomo filled"></span><span class="pomo"></span><span class="pomo"></span>
+          </span>
+        </div>
+        <div class="demo-task">
+          <span class="drag-handle"></span>
+          <span class="dt-text">Port V1 components to Preact</span>
+          <span class="pomo-row">
+            <span class="pomo filled"></span><span class="pomo filled"></span><span class="pomo filled"></span><span class="pomo filled"></span>
+          </span>
+        </div>
+        <div class="demo-task">
+          <span class="drag-handle"></span>
+          <span class="dt-text">Review Rick's budget</span>
+          <span class="pomo-row">
+            <span class="pomo filled"></span><span class="pomo"></span><span class="pomo"></span><span class="pomo"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="caption">24 — POMODORO GLYPH · STUDY (drag rail + urgent accent demo)</div>
+</div>
+</body>
+</html>

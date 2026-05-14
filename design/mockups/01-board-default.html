@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>01 — Board: Default</title>
-<link rel="stylesheet" href="shared.css?v=5">
+<link rel="stylesheet" href="shared.css?v=14">
 </head>
 <body>
 <div class="stage">
@@ -11,23 +11,20 @@
     <div class="bg-gradient"></div>
     <div class="grid-overlay"></div>
 
-    <!-- iOS Status bar -->
     <div class="status-bar">
       <span>9:41</span>
       <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
     </div>
 
-    <!-- TopBar -->
     <div class="topbar">
       <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
       <span class="wordmark">THEGRIND</span>
       <span class="topbar-status">TUE · 09:41</span>
     </div>
 
-    <!-- Viewport -->
     <div class="viewport">
       <div class="section-title">IN CONTEXT</div>
-      <div class="section-sub">3 PROJECTS · 10 PENDING</div>
+      <div class="section-sub">3 PROJECTS · 4 URGENT / 10</div>
 
       <!-- Pallister (yellow) -->
       <div class="panel project-card">
@@ -36,29 +33,21 @@
         <div class="project-head">
           <span class="heartbeat yellow"></span>
           <span class="project-name">708 PALLISTER</span>
-          <span class="project-meta">5D · 3 PENDING</span>
+          <span class="urgent-count"><span class="n-urgent">2 URGENT</span><span class="slash">/</span>3</span>
         </div>
-        <div class="task-row">
-          <span class="p-badge p1">P1</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Call Sam re: countertop installer</div>
-            <div class="task-meta overdue">14+ DAYS OVERDUE</div>
-          </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Call Sam re: countertop installer</div>
+          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+        </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Finalize easement SNDA provisions</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
         <div class="task-row">
-          <span class="p-badge p2">P2</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Finalize easement SNDA provisions</div>
-            <div class="task-meta due">DUE FRI</div>
-          </div>
-          <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
-        </div>
-        <div class="task-row">
-          <span class="p-badge p3">P3</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Review Rick's budget spreadsheet</div>
-          </div>
+          <span class="drag-handle"></span>
+          <div class="task-text">Review Rick's budget spreadsheet</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
       </div>
@@ -70,27 +59,21 @@
         <div class="project-head">
           <span class="heartbeat green"></span>
           <span class="project-name">LIONMAKER SYSTEMS</span>
-          <span class="project-meta">0D · 5 PENDING</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
         </div>
-        <div class="task-row">
-          <span class="p-badge p1">P1</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Ship V2 DESIGN.md to repo</div>
-          </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Ship V2 DESIGN.md to repo</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
         <div class="task-row">
-          <span class="p-badge p2">P2</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Port V1 components to Preact</div>
-          </div>
+          <span class="drag-handle"></span>
+          <div class="task-text">Port V1 components to Preact</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
         <div class="task-row">
-          <span class="p-badge p3">P3</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Wire up Muse FAB overlay</div>
-          </div>
+          <span class="drag-handle"></span>
+          <div class="task-text">Wire up Muse FAB overlay</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
       </div>
@@ -102,34 +85,27 @@
         <div class="project-head">
           <span class="heartbeat red"></span>
           <span class="project-name">MARCUS</span>
-          <span class="project-meta">9D · 2 PENDING</span>
+          <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>2</span>
         </div>
-        <div class="task-row">
-          <span class="p-badge p1">P1</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Verify trading resumed after MDD lockout</div>
-          </div>
+        <div class="task-row urgent">
+          <span class="drag-handle"></span>
+          <div class="task-text">Verify trading resumed after MDD lockout</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
         <div class="task-row">
-          <span class="p-badge p2">P2</span>
-          <div style="flex:1;min-width:0">
-            <div class="task-text">Review funding rate arb logs</div>
-          </div>
+          <span class="drag-handle"></span>
+          <div class="task-text">Review funding rate arb logs</div>
           <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
         </div>
       </div>
 
-      <!-- + NEW PROJECT (voice-primary discoverability affordance) -->
       <button class="add-project-ghost" style="width:100%">+ NEW PROJECT</button>
     </div>
 
-    <!-- EXECUTE -->
     <div class="execute-wrap">
       <button class="btn-primary">▶ EXECUTE</button>
     </div>
 
-    <!-- Muse FAB -->
     <div class="muse-fab">●</div>
   </div>
 </div>

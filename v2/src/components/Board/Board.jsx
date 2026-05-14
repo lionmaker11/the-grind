@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
-import { boardStore, fetchBoard } from '../../state/board.js';
+import { boardStore, fetchBoard, launchTask } from '../../state/board.js';
 import { museStore, open as museOpen } from '../../state/muse.js';
 import { ProjectCard } from './ProjectCard.jsx';
 import { EmptyState } from './EmptyState.jsx';
@@ -9,6 +9,29 @@ import './Board.css';
 function formatTime(ts) {
   const d = new Date(ts);
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+// Returns the first task in the first project after the backend's
+// urgent-first sort (per phase5a-spec.md Decision 4). Returns null
+// if summary is empty OR if no project has a non-empty top[]. Used
+// as both the render gate and launch target for EXECUTE — the
+// button only renders when there's something to launch, and the
+// onClick reads the same target from the same helper, so render
+// and dispatch never disagree.
+//
+// .find(Boolean) instead of [0] per Codex 5a-7 review (NIT): defends
+// against sparse/null entries in top[] without changing behavior
+// for dense responses. Backend response is dense, but the cost is
+// one character.
+function topMostTask(summary) {
+  if (!Array.isArray(summary) || summary.length === 0) return null;
+  for (const p of summary) {
+    const task = (p.top || []).find(Boolean);
+    if (task) {
+      return { projectId: p.project_id, id: task.id, text: task.text };
+    }
+  }
+  return null;
 }
 
 export function Board() {
@@ -30,6 +53,7 @@ export function Board() {
 
   const isOffline = error !== null;
   const allEmpty = summary.length === 0 || summary.every((p) => (p.top || []).length === 0);
+  const execTarget = topMostTask(summary);
 
   if (isOffline) {
     const syncLabel = lastFetchAt
@@ -41,7 +65,18 @@ export function Board() {
         <div class="section-sub section-sub--offline">{syncLabel}</div>
         {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}
         <div class="muse-offline-note">// MUSE OFFLINE — voice filing paused</div>
-        <div class="execute-wrap"><button class="btn-primary" type="button"><span aria-hidden="true">▶ </span>EXECUTE</button></div>
+        {execTarget && (
+          <div class="execute-wrap">
+            <button
+              class="btn-primary"
+              type="button"
+              onClick={() => launchTask(execTarget.projectId, execTarget.id)}
+              data-testid="board-execute"
+            >
+              <span aria-hidden="true">▶ </span>EXECUTE
+            </button>
+          </div>
+        )}
       </main>
     );
   }
@@ -70,7 +105,18 @@ export function Board() {
       >
         <span aria-hidden="true">+ </span>NEW PROJECT
       </button>
-      <div class="execute-wrap"><button class="btn-primary" type="button"><span aria-hidden="true">▶ </span>EXECUTE</button></div>
+      {execTarget && (
+        <div class="execute-wrap">
+          <button
+            class="btn-primary"
+            type="button"
+            onClick={() => launchTask(execTarget.projectId, execTarget.id)}
+            data-testid="board-execute"
+          >
+            <span aria-hidden="true">▶ </span>EXECUTE
+          </button>
+        </div>
+      )}
     </main>
   );
 }

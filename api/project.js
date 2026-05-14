@@ -125,14 +125,37 @@ export default async function handler(req, res) {
     };
     const backlogPath = `vault/projects/${id}/backlog.json`;
 
-    // Write registry and new backlog.json in parallel
-    const [regResult, backlogResult] = await Promise.all([
-      putFile(REGISTRY_PATH, updatedRegistry, regSha, `registry: add project ${id}`),
-      putFile(backlogPath, backlogPayload, null, `backlog: create ${id}`)
-    ]);
+    // Serialize writes. Parallel PUTs to the same GitHub ref race —
+    // registry and backlog compute their trees independently, GitHub
+    // applies one and silently drops the other's commit. Phone test
+    // surfaced 3 stale registry entries (personal, financial,
+    // motor-city-deals-command-center) whose backlog files were never
+    // written despite both PUT calls supposedly succeeding. Backlog
+    // first so orphan files are harmless; registry second, and only
+    // if backlog landed.
 
-    if (!regResult.ok) return res.status(regResult.status || 500).json({ error: regResult.error });
-    if (!backlogResult.ok) return res.status(backlogResult.status || 500).json({ error: backlogResult.error });
+    const backlogResult = await putFile(
+      backlogPath,
+      backlogPayload,
+      null,
+      `backlog: create ${id}`
+    );
+    if (!backlogResult.ok) {
+      return res.status(backlogResult.status || 500).json({ error: backlogResult.error });
+    }
+
+    const regResult = await putFile(
+      REGISTRY_PATH,
+      updatedRegistry,
+      regSha,
+      `registry: add project ${id}`
+    );
+    if (!regResult.ok) {
+      // Registry failed after backlog succeeded — orphan backlog file,
+      // but no registry entry means no one can reference it. Harmless
+      // but should be cleaned up eventually. Surface to caller.
+      return res.status(regResult.status || 500).json({ error: regResult.error });
+    }
 
     return res.status(200).json({ ok: true, project: entry });
   }

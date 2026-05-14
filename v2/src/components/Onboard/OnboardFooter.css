@@ -1,0 +1,7 @@
+.of-status {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  color: var(--magenta);
+  text-transform: uppercase;
+}

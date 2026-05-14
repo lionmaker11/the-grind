@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>37 — Onboard: Capture · Recording</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  /* 37-only: live dashed transcript + caret */
+  .transcript-inline {
+    align-self: flex-end;
+    max-width: 88%;
+    padding: 12px 14px;
+    border: 1px dashed rgba(0,240,255,.45);
+    border-radius: var(--r-md);
+    background: rgba(0,240,255,.05);
+    font-family: var(--font-body);
+    font-size: .95rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+  .transcript-inline::after {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--cyan);
+    margin-left: 4px;
+    vertical-align: -2px;
+    animation: caret-blink 1s steps(2) infinite;
+  }
+  .transcript-inline .tag {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: .55rem;
+    letter-spacing: 1.5px;
+    color: rgba(0,240,255,.75);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="37 Onboard Capture Recording">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right"><span>●●●●</span><span>5G</span><span>█</span></div>
+    </div>
+
+    <button class="onboard-close" aria-label="Exit onboarding">×</button>
+
+    <div class="onboard">
+      <div class="onboard-musehead">
+        <span class="muse-dot listening"></span>
+        <img src="assets/muse-portrait.png" class="muse-avatar" alt="Muse">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span class="muse-title">MUSE</span>
+          <span class="muse-status listening">// ONBOARDING · CAPTURE · LISTENING</span>
+        </div>
+      </div>
+
+      <div class="onboard-convo">
+        <div class="muse-row">
+          <img src="assets/muse-portrait.png" class="muse-avatar-bubble" alt="">
+          <div class="capture-question">
+            Walk me through what's active. Every project, what's happening.
+          </div>
+        </div>
+
+        <div class="transcript-inline">
+          <span class="tag">// YOU · LIVE</span>
+          I've got Pallister, that's the commercial deal with Rick and the easement stuff, plus Lionmaker Systems — V2 build is on — and Marcus, the trading project that's
+        </div>
+      </div>
+
+      <div class="big-mic-wrap" style="margin-top:auto">
+        <div class="big-mic recording">●</div>
+        <div class="mic-timer">0:47 LISTENING...</div>
+      </div>
+    </div>
+
+    <div class="onboard-footer-status listening">
+      <span class="dot"></span>CAPTURE · RECORDING
+    </div>
+
+  </div>
+  <div class="caption">37 / 42 — CAPTURE · RECORDING</div>
+</div>
+</body>
+</html>

@@ -17,3 +17,6 @@ THE_GRIND_CLAUDE_CODE_PROMPT.md
 /v2/.eslintcache
 /v2/test-results/
 /v2/playwright-report/
+
+# Codex / agent review artifacts — kept locally, not tracked
+/v2/reviews/

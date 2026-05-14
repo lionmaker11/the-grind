@@ -1,0 +1,251 @@
+/* OrphanPicker.css — bottom-sheet for assigning a single orphan task.
+   Structure follows MuseSheet (backdrop + slide-up sheet, safe-area inset).
+   z-index sits above OnboardExitConfirm (50). Destructive DISCARD row
+   matches OnboardExitConfirm .oec-btn--danger treatment. Mobile-first;
+   desktop uses the same sheet pattern. */
+
+.op-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 60;
+  animation: op-fade-in var(--dur-base) var(--ease-out);
+}
+
+.op-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 85vh;
+  background: var(--bg-sheet);
+  border-top: 2px solid var(--cyan);
+  box-shadow: 0 -20px 60px rgba(0, 255, 255, 0.12);
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  animation: op-slide-up var(--dur-base) var(--ease-out);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+@keyframes op-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes op-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ── header ── */
+.op-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.op-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.op-close {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.op-close:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+
+.op-close:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ── orphan task subhead (deviation 2 in JSX header) ── */
+.op-orphan-text {
+  padding: 12px 18px 4px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── body (scrollable section list) ── */
+.op-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.op-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.op-section-header {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 0 2px;
+}
+
+.op-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.op-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: var(--touch-min);
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  word-break: break-word;
+}
+
+.op-row:hover {
+  border-color: var(--border-bright);
+  background: rgba(0, 255, 255, 0.04);
+}
+
+.op-row:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.op-row--suggested {
+  color: var(--cyan);
+  border-color: rgba(0, 255, 255, 0.45);
+  background: rgba(0, 255, 255, 0.06);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.op-row--danger {
+  color: var(--red);
+  border-color: rgba(255, 0, 60, 0.6);
+  background: rgba(255, 0, 60, 0.08);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── new-project input row ── */
+.op-new-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.op-new-input {
+  flex: 1;
+  min-height: var(--touch-min);
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  border-radius: var(--r-sm);
+}
+
+.op-new-input::placeholder {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.8rem;
+}
+
+.op-new-input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  border-style: solid;
+}
+
+.op-new-submit {
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.op-new-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.op-section--discard {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+/* Reduced motion: kill slide/fade */
+@media (prefers-reduced-motion: reduce) {
+  .op-backdrop,
+  .op-sheet {
+    animation: none !important;
+  }
+}

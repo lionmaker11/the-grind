@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>33 — Reorder &amp; Urgent Animation</title>
+<link rel="stylesheet" href="shared.css?v=14">
+<style>
+  body { overflow-x: auto; }
+  .stage.row {
+    flex-direction: row;
+    gap: 28px;
+    padding: 32px;
+    min-width: max-content;
+    align-items: flex-start;
+  }
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+  }
+  .frame-label {
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .frame-label .step { color: var(--cyan); font-weight: 700; margin-right: 8px; }
+  .frame-label .action {
+    display: block;
+    font-size: .6rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 2px;
+    max-width: 280px;
+  }
+  .frame-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -28px;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--cyan);
+    opacity: .45;
+    pointer-events: none;
+  }
+  .frame-arrow.urgent { color: var(--amber); }
+  .story-break {
+    width: 3px;
+    align-self: stretch;
+    background: repeating-linear-gradient(0deg, var(--border) 0 4px, transparent 4px 10px);
+    margin: 0 16px;
+  }
+
+  .study-header {
+    position: fixed;
+    top: 16px; left: 28px;
+    font-family: var(--font-mono);
+    font-size: .6rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    z-index: 10;
+  }
+  .study-header strong { color: var(--cyan); font-weight: 700; }
+
+  /* ——— DRAG STORY ——— */
+  .drag-handle.gripping { color: var(--cyan); border-right-color: var(--cyan-dim) !important; }
+  .task-row.lifted {
+    background: rgba(0,240,255,.05) !important;
+    border-color: rgba(0,240,255,.4) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.55), 0 0 20px var(--cyan-dim);
+    transform: translateY(-4px) scale(1.02);
+    z-index: 2;
+  }
+  .task-row.lifted .drag-handle {
+    border-right-color: rgba(0,240,255,.4);
+    color: var(--cyan);
+  }
+  .task-row.lifted.in-flight {
+    transform: translateY(68px) scale(1.02);
+    transition: transform 400ms var(--ease-out);
+  }
+  .ghost-slot {
+    height: 56px;
+    border: 1px dashed rgba(0,240,255,.4);
+    border-radius: var(--r-sm);
+    margin: 8px 0;
+    background: rgba(0,240,255,.03);
+    display: flex; align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: .55rem;
+    letter-spacing: 2px;
+    color: rgba(0,240,255,.6);
+    text-transform: uppercase;
+    animation: ghost-blink 1.2s ease-in-out infinite;
+  }
+  @keyframes ghost-blink {
+    0%,100% { opacity: .7; }
+    50%     { opacity: .35; }
+  }
+  .finger-glyph {
+    position: absolute;
+    font-size: 1.6rem;
+    line-height: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(0,240,255,.6));
+  }
+  .finger-glyph.amber { filter: drop-shadow(0 0 10px var(--amber-glow)); }
+
+  /* ——— URGENT STORY ——— */
+  .longpress-ring {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--amber);
+    opacity: .75;
+    pointer-events: none;
+    animation: ring-fill 1.2s ease-out infinite;
+  }
+  @keyframes ring-fill {
+    0%   { box-shadow: inset 0 0 0 0 var(--amber); opacity: .4; }
+    50%  { box-shadow: inset 0 0 0 18px rgba(255,167,38,.25); opacity: .9; }
+    100% { box-shadow: inset 0 0 0 18px rgba(255,167,38,.25); opacity: .4; }
+  }
+  .task-row.pulsing::after {
+    content: '';
+    position: absolute;
+    left: -2px; top: 2px; bottom: 2px;
+    width: 3px;
+    background: var(--amber);
+    box-shadow: 0 0 20px var(--amber-glow), 0 0 40px var(--amber-dim);
+    animation: amber-flash 1s ease-out infinite;
+    z-index: 3;
+  }
+  @keyframes amber-flash {
+    0%,100% { box-shadow: 0 0 8px var(--amber-dim); }
+    50%     { box-shadow: 0 0 28px var(--amber-glow), 0 0 50px var(--amber-dim); }
+  }
+
+  .project-card.dim { opacity: .35; }
+</style>
+</head>
+<body>
+
+<div class="study-header">
+  <strong>33</strong> &nbsp; // &nbsp; DRAG-TO-REORDER &nbsp; + &nbsp; LONG-PRESS URGENT
+</div>
+
+<div class="stage row">
+
+  <!-- ============ STORY 1 · DRAG ============ -->
+
+  <!-- A · GRAB -->
+  <div class="frame-wrap">
+    <div class="device" data-screen-label="33a Drag Grab">
+      <div class="bg-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="status-bar"><span>9:41</span><div class="right"><span>●●●●</span><span>5G</span><span>█</span></div></div>
+      <div class="topbar">
+        <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+        <span class="wordmark">THEGRIND</span>
+        <span class="topbar-status">TUE · 09:41</span>
+      </div>
+      <div class="viewport">
+        <div class="section-title">IN CONTEXT</div>
+        <div class="section-sub">1 URGENT / 3</div>
+
+        <div class="panel project-card">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat yellow"></span>
+            <span class="project-name">708 PALLISTER</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+          <div class="task-row" style="position:relative">
+            <span class="drag-handle gripping"></span>
+            <div class="task-text">Review Rick's budget spreadsheet</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+            <span class="finger-glyph" style="left:4px;top:22px">👆</span>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row">
+            <span class="drag-handle"></span>
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+        </div>
+        <div class="panel project-card dim">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat green"></span>
+            <span class="project-name">LIONMAKER SYSTEMS</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+        </div>
+      </div>
+      <div class="execute-wrap"><button class="btn-primary">▶ EXECUTE</button></div>
+      <div class="muse-fab">●</div>
+    </div>
+    <div class="frame-label">
+      <span class="step">A</span>GRAB
+      <span class="action">TOUCH HANDLE · CURSOR ARMS</span>
+    </div>
+    <div class="frame-arrow">→</div>
+  </div>
+
+  <!-- B · IN FLIGHT -->
+  <div class="frame-wrap">
+    <div class="device" data-screen-label="33b Drag In Flight">
+      <div class="bg-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="status-bar"><span>9:41</span><div class="right"><span>●●●●</span><span>5G</span><span>█</span></div></div>
+      <div class="topbar">
+        <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+        <span class="wordmark">THEGRIND</span>
+        <span class="topbar-status">TUE · 09:41</span>
+      </div>
+      <div class="viewport">
+        <div class="section-title">IN CONTEXT</div>
+        <div class="section-sub">1 URGENT / 3</div>
+
+        <div class="panel project-card">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat yellow"></span>
+            <span class="project-name">708 PALLISTER</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+          <!-- Empty slot the row vacated -->
+          <div class="ghost-slot">← DROP ZONE</div>
+          <!-- Row in flight, translated down to a new target -->
+          <div class="task-row lifted in-flight" style="position:relative">
+            <span class="drag-handle gripping"></span>
+            <div class="task-text">Review Rick's budget spreadsheet</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+            <span class="finger-glyph" style="left:4px;top:22px">👆</span>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row">
+            <span class="drag-handle"></span>
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+        </div>
+        <div class="panel project-card dim">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat green"></span>
+            <span class="project-name">LIONMAKER SYSTEMS</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+        </div>
+      </div>
+      <div class="execute-wrap"><button class="btn-primary">▶ EXECUTE</button></div>
+      <div class="muse-fab">●</div>
+    </div>
+    <div class="frame-label">
+      <span class="step">B</span>IN FLIGHT
+      <span class="action">ROW LIFTED · OTHERS REFLOW</span>
+    </div>
+    <div class="frame-arrow">→</div>
+  </div>
+
+  <!-- C · LANDED -->
+  <div class="frame-wrap">
+    <div class="device" data-screen-label="33c Drag Landed">
+      <div class="bg-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="status-bar"><span>9:41</span><div class="right"><span>●●●●</span><span>5G</span><span>█</span></div></div>
+      <div class="topbar">
+        <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+        <span class="wordmark">THEGRIND</span>
+        <span class="topbar-status">TUE · 09:41</span>
+      </div>
+      <div class="viewport">
+        <div class="section-title">IN CONTEXT</div>
+        <div class="section-sub">1 URGENT / 3</div>
+
+        <div class="panel project-card">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat yellow"></span>
+            <span class="project-name">708 PALLISTER</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row">
+            <span class="drag-handle"></span>
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <!-- Landed with subtle cyan flash -->
+          <div class="task-row" style="background: rgba(0,240,255,.05); border-radius: var(--r-sm); margin: 0 -4px; padding: 6px 4px">
+            <span class="drag-handle"></span>
+            <div class="task-text">Review Rick's budget spreadsheet</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+        </div>
+        <div class="panel project-card dim">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat green"></span>
+            <span class="project-name">LIONMAKER SYSTEMS</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+        </div>
+      </div>
+      <div class="execute-wrap"><button class="btn-primary">▶ EXECUTE</button></div>
+      <div class="muse-fab">●</div>
+    </div>
+    <div class="frame-label">
+      <span class="step">C</span>LANDED
+      <span class="action">DROPPED · FLASH DECAYS · ORDER SAVED</span>
+    </div>
+  </div>
+
+  <div class="story-break"></div>
+
+  <!-- ============ STORY 2 · URGENT ============ -->
+
+  <!-- D · LONG PRESS START -->
+  <div class="frame-wrap">
+    <div class="device" data-screen-label="33d Urgent Pressing">
+      <div class="bg-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="status-bar"><span>9:41</span><div class="right"><span>●●●●</span><span>5G</span><span>█</span></div></div>
+      <div class="topbar">
+        <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+        <span class="wordmark">THEGRIND</span>
+        <span class="topbar-status">TUE · 09:41</span>
+      </div>
+      <div class="viewport">
+        <div class="section-title">IN CONTEXT</div>
+        <div class="section-sub">1 URGENT / 3</div>
+
+        <div class="panel project-card">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat yellow"></span>
+            <span class="project-name">708 PALLISTER</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row" style="position:relative">
+            <span class="drag-handle"></span>
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <span class="longpress-ring"></span>
+            <span class="finger-glyph amber" style="left:4px;top:22px">👆</span>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row">
+            <span class="drag-handle"></span>
+            <div class="task-text">Review Rick's budget spreadsheet</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+        </div>
+        <div class="panel project-card dim">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat green"></span>
+            <span class="project-name">LIONMAKER SYSTEMS</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+        </div>
+      </div>
+      <div class="execute-wrap"><button class="btn-primary">▶ EXECUTE</button></div>
+      <div class="muse-fab">●</div>
+    </div>
+    <div class="frame-label">
+      <span class="step">D</span>PRESS
+      <span class="action">LONG-PRESS · AMBER RING FILLS</span>
+    </div>
+    <div class="frame-arrow urgent">→</div>
+  </div>
+
+  <!-- E · COMMIT PULSE -->
+  <div class="frame-wrap">
+    <div class="device" data-screen-label="33e Urgent Commit">
+      <div class="bg-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="status-bar"><span>9:41</span><div class="right"><span>●●●●</span><span>5G</span><span>█</span></div></div>
+      <div class="topbar">
+        <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+        <span class="wordmark">THEGRIND</span>
+        <span class="topbar-status">TUE · 09:41</span>
+      </div>
+      <div class="viewport">
+        <div class="section-title">IN CONTEXT</div>
+        <div class="section-sub">2 URGENT / 3</div>
+
+        <div class="panel project-card">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat yellow"></span>
+            <span class="project-name">708 PALLISTER</span>
+            <span class="urgent-count"><span class="n-urgent">2 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row urgent pulsing" style="position:relative">
+            <span class="drag-handle"></span>
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row">
+            <span class="drag-handle"></span>
+            <div class="task-text">Review Rick's budget spreadsheet</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+        </div>
+        <div class="panel project-card dim">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat green"></span>
+            <span class="project-name">LIONMAKER SYSTEMS</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+        </div>
+      </div>
+      <div class="execute-wrap"><button class="btn-primary">▶ EXECUTE</button></div>
+      <div class="muse-fab">●</div>
+    </div>
+    <div class="frame-label">
+      <span class="step">E</span>COMMIT
+      <span class="action">AMBER FLASH · COUNT TICKS 1→2</span>
+    </div>
+    <div class="frame-arrow urgent">→</div>
+  </div>
+
+  <!-- F · RESTING URGENT -->
+  <div class="frame-wrap">
+    <div class="device" data-screen-label="33f Urgent Rest">
+      <div class="bg-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="status-bar"><span>9:41</span><div class="right"><span>●●●●</span><span>5G</span><span>█</span></div></div>
+      <div class="topbar">
+        <img src="assets/lionmaker-logo.png" class="logo-mark" alt="">
+        <span class="wordmark">THEGRIND</span>
+        <span class="topbar-status">TUE · 09:41</span>
+      </div>
+      <div class="viewport">
+        <div class="section-title">IN CONTEXT</div>
+        <div class="section-sub">2 URGENT / 3</div>
+
+        <div class="panel project-card">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat yellow"></span>
+            <span class="project-name">708 PALLISTER</span>
+            <span class="urgent-count"><span class="n-urgent">2 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Call Sam re: countertop installer</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row urgent">
+            <span class="drag-handle"></span>
+            <div class="task-text">Finalize easement SNDA provisions</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+          <div class="task-row">
+            <span class="drag-handle"></span>
+            <div class="task-text">Review Rick's budget spreadsheet</div>
+            <div class="task-actions"><button class="btn-icon launch">▶</button><button class="btn-icon check">✓</button></div>
+          </div>
+        </div>
+        <div class="panel project-card dim">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <div class="project-head">
+            <span class="heartbeat green"></span>
+            <span class="project-name">LIONMAKER SYSTEMS</span>
+            <span class="urgent-count"><span class="n-urgent">1 URGENT</span><span class="slash">/</span>3</span>
+          </div>
+        </div>
+      </div>
+      <div class="execute-wrap"><button class="btn-primary">▶ EXECUTE</button></div>
+      <div class="muse-fab">●</div>
+    </div>
+    <div class="frame-label">
+      <span class="step">F</span>REST
+      <span class="action">NEW URGENT ROW · ACCENT STAYS</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
