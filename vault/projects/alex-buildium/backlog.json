@@ -39,6 +39,16 @@
       "status": "pending",
       "created": "2026-05-14",
       "urgent": false
+    },
+    {
+      "id": "ab-005",
+      "text": "Test Alex's Hermes agent",
+      "done_condition": null,
+      "category": "In Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
     }
   ]
 }
