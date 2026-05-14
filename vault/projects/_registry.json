@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-05-09",
+  "updated": "2026-05-14",
   "projects": [
     {
       "id": "708-pallister",
@@ -161,6 +161,15 @@
       "folder": "vault/projects/defi-cockpit",
       "aliases": [],
       "note": "Two or three remaining tasks to finish."
+    },
+    {
+      "id": "great-lakes-landscaping",
+      "name": "Great Lakes Landscaping",
+      "status": "active",
+      "priority": 13,
+      "folder": "vault/projects/great-lakes-landscaping",
+      "aliases": [],
+      "note": "New website build, phase one kickoff"
     }
   ]
 }
