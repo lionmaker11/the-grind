@@ -194,18 +194,21 @@ voice → Muse response → task on Board in <10s.
 
 Forward-looking work items committed to V2 ship but not yet placed in a specific phase. Filed here so they survive across sessions and don't get lost in chat history.
 
-### Motion polish — final sweep before V2 ship
+**Motion polish — final sweep before V2 ship.** V2 currently has
+binary state transitions throughout (instant mount/unmount,
+immediate appear/disappear, snap reorders). The app feels rigid.
+A dedicated motion-polish pass smooths every surface as the final
+step before V2 is considered shipped.
 
-V2 currently has binary state transitions throughout (instant mount/unmount, immediate appear/disappear, snap reorders). The app feels rigid. A dedicated motion-polish pass smooths every surface as the final step before V2 is considered shipped.
-
-This is not gamification, not dopamine architecture, just craft. Target: the app flows between states rather than snapping.
+Not gamification, not dopamine architecture, just craft. Target:
+the app flows between states rather than snapping.
 
 Scope (non-exhaustive — to be expanded as surfaces are built):
 - Row fade-out on ✓ tap (~200ms ease-out)
 - Board ↔ Focus transition (currently jarring mount/unmount)
 - Sibling-row settle animation after drag-release
 - Header count number tweens (urgent/total animate up/down rather than swap)
-- Project card expand/collapse if Phase 5b adds Backlog detail modal
+- Project card expand/collapse if Phase 5b adds Backlog detail
 - Onboard step transitions (currently snap between drive-states)
 - Focus surface state transitions once Phase 6 builds the real one
 - Any other surface added in Phase 6, 7, 8 — all in scope for the final sweep
@@ -214,7 +217,8 @@ Timing: AFTER all functional V2 phases ship. This is the last pass before V2 is 
 
 Implementation: CSS transitions + transform animations primarily. Possible useTransition/AnimatePresence-equivalent for Preact if needed for mount/unmount transitions. Low JS-state-machine change.
 
-Not deferred or optional — a commitment for V2 ship. If V2 ships without this pass, V2 isn't fully shipped.
+Not deferred or optional — committed deliverable for V2 ship. If
+V2 ships without this pass, V2 isn't fully shipped.
 
 ## Patterns observed during the build
 
