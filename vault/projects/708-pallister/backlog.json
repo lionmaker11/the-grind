@@ -12,7 +12,19 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 0
+      "order": 0,
+      "priority": 1
+    },
+    {
+      "id": "pal-004",
+      "text": "Verify windows are installed properly",
+      "done_condition": null,
+      "category": null,
+      "estimated_pomodoros": null,
+      "priority": 1,
+      "status": "pending",
+      "created": "2026-04-21",
+      "urgent": true
     },
     {
       "id": "pal-016",
@@ -23,7 +35,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 1
+      "order": 1,
+      "priority": 1
     },
     {
       "id": "pal-014",
@@ -34,7 +47,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 0
+      "order": 0,
+      "priority": 1
     },
     {
       "id": "pal-011",
@@ -45,7 +59,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 0
+      "order": 0,
+      "priority": 2
     },
     {
       "id": "pal-012",
@@ -56,7 +71,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 1
+      "order": 1,
+      "priority": 2
     },
     {
       "id": "pal-013",
@@ -67,7 +83,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 2
+      "order": 2,
+      "priority": 2
     },
     {
       "id": "pal-009",
@@ -78,7 +95,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 0
+      "order": 0,
+      "priority": 2
     },
     {
       "id": "pal-010",
@@ -89,7 +107,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 1
+      "order": 1,
+      "priority": 3
     },
     {
       "id": "pal-008",
@@ -100,7 +119,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 0
+      "order": 0,
+      "priority": 3
     },
     {
       "id": "pal-005",
@@ -111,7 +131,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 0
+      "order": 0,
+      "priority": 3
     },
     {
       "id": "pal-006",
@@ -122,7 +143,8 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 1
+      "order": 1,
+      "priority": 3
     },
     {
       "id": "pal-007",
@@ -133,14 +155,15 @@
       "status": "pending",
       "created": "2026-04-23",
       "urgent": false,
-      "order": 2
+      "order": 2,
+      "priority": 4
     },
     {
       "id": "pal-001",
       "text": "Sam: countertop installer follow-up (14+ days overdue)",
       "done_condition": null,
       "category": "In Business",
-      "priority": 1,
+      "priority": 4,
       "status": "done",
       "created": "2026-04-21",
       "completed": "2026-04-21"
@@ -151,7 +174,7 @@
       "done_condition": null,
       "category": null,
       "estimated_pomodoros": null,
-      "priority": 1,
+      "priority": 4,
       "status": "done",
       "created": "2026-04-21",
       "urgent": true,
@@ -162,22 +185,11 @@
       "text": "Daily contractor check-in with Sam",
       "done_condition": null,
       "category": "In Business",
-      "priority": 2,
+      "priority": 4,
       "status": "done",
       "created": "2026-04-21",
       "recurring": true,
       "completed": "2026-04-21"
-    },
-    {
-      "id": "pal-004",
-      "text": "Verify windows are installed properly",
-      "done_condition": null,
-      "category": null,
-      "estimated_pomodoros": null,
-      "priority": 3,
-      "status": "pending",
-      "created": "2026-04-21",
-      "urgent": true
     },
     {
       "id": "pal-017",
@@ -187,7 +199,8 @@
       "estimated_pomodoros": null,
       "status": "pending",
       "created": "2026-05-10",
-      "urgent": false
+      "urgent": false,
+      "priority": 5
     },
     {
       "id": "pal-018",
@@ -197,7 +210,8 @@
       "estimated_pomodoros": null,
       "status": "pending",
       "created": "2026-05-14",
-      "urgent": false
+      "urgent": false,
+      "priority": 5
     },
     {
       "id": "pal-019",
@@ -207,7 +221,8 @@
       "estimated_pomodoros": null,
       "status": "pending",
       "created": "2026-05-14",
-      "urgent": false
+      "urgent": false,
+      "priority": 5
     }
   ]
 }
