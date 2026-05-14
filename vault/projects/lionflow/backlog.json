@@ -12,6 +12,16 @@
       "status": "pending",
       "created": "2026-05-14",
       "urgent": false
+    },
+    {
+      "id": "lio-002",
+      "text": "Set up GitHub repo for Lionflow",
+      "done_condition": null,
+      "category": "On Business",
+      "estimated_pomodoros": null,
+      "status": "pending",
+      "created": "2026-05-14",
+      "urgent": false
     }
   ]
 }
