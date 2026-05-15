@@ -189,7 +189,7 @@ export default async function handler(req, res) {
   // ── POST ─────────────────────────────────────────────────────────────────
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { op, project_id, task, task_id, priority, order, count, urgent } = req.body || {};
+  const { op, project_id, task, task_id, priority, order, count, urgent, text } = req.body || {};
 
   if (!op || !project_id) return res.status(400).json({ error: 'Missing op or project_id' });
 
@@ -340,6 +340,33 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, task: taskObj });
   }
 
+  // ── update_task_text ─────────────────────────────────────────────────────
+  // Edit a task's text in place. Frontend trims + slices to 200 chars
+  // before sending, but we re-validate server-side to defend against
+  // stale clients and malformed requests. Mirrors op:add's 200-char cap.
+  // Retries with the same text are idempotent.
+  if (op === 'update_task_text') {
+    if (!task_id) return res.status(400).json({ error: 'Missing task_id' });
+    if (text === undefined || text === null) return res.status(400).json({ error: 'Missing text' });
+    if (typeof text !== 'string') return res.status(400).json({ error: 'text must be a string' });
+    const trimmedText = text.trim();
+    if (trimmedText.length === 0) return res.status(400).json({ error: 'Text cannot be empty' });
+    const cleanText = trimmedText.slice(0, 200);
+
+    const taskObj = backlog.tasks.find(t => t.id === task_id);
+    if (!taskObj) return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
+
+    taskObj.text = cleanText;
+
+    const msg = `backlog: edit text on ${task_id} in ${project_id}`;
+    const [result] = await Promise.all([
+      writeBacklog(project_id, backlog, sha, msg),
+      touchRegistry(project_id)
+    ]);
+    if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
+    return res.status(200).json({ ok: true, task: taskObj });
+  }
+
   // ── complete ─────────────────────────────────────────────────────────────
   if (op === 'complete') {
     if (!task_id) return res.status(400).json({ error: 'Missing task_id' });
@@ -361,6 +388,29 @@ export default async function handler(req, res) {
     ]);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true, task: taskObj });
+  }
+
+  // ── delete_task ──────────────────────────────────────────────────────────
+  // Permanently remove a task from the project's task array. Unlike
+  // op:complete (which flips status to 'done' but keeps the task in
+  // vault for history), delete is final. Splice regardless of status —
+  // done tasks aren't surfaced in the modal UI but the op handles them
+  // gracefully without special-casing.
+  if (op === 'delete_task') {
+    if (!task_id) return res.status(400).json({ error: 'Missing task_id' });
+
+    const taskExists = backlog.tasks.some(t => t.id === task_id);
+    if (!taskExists) return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
+
+    backlog.tasks = backlog.tasks.filter(t => t.id !== task_id);
+
+    const msg = `backlog: delete ${task_id} from ${project_id}`;
+    const [result] = await Promise.all([
+      writeBacklog(project_id, backlog, sha, msg),
+      touchRegistry(project_id)
+    ]);
+    if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
+    return res.status(200).json({ ok: true });
   }
 
   // ── reorder ───────────────────────────────────────────────────────────────

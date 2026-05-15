@@ -7,8 +7,9 @@
 //
 // Response shapes mirror the real handlers EXACTLY — see:
 //   - api/backlog.js (GET summary, POST op:add / op:complete / op:reorder
-//                     / op:toggle_urgent — POST handler branches on body.op
-//                     since 5a-8 added Board mutators)
+//                     / op:toggle_urgent / op:update_task_text / op:delete_task
+//                     — POST handler branches on body.op since 5a-8 added
+//                     Board mutators; 5b-2 added the edit + delete ops)
 //   - api/project.js (POST op:add)
 //   - api/chief.js   (POST returns { actions: [...] }; onboarding action has
 //                     type:'extract_onboarding' with { projects, orphan_tasks,
@@ -138,6 +139,31 @@ export async function setupMockBackend(page, options = {}) {
             ok: true,
             task: { id: body.task_id, urgent: body.urgent }
           })
+        });
+        return;
+      }
+      // 5b-2 ops. Mock applies the same trim().slice(0, 200) normalization
+      // the real handler does so test assertions on echoed text match what
+      // production would return — Codex flagged this during 5b-2 review.
+      if (op === 'update_task_text') {
+        const cleanText = typeof body.text === 'string'
+          ? body.text.trim().slice(0, 200)
+          : body.text;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ok: true,
+            task: { id: body.task_id, text: cleanText }
+          })
+        });
+        return;
+      }
+      if (op === 'delete_task') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: true })
         });
         return;
       }
