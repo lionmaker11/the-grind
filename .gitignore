@@ -20,3 +20,6 @@ THE_GRIND_CLAUDE_CODE_PROMPT.md
 
 # Codex / agent review artifacts — kept locally, not tracked
 /v2/reviews/
+
+# Dev Loop Protocol session-handoff state (operational, not source)
+.claude/handoff.md
