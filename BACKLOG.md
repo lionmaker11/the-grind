@@ -37,3 +37,41 @@ Operational backlog for items committed to ship but not yet placed in a specific
   Defensive bounds check in ProjectCard catches the list-shrunk case (partial mitigation). Full fix requires `drag.js` extension (onDragStart callback) which would ripple to OnboardReview — out of scope for 5a-7.
 
   Status: ship-and-revisit — address if wrong-task-reordered behavior surfaces in real use during dogfood. Otherwise revisit Phase 6+ if needed.
+
+## 2026-05-15 — captured during 5b-3 (backlogStore)
+
+- [ ] **Concurrent same-modal mutator rollback can resurrect/undo later mutations** — Codex flagged during 5b-3 Phase 2 review. backlogStore mutators snapshot the whole `tasks` array at start; on failure, they restore the snapshot. If two mutators run concurrently (e.g. `completeTask(A)` removes A and succeeds, then a previously-started `toggleUrgent(A)` fails and restores the older snapshot containing A), the failed rollback resurrects A. Same shape: `editText(A)` followed by `deleteTask(A)` — edit failure can resurrect the deleted task.
+
+  Generation guard added in 5b-3 covers modal-close + project-switch races; this remaining race is concurrent same-modal mutators on overlapping rows. Single-user single-tenant scope makes it low-frequency in practice.
+
+  Fix when surfaced: per-row mutation lock (UI disables actions while in flight) OR patch-based rollback (each mutator records its specific change and reverses just that change on failure, instead of whole-array snapshot restore). Latter is cleaner but ~80 lines of additional defensive code per mutator.
+
+  Status: defer — revisit if observed in dogfood (look for "task that I deleted reappeared" or "edit that I made reverted" reports).
+
+- [ ] **boardStore.fetchBoard out-of-order response race** — Codex 5b-3 Phase 3 flagged. Multiple rapid modal mutations each fire `fetchBoard()`; if response #4 arrives after response #10, the older summary overwrites the newer. Visual result: Board momentarily reverts to an older state. Fix needs request-generation guard inside `fetchBoard()` itself (boardStore module change, not backlogStore).
+
+  Status: defer — backlogStore now sends fetchBoard pings; the race is in fetchBoard's lack of guard. Fix when this surfaces or as part of broader fetch-orchestration cleanup.
+
+- [ ] **fetchBoard sets `loading: true` causing flicker on modal-action sync** — Codex 5b-3 Phase 3 flagged. Each modal save triggers fetchBoard which sets `loading: true`; Board may render skeleton/spinner behind/after the modal. Fix: add `silent: true` option to fetchBoard that skips loading flag for background sync calls. Module change in board.js.
+
+  Status: defer — UX concern only. Verify in dogfood if Board behind modal has visible loading state.
+
+- [ ] **GitHub API request pressure under modal-action spam** — Codex 5b-3 Phase 3 flagged. Each successful modal mutation calls fetchBoard which triggers ~N+1 GitHub Contents API calls (registry + per-project backlog). 10 modal actions × 20 active projects = ~200 reads. No rate-limit hit yet, but worth coalescing. Fix: debounce fetchBoard to fire at most once per N seconds, OR batch-fire after a quiet period.
+
+  Status: defer — single-user dogfood is unlikely to spam at this scale; revisit if rate limits trigger or if Vercel cold-start latency becomes noticeable.
+
+- [ ] **External-mutation invalidation while modal open** — Codex 5b-3 Phase 3 flagged. If Muse files a new task to the project while modal is open, modal's tasks array is stale until close+reopen. Modal mutators and Muse ops can also overwrite each other at the backend (sha-based optimistic concurrency catches conflicts but frontend doesn't refetch on success to discover them).
+
+  Fix: subscribe modal to a server-sent event or poll periodically while open. Simpler: add a "refresh" affordance in the modal header. Simplest: accept the race — modal sessions are short, Muse-while-modal-open is rare.
+
+  Status: defer to dogfood signal. Likely never happens in solo-operator use.
+
+- [ ] **Closed-modal mutation failure swallowed (no user feedback)** — Codex 5b-3 Phase 3 flagged. User taps delete then closes immediately; backend returns 500. Generation guard suppresses the error write. User has no signal that delete failed. Board's fetchBoard fires unconditionally on success but NOT on failure — so the failed mutation's underlying state never surfaces.
+
+  Fix options: (a) write closed-modal failures to boardStore.error (TopBar shows offline indicator); (b) toast notification surface; (c) accept and log via dogfood.
+
+  Status: defer — accept the swallow for now. Watch dogfood for "I deleted that task but it's still there with no error" reports.
+
+- [ ] **Extract assignBucketedPriorities + sortByPriority to lib/sort.js** — Council 4 (5b-3) flagged: same logic now triplicated in `api/_lib/vault.js`, `v2/src/state/board.js`, `v2/src/state/backlog.js`. YAGNI threshold passed at 3. Extract to a shared util when a fourth caller appears (likely Phase 6 Focus surface).
+
+  Status: defer until fourth caller. Note: extraction may want to live in a shared `lib/` accessible to both /api/* (Node) and /v2/src/* (browser bundle), which means picking a path that works for both runtime targets. Currently no shared lib exists — `api/_lib/` is /api/* private, `v2/src/lib/` is bundle private.

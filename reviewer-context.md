@@ -48,7 +48,33 @@ TheGrind V2 rebuild — Preact + Vite + nanostores + vanilla CSS PWA at https://
 
 ## Past Council Members That Added Value
 
-(Empty — auto-populates as Dev Loop runs and councils catch real issues.)
+- **2026-05-15 (5b-3):** Concurrency / Distributed Systems Engineer (adversarial) — caught that the generation guard solves modal-lifecycle races but NOT same-modal concurrent mutator races. Validated Codex Phase 2's deferred concern in concrete UX scenarios. Reinforced the "watch dogfood for resurrected/reverted tasks" trigger.
+- **2026-05-15 (5b-3):** Daily-driver-tool product specialist — escalated the closed-modal silent-failure concern from "deferred" to "5b-6 must surface". Re-seat for any task surface where T.J. uses the tool 10+ times/day.
+- **2026-05-15 (5b-3):** Mobile-Web / iOS Safari specialist — flagged the modal-with-Board-fetching backdrop-filter repaint cost. Re-seat for any modal/overlay work touching iOS Safari.
+- **2026-05-15 (5b-3):** Frontend State Management Architect — flagged the `(args) => Promise<void>` mutator API inconsistency with normal Promise semantics. Decided to live with it (matches Phase 5a-4 boardStore convention).
+
+## Cross-store sync conventions (established 5b-3)
+
+Direction: **modal mutators → fetchBoard()** is the established cross-store sync pattern. Every successful backlogStore mutation calls fetchBoard() unconditionally to propagate to Board's top-3 summary. The generation guard suppresses the modal-store rollback write only — NOT the success-path fetchBoard.
+
+Inverse direction (board → modal) is undefined. If Phase 6's Focus store ever mutates tasks while modal is mounted, it MUST decide whether to:
+  (a) re-fetch backlogStore to refresh the modal
+  (b) accept the modal's stale view until close
+
+Default lean: (b) — modal sessions are short, cross-surface invalidation adds complexity for low-frequency conflict.
+
+## Dogfood watch list (5b-3 council deferrals)
+
+Watch for these reports during single-user dogfood; if any surfaces, the listed BACKLOG item triggers:
+
+- **"Task I deleted came back"** OR **"Edit I made reverted"** → triggers concurrent-mutator-rollback fix (per-row lock or patch-based rollback). BACKLOG item.
+- **"Modal scrolling is janky on iPhone"** OR **"Board flickered while I was editing"** → triggers fetchBoard debouncing + iOS profiling. BACKLOG item (loading flicker + GitHub API pressure entries).
+- **"I deleted a task and there was no error but it stayed there"** → triggers closed-modal-failure surfacing (boardStore.error, toast, or inline retry). BACKLOG item.
+- **"I made an edit and it never saved"** → 5b-6 implementation must surface save-failure visibly. NOT a BACKLOG item; this is a hard requirement for 5b-6 spec implementation.
+
+## Pattern promotion candidates
+
+- **`assignBucketedPriorities` / `sortByPriority` triplication** — same logic now duplicated in `api/_lib/vault.js`, `v2/src/state/board.js`, and `v2/src/state/backlog.js`. Three copies of bucket math + urgent-first sort. YAGNI threshold passed. Promote to `v2/src/lib/sort.js` when a fourth caller appears (likely Phase 6 Focus surface). Logged as a backlog item below.
 
 ## Things Previous Reviews Have Caught
 
@@ -62,5 +88,11 @@ Pre-Dev-Loop history (worth remembering even though not formally captured by the
 - **2026-05-14 (5b-2 codex):** Mock backend echoed raw `body.text` for `op:update_task_text` without applying real backend's `trim().slice(0,200)` normalization. Tests would pass against behavior real backend won't deliver. Fix applied. Pattern: mock branches must mirror real-handler normalization.
 
 (Auto-learning entries from Dev Loop Phase 5 will append below this line going forward.)
+
+- 2026-05-15: optimistic-mutator generation guard pattern — needed for any nanostore that fans out to multiple components AND has async mutators that can outlive the modal/surface lifecycle. Caught by Codex adversarial review (5b-3 Phase 3).
+- 2026-05-15: success-path cross-store sync should NOT inherit modal-lifecycle generation guards — backend committed regardless of modal state, so other stores need to learn. Caught by Codex adversarial review (5b-3 Phase 3).
+- 2026-05-15: optimistic reorder MUST mirror backend priority-rewriting, otherwise subsequent local sorts re-shuffle dragged tasks back. Caught by Codex standard review (5b-3 Phase 2).
+- 2026-05-15: drag-layer contract should be documented in the receiving store, not just the drag.js implementation — prevents downstream sub-steps from constructing malformed payloads. Caught by Concurrency Engineer (5b-3 council).
+- 2026-05-15: closed-modal silent failure of destructive ops needs UI-level surface in the implementing component, not just store-level error setting — a 30x/day tool loses trust after 2-3 silent failures. Caught by Daily-driver-tool product specialist (5b-3 council).
 
 ---

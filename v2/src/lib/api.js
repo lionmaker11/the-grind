@@ -56,6 +56,13 @@ async function postJson(url, payload) {
 
 export const getBacklog = () => getJson('/api/backlog');
 
+// Fetch a single project's full backlog (used by Phase 5b backlog detail
+// modal). Returns { backlog: { schema_version, project_id, project_name,
+// tasks: [...] } } on success; throws on 404 or transport error. Distinct
+// from getBacklog() which returns the multi-project summary used by Board.
+export const getProjectBacklog = (projectId) =>
+  getJson(`/api/backlog?project_id=${encodeURIComponent(projectId)}`);
+
 // ─── muse ──────────────────────────────────────────────────────────────
 
 export function postChief({ message, conversation = [], firstTurnToday = false, mode = 'muse' }) {
