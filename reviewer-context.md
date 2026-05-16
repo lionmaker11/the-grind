@@ -73,9 +73,9 @@ Watch for these reports during single-user dogfood; if any surfaces, the listed 
 - **"I made an edit and it never saved"** → 5b-6 implementation must surface save-failure visibly. NOT a BACKLOG item; this is a hard requirement for 5b-6 spec implementation.
 - **"Muse FAB covers stuff in the backlog modal"** OR **"I keep tapping Muse by accident in the modal"** → triggers Muse-FAB hide-while-modal-open decision. Currently kept mounted per voice-first principle (Codex 5b-4 standard review flagged); flip to `!isActive && !openProjectId && <Muse />` in app.jsx if overlap surfaces. The bottom-right corner of the modal is where mockup 23 places the `+ ADD TASK` affordance (5b-5+ scope) — overlap with FAB is plausible.
 
-## 5b-9 phone test agenda (5b-5 council forwards)
+## 5b-10 phone test agenda (compiled during 5b-5 → 5b-7 Dev Loop cycles)
 
-The phone test session at 5b-9 must explicitly verify these scenarios surfaced by 5b-5 council/codex:
+The phone test session at **5b-10** (compiled across 5b-5 / 5b-6 / 5b-7 council deliberations + Codex flags; consolidated into phase5b-status.md during 5b-9) must explicitly verify these scenarios:
 
 1. **Drag-handle scroll-blocking on left rail.** Thumb-scroll the modal body starting from the left edge of any row. Drag handle has `touch-action: none`. Does scroll work or does drag engage? If drag engages on attempted scroll, fix needed (likely drag.js engagement threshold bump).
 2. **Right-edge delete mis-tap during scroll.** Scroll the modal body, observe if × button at row's right edge triggers from finger movement near it. iPhone with bumper case especially.
@@ -154,5 +154,7 @@ Pre-Dev-Loop history (worth remembering even though not formally captured by the
 - 2026-05-15: render conditionals using truthy `error` to gate the entire UI region can swallow row-level error UIs that depend on the region being rendered. Pattern: gate top-level error display on `error && tasks.length === 0` (i.e., only on initial-load failure), let row-level errors handle in-list mutation failures via component state. Caught by 5b-8 test writing — test 10 (save-failed retry) failed because store.error was set by editText rollback, hiding the BacklogList that would have rendered the row-level retry button.
 - 2026-05-15: error states should preserve enough context for the user to know WHICH thing failed. After openProject 404, store had openProjectId set but projectName was blank — modal showed "..." with no clue about the failed project. Fix: setKey('projectName', projectId) in catch path. Caught by 5b-8 test 12 surfacing the UX gap.
 - 2026-05-15: drag suppression via pointer-events:none doesn't prevent input blur — mouse events at suppressed handle coords land on the row/modal underneath, which IS outside the focused input → blur fires → commit. Net effect: drag is blocked AS INTENDED, edit gets committed via blur, no rollback race because no reorder happened. User-intent ambiguity (edit + drag simultaneously) resolves cleanly in favor of edit. Test surfaced the actual contract through iteration. Caught by 5b-8 Phase 3 test rewrite.
+- 2026-05-15: status documents written from memory get numerical claims wrong — bundle "growth ~9KB JS / ~7KB CSS" was actually ~2KB / ~1KB. Compute deltas explicitly from the prior status doc baseline rather than estimating. Caught by Codex 5b-9 Phase 3.
+- 2026-05-15: status documents should hedge unverified facts rather than presenting them as concrete — "preview URL is X" should be "TBD; run vercel ls" if the deployment hasn't happened. Caught by Codex 5b-9 Phase 3.
 
 ---
