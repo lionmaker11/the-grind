@@ -175,9 +175,13 @@ export async function openProject(projectId) {
   } catch (e) {
     if (myGen !== generation) return; // generation expired
     // Keep openProjectId set so the modal stays mounted with an error
-    // message rather than dismissing without explanation.
+    // message rather than dismissing without explanation. Set
+    // projectName to projectId as a fallback so the modal header
+    // shows context ("Project not found: foo-bar") rather than the
+    // bare "..." placeholder. Codex 5b-8 Phase 3 flagged this UX gap.
     backlogStore.setKey('loading', false);
     backlogStore.setKey('error', String(e?.message || e));
+    backlogStore.setKey('projectName', projectId);
   }
 }
 

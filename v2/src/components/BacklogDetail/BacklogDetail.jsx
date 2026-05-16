@@ -66,7 +66,14 @@ export function BacklogDetail() {
           </div>
         )}
 
-        {!loading && error && (
+        {/* Modal-level error renders ONLY when there are no tasks to show
+            (i.e., openProject() itself failed — 404, fetch error, etc).
+            When tasks exist + a mutation later fails, the row-level
+            save-failed state (5b-6) handles surfacing per affected row;
+            we keep the list rendered so users can see + recover.
+            5b-8 found that gating the list on `!error` swallowed the
+            row-level error UI when an editText rollback set store.error. */}
+        {!loading && error && tasks.length === 0 && (
           <div class="backlog-modal-error" data-testid="backlog-modal-error">
             <div class="backlog-modal-error-label">// ERROR</div>
             <div class="backlog-modal-error-message">{error}</div>
@@ -79,7 +86,7 @@ export function BacklogDetail() {
           </div>
         )}
 
-        {!loading && !error && tasks.length > 0 && <BacklogList />}
+        {!loading && tasks.length > 0 && <BacklogList />}
       </div>
     </main>
   );

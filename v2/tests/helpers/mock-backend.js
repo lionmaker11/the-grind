@@ -6,10 +6,13 @@
 // with X then Y" or "backlog got 3 POSTs for project A and 1 for B".
 //
 // Response shapes mirror the real handlers EXACTLY — see:
-//   - api/backlog.js (GET summary, POST op:add / op:complete / op:reorder
-//                     / op:toggle_urgent / op:update_task_text / op:delete_task
-//                     — POST handler branches on body.op since 5a-8 added
-//                     Board mutators; 5b-2 added the edit + delete ops)
+//   - api/backlog.js (GET summary OR GET ?project_id=X full backlog;
+//                     POST op:add / op:complete / op:reorder /
+//                     op:toggle_urgent / op:update_task_text /
+//                     op:delete_task — POST handler branches on body.op
+//                     since 5a-8 added Board mutators; 5b-2 added edit
+//                     + delete ops; 5b-8 added project_id GET path for
+//                     backlogStore.openProject)
 //   - api/project.js (POST op:add)
 //   - api/chief.js   (POST returns { actions: [...] }; onboarding action has
 //                     type:'extract_onboarding' with { projects, orphan_tasks,
@@ -38,7 +41,13 @@ const DEFAULT_EXTRACTION = { projects: [], orphan_tasks: [] };
 
 /**
  * @typedef {Object} MockBackendOptions
- * @property {Object} [registry]   — GET /api/backlog response. Defaults to { summary: [] }.
+ * @property {Object} [registry]   — GET /api/backlog response (no project_id). Defaults to { summary: [] }.
+ * @property {Object<string, Object>} [backlogs]
+ *   Map of project_id → full-backlog response payload, used by GET
+ *   /api/backlog?project_id=X (Phase 5b-3 backlogStore.openProject).
+ *   Each value should be the inner backlog object: { schema_version,
+ *   project_id, project_name, tasks: [...] }. Mock wraps it as
+ *   { backlog: <value> } per real handler. Missing project_id → 404.
  * @property {string[]} [transcripts]
  *   Array of transcript strings returned by sequential POST /api/transcribe
  *   calls. Index 0 = capture, index 1 = clarify. If the array is exhausted
@@ -63,6 +72,10 @@ const DEFAULT_EXTRACTION = { projects: [], orphan_tasks: [] };
  *   If POST /api/backlog comes in with this task text (case-sensitive),
  *   return 500. Used for partial-commit scenarios involving task-level
  *   failures (optional; may be unused by Gate 2).
+ * @property {string} [backlogEditFailOnText]
+ *   If POST /api/backlog op:update_task_text comes in with this exact
+ *   text (case-sensitive, post-trim), return 500. Used by 5b-8 to
+ *   exercise the save-failed row state introduced in 5b-6.
  */
 
 /**
@@ -82,21 +95,45 @@ const DEFAULT_EXTRACTION = { projects: [], orphan_tasks: [] };
  */
 export async function setupMockBackend(page, options = {}) {
   const registry = options.registry || { summary: [] };
+  const backlogs = options.backlogs || {};
   const transcripts = options.transcripts || [''];
   const transcribeFailOn = new Set(options.transcribeFailOn || []);
   const extraction = options.extraction || DEFAULT_EXTRACTION;
   const clarifyResolve = options.extractionClarifyThenResolve || null;
   const projectFail = options.projectAddFailOnName || null;
   const backlogFail = options.backlogAddFailOnText || null;
+  const editFail = options.backlogEditFailOnText || null;
   const projectFailedOnce = new Set();
 
   const capture = { chief: [], transcribe: [], projects: [], backlog: [] };
 
-  // GET /api/backlog (no project_id) → registry summary.
-  // POST /api/backlog → add task (returns { ok: true, task: {...} }).
+  // GET /api/backlog → registry summary (no project_id) OR full
+  //   per-project backlog (with project_id, used by 5b-3 backlogStore).
+  // POST /api/backlog → branches on body.op (5a-4 mutators + 5b-2 ops).
   await page.route('**/api/backlog**', async (route) => {
     const req = route.request();
     if (req.method() === 'GET') {
+      const url = new URL(req.url());
+      const projectId = url.searchParams.get('project_id');
+      if (projectId) {
+        // Single-project full backlog response per 5b-3 contract.
+        const backlog = backlogs[projectId];
+        if (!backlog) {
+          await route.fulfill({
+            status: 404,
+            contentType: 'application/json',
+            body: JSON.stringify({ error: `Unknown project: ${projectId}` })
+          });
+          return;
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ backlog })
+        });
+        return;
+      }
+      // Summary response (existing).
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -149,6 +186,17 @@ export async function setupMockBackend(page, options = {}) {
         const cleanText = typeof body.text === 'string'
           ? body.text.trim().slice(0, 200)
           : body.text;
+        // Test-only failure trigger: if backlogEditFailOnText was supplied
+        // and matches, return 500 to exercise the save-failed row state
+        // introduced in 5b-6.
+        if (editFail && cleanText === editFail) {
+          await route.fulfill({
+            status: 500,
+            contentType: 'application/json',
+            body: '{"error":"mock edit fail"}'
+          });
+          return;
+        }
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
