@@ -229,7 +229,17 @@ export async function completeTask(taskId) {
   const myGen = generation;
   const snapshot = before.tasks;
 
-  const optimistic = snapshot.filter(t => t.id !== taskId);
+  // Recurring daily tasks stay pending in vault per api/backlog.js
+  // op:complete (line 350-352). Backend stamps last_completed without
+  // flipping status. Optimistic filter MUST NOT remove recurring tasks
+  // or they'll vanish from the modal until next fetch — Codex 5b-5
+  // Phase 3 flagged as user-visible bug (real recurring task exists
+  // at vault/projects/fitness/fit-001).
+  const targetTask = snapshot.find(t => t.id === taskId);
+  const isRecurring = targetTask?.recurring === 'daily';
+  const optimistic = isRecurring
+    ? snapshot // recurring task stays visible; backend stamps last_completed
+    : snapshot.filter(t => t.id !== taskId);
   const { taskCount, urgentCount } = deriveCounts(optimistic);
   backlogStore.set({
     ...before,

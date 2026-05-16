@@ -126,8 +126,7 @@
 }
 
 .backlog-modal-loading,
-.backlog-modal-empty,
-.backlog-modal-list-stub {
+.backlog-modal-empty {
   font-family: var(--font-mono);
   font-size: var(--t-sm);
   letter-spacing: 2px;

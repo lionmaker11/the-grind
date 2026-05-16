@@ -73,6 +73,18 @@ Watch for these reports during single-user dogfood; if any surfaces, the listed 
 - **"I made an edit and it never saved"** → 5b-6 implementation must surface save-failure visibly. NOT a BACKLOG item; this is a hard requirement for 5b-6 spec implementation.
 - **"Muse FAB covers stuff in the backlog modal"** OR **"I keep tapping Muse by accident in the modal"** → triggers Muse-FAB hide-while-modal-open decision. Currently kept mounted per voice-first principle (Codex 5b-4 standard review flagged); flip to `!isActive && !openProjectId && <Muse />` in app.jsx if overlap surfaces. The bottom-right corner of the modal is where mockup 23 places the `+ ADD TASK` affordance (5b-5+ scope) — overlap with FAB is plausible.
 
+## 5b-9 phone test agenda (5b-5 council forwards)
+
+The phone test session at 5b-9 must explicitly verify these scenarios surfaced by 5b-5 council/codex:
+
+1. **Drag-handle scroll-blocking on left rail.** Thumb-scroll the modal body starting from the left edge of any row. Drag handle has `touch-action: none`. Does scroll work or does drag engage? If drag engages on attempted scroll, fix needed (likely drag.js engagement threshold bump).
+2. **Right-edge delete mis-tap during scroll.** Scroll the modal body, observe if × button at row's right edge triggers from finger movement near it. iPhone with bumper case especially.
+3. **Multi-touch reorder behavior.** Intentionally drag URGENT row with one finger AND NORMAL row with another finger simultaneously. Do both controllers fire? Does backend handle the race? Theoretical scenario — only test if T.J. naturally encounters; don't engineer.
+4. **Recurring task ✓ feedback gap.** Tap ✓ on fit-001 in the fitness project's modal. Row stays visible (fix landed). Does the absence of any visual feedback confuse? If yes, add brief flash/highlight band-aid (5 lines CSS) per Domain Expert recommendation; if no, defer to designed recurring-task UX.
+5. **Resurrection scenario (concurrent mutator rollback).** Open modal with 3+ tasks. Throttle network in iOS Safari devtools (or actually be on flaky cellular). Tap ✓ on task A, within ~300ms tap × on task B. If A's request fails while B's succeeds (or vice versa), does the failed one's whole-snapshot rollback resurrect the other? If yes — concurrent-mutator BACKLOG item triggers; implement patch-based rollback (~80 lines).
+6. **drag.js mixed-height row drop accuracy.** Drag a 1-line row past several 2-line rows. Verify drop position matches finger visual position, not skipping 2 slots.
+7. **500-task perf.** Synthesize a 500-task fixture (vault edit acceptable; revert after). Open modal. Profile scroll, drag, render. If jank surfaces, virtualization fix needed.
+
 ## Pattern promotion candidates
 
 - **`assignBucketedPriorities` / `sortByPriority` triplication** — same logic now duplicated in `api/_lib/vault.js`, `v2/src/state/board.js`, and `v2/src/state/backlog.js`. Three copies of bucket math + urgent-first sort. YAGNI threshold passed. Promote to `v2/src/lib/sort.js` when a fourth caller appears (likely Phase 6 Focus surface). Logged as a backlog item below.
@@ -80,6 +92,19 @@ Watch for these reports during single-user dogfood; if any surfaces, the listed 
 - **Modal overlay pattern (Focus, BacklogDetail, MuseSheet, OnboardExitConfirm)** — `position: fixed; inset: 0; height: 100vh; height: 100dvh; z-index: N; padding-top: var(--top-bar-h); background: var(--bg);` is now established across 4 surfaces. Reusable as a CSS class `.modal-overlay` or a component primitive when a 5th surface lands.
 
   **IMPORTANT (Accessibility Engineer, 5b-4 council):** A11y deferrals are NOT part of the reusable pattern. Each new modal surface must re-decide: focus management on mount/close, Escape handler, inert background for assistive tech, aria-live for dynamic counts. BacklogDetail ships these as deferred per voice-first + iPhone-only context; do NOT copy the deferral by default when implementing a new modal surface.
+
+## Modal-Board visual parity (established 5b-5)
+
+Drag and long-press visuals on BacklogDetail modal are INTENTIONALLY identical to Board's drag and long-press visuals as of 5b-5:
+- Both surfaces: translateY drag with `.dragging` class (cyan glow + shadow + bg)
+- Both surfaces: `.longpress-active` amber outline during hold (no filling ring)
+- Both surfaces: no ghost-row placeholder at drag origin (drag.js doesn't render it)
+
+Spec Decision 10 originally aspired to ship ghost-row + amber-ring on modal-only in Phase 5b. Technical reality: implementing required either (a) extending drag.js + longpress.js with rendering callbacks that ripple to Board's controllers, or (b) hand-rolling parallel controllers for modal. Either path exceeded 5b-5 scope per Solo-operator velocity.
+
+Both deferred to motion-polish sweep, landing simultaneously on Board + modal. Result: V2's first dogfood-ready BacklogDetail has visually consistent drag/longpress with Board, NOT mockup-33-fidelity. This is a feature: one mental model across surfaces.
+
+Mockup 33's ghost-row + amber-ring fidelity should NOT be a 5b-9 phone test expectation. Future motion-polish sweep delivers them.
 
 ## Stacked-surface lifecycle ownership (established 5b-4)
 
@@ -113,5 +138,8 @@ Pre-Dev-Loop history (worth remembering even though not formally captured by the
 - 2026-05-15: dev-override URL params (?force-onboard, ?force-backlog) need explicit cross-flag guards — independent useEffects can race and create hidden-modal-behind-other-modal state. Caught by Codex adversarial review (5b-4 Phase 3).
 - 2026-05-15: a non-fetching `clear*()` variant of a store's `close()` is the right primitive when another store's lifecycle needs to orchestrate clearance without triggering side effects. Pattern: `close()` for user-initiated dismissal (may fetchBoard); `clearBacklog()` for lifecycle-orchestrated dismissal (no side effects). Caught by State Lifecycle Architect (5b-4 council).
 - 2026-05-15: modal pattern is reusable as CSS/component primitive, but a11y deferrals (focus management, Escape, inert background, aria-live) are explicitly NOT part of the reusable pattern — each new modal surface must re-decide. Caught by Accessibility Engineer (5b-4 council).
+- 2026-05-15: recurring task semantic (vault stores `recurring: "daily"`, backend keeps status pending + stamps last_completed, frontend optimistic filter must NOT remove these or row disappears-then-reappears) — overlooked in initial implementation; verified real fit-001 recurring task exists in vault. Caught by Codex adversarial review (5b-5 Phase 3). Same bug exists in boardStore.completeTask — logged for separate fix.
+- 2026-05-15: drag controller onReorder callbacks should read CURRENT store state at release time, not closed-over render-time arrays. Mirrors Board's ProjectCard pattern. Reduces stale-closure risk from non-id mutations that don't trigger controller rebuild. Caught by Codex adversarial review (5b-5 Phase 3).
+- 2026-05-15: per-section drag controllers (one per URGENT, one per NORMAL) with full-list-payload construction is the right pattern for grouped lists where cross-section moves happen via separate gesture (long-press) rather than drag. Caught by 5b-5 implementation pass.
 
 ---

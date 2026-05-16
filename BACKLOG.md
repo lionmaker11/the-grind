@@ -107,3 +107,71 @@ Operational backlog for items committed to ship but not yet placed in a specific
   Related to existing dogfood watch entry ("Muse FAB covers stuff in modal"). If the Muse-FAB-hide decision lands, this stacked-modal issue resolves as a side effect.
 
   Status: defer — same root cause as the FAB-overlap dogfood entry.
+
+## 2026-05-15 — captured during 5b-5 (TaskRow inside BacklogDetail)
+
+- [ ] **drag.js mixed-height row drop-index inaccuracy** — Codex 5b-5 Phase 2 flagged. `lib/drag.js` measures only the dragged row's height (line 138) and computes `toIdx` via `Math.round(delta / drag.rowHeight)` (line 163), assuming uniform row heights. Backlog detail rows wrap to 2 lines via `.wrap2` class, so a short row dragged through tall rows can skip slots earlier than the visual midpoint suggests.
+
+  Pre-existing drag.js limitation; affects Board too but is more visible in modal where rows tend to be longer text. Fix: extend drag.js to use actual element bounding rects per row instead of the uniform assumption.
+
+  Status: defer — library work, not 5b-5 scope. Verify in 5b-9 phone test on iPhone with mixed-length tasks; if dogfood signals "wrong row moved" reports, prioritize.
+
+- [ ] **longpress.js timer can fire on detached element** — Codex 5b-5 Phase 2 flagged. `lib/longpress.js` has no destroy hook (line 86 acknowledges this); timer set on pointerdown can fire after the row unmounts (e.g. concurrent complete/delete removes the row mid-hold, or modal closes mid-hold).
+
+  Scenario: user holds task text while another action removes the row → spurious `toggleUrgent(missingTaskId)` → backend 404 → store error state. Same class as the deferred concurrent same-modal mutator rollback issue.
+
+  Fix when surfaced: add destroy hook to longpress.js, call from BacklogTaskRow unmount via useEffect cleanup. Or accept and rely on backend 404 + frontend rollback handling.
+
+  Status: defer — low-frequency in single-user single-tenant use. Variant of the existing "Concurrent same-modal mutator rollback" BACKLOG entry.
+
+- [ ] **Modal-only ghost-row drop indicator (mockup 33 spec)** — Spec Decision 10 aspirational: "Mockup 33's drag/longpress storyboards (ghost-slot at drag origin, amber longpress-ring 1.2s fill) apply to both Board and modal, but Phase 5b ships them on modal only."
+
+  Technical reality: `lib/drag.js` does not currently render a placeholder element at the drag origin (it translates the dragged row visually but the original DOM slot still contains the row). Implementing ghost-row requires either:
+  - Extending drag.js with optional `renderPlaceholder` callback (ripples to Board's controller; gated by per-call option so Board behavior unchanged unless opted in)
+  - Hand-rolling a parallel drag controller for the modal
+
+  Both options exceed 5b-5 scope per Solo-operator velocity. Defer to motion-polish sweep where ghost-row + Board parity land together.
+
+  Status: defer to motion-polish sweep. Existing drag visual (translateY + .dragging class with cyan glow) provides functional drag feedback without the ghost-row.
+
+- [ ] **Modal-only amber longpress-ring (mockup 33 spec)** — Companion to the ghost-row item above. Mockup 33 shows a 36×36 amber ring filling around the long-press target over 1.2s. `lib/longpress.js` currently fires only at 500ms with no visual progress indicator (just adds `.longpress-active` class for outline feedback).
+
+  Implementing requires extending longpress.js with progress callback or hand-rolling the ring in BacklogTaskRow (setInterval/raf updating a CSS conic-gradient or SVG arc).
+
+  Status: defer to motion-polish sweep. Existing `.longpress-active` amber outline provides adequate feedback for functional gesture confirmation.
+
+- [ ] **boardStore.completeTask has the same recurring-task filter bug as backlogStore had** — Codex 5b-5 Phase 3 surfaced the bug in backlogStore (fixed); same pattern exists in `v2/src/state/board.js` completeTask. When user completes a daily recurring task from Board's top-3, the optimistic update removes it from top[]; backend keeps it pending (stamps last_completed only); next fetchBoard re-includes it. User sees it disappear then come back.
+
+  Fix: mirror backlogStore's `isRecurring` check in boardStore.completeTask. Keep recurring tasks in top[] optimistically; don't decrement task_count.
+
+  Status: pre-existing bug, not in 5b-5 scope. Fix in a focused boardStore commit OR fold into motion-polish sweep when recurring-task UX is designed properly.
+
+- [ ] **Recurring task done-today visual indicator in modal + Board** — Frontend fix above keeps recurring tasks visible after completion. But the user has no visual signal that their tap registered. Backend stamps `last_completed = today`; frontend could compare to today's date and render a "✓ DONE TODAY" indicator on the row.
+
+  Requires CSS rule + small markup addition to BacklogTaskRow (and Board TaskRow when that fix lands). Plus a `today()` helper or date-fns dependency.
+
+  Status: defer — UX design needed. Recurring-task workflow hasn't been formally designed in the V2 spec set. Could pair with the boardStore fix above.
+
+- [ ] **Concurrent same-modal mutator rollback — RE-RATED severity** — Originally logged in 5b-3 as low-frequency-in-practice. Codex 5b-5 Phase 3 argued that 5b-5's rapid check/delete row controls make this LESS rare: user can easily tap completeTask on row A then deleteTask on row B in ~300ms window. If one succeeds and one fails, snapshot-based rollback resurrects the other.
+
+  Single-user single-tenant context still bounds the issue (one finger, one tap at a time), but the window is wider than 5b-3 estimated. Watch dogfood especially closely during 5b-9 phone test — if T.J. reports "I completed/deleted something and it came back," prioritize per-row mutation lock or patch-based rollback fix.
+
+  Status: dogfood-watch priority elevated. Still deferred until signal.
+
+- [ ] **In-flight drag silently canceled if section membership changes** — Codex 5b-5 Phase 3 flagged. `BacklogList` rebuilds urgent/normal drag controllers when section id lists change. If a separate mutator (long-press toggle on another row, complete/delete on another row) changes section membership mid-drag, the old controller is destroyed and the user's pointer-down is orphaned. Drag doesn't corrupt state — it just dies; user lifts finger and re-drags.
+
+  Fix would require persistent controllers across re-renders OR pausing section rebuilds while drag is active.
+
+  Status: defer — behavioral concern only, not data corruption. Low-frequency in single-user. Revisit if dogfood reports "drag stopped working mid-action."
+
+- [ ] **`.join(',')` useMemo dep collision with comma-in-id schemes** — Codex 5b-5 Phase 3 noted: current ids are `<prefix>-NNN` (no commas) so the stringified dep is safe. If future id scheme allows commas (e.g. user-named ids), `['a,b', 'c']` and `['a', 'b,c']` would both stringify to `a,b,c`, skipping a needed controller rebuild.
+
+  Fix when relevant: switch to `JSON.stringify(ids)` or use a delimiter impossible in ids (e.g. `'\x00'`).
+
+  Status: defer — current id scheme is safe. Add to checklist when next id format change is proposed.
+
+- [ ] **500-task backlog performance on iPhone** — Codex 5b-5 Phase 3 noted: every render filters tasks twice, maps all rows, recreates dep strings, drag controllers track refs. No virtualization. iPhone rendering performance at 500 rows untested. Current largest project is ~20 tasks.
+
+  Fix if needed: virtualized list (react-window equivalent for Preact) OR pagination ("show all" affordance with lazy-render in batches of 50).
+
+  Status: 5b-9 phone test verification. Defer until profile shows actual jank.

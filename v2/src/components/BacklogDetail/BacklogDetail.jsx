@@ -24,6 +24,7 @@
 
 import { useStore } from '@nanostores/preact';
 import { backlogStore, close } from '../../state/backlog.js';
+import { BacklogList } from './BacklogList.jsx';
 import './BacklogDetail.css';
 
 export function BacklogDetail() {
@@ -78,11 +79,7 @@ export function BacklogDetail() {
           </div>
         )}
 
-        {!loading && !error && tasks.length > 0 && (
-          <div class="backlog-modal-list-stub" data-testid="backlog-modal-list-stub">
-            // TASK LIST — PHASE 5b-5 ({tasks.length} pending)
-          </div>
-        )}
+        {!loading && !error && tasks.length > 0 && <BacklogList />}
       </div>
     </main>
   );
