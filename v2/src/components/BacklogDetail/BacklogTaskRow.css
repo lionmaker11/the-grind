@@ -61,6 +61,17 @@
 .backlog-task-row .backlog-task-drag:hover { color: var(--cyan); }
 .backlog-task-row.dragging .backlog-task-drag { color: var(--cyan); cursor: grabbing; }
 
+/* While editing, suppress drag on this row to prevent the drag+edit
+   rollback race (Codex 5b-6 Phase 3 flagged): blur-on-pointerdown
+   commits edit, drag fires reorder, if edit fails the snapshot
+   rollback can undo the reorder. pointer-events:none on the handle
+   blocks the drag controller from receiving pointerdown. Visual cue:
+   handle dims to match other disabled affordances during edit. */
+.backlog-task-row .backlog-task-drag.editing-suppressed {
+  pointer-events: none;
+  opacity: 0.35;
+}
+
 /* Task text — middle column. iOS Safari text-selection menu
    suppressed per Phase 5a-10 lesson on long-press targets. */
 .backlog-task-row .backlog-task-text {
@@ -118,6 +129,109 @@
 .backlog-task-row .btn-icon.delete:hover {
   color: var(--red);
   text-shadow: 0 0 6px var(--red-glow);
+}
+
+/* Disabled state — applied while editing (5b-6) to prevent the
+   concurrent-mutator rollback race from edit→check or edit→delete
+   sequences. User must commit/cancel edit (Enter / Esc / blur) before
+   destructive actions on the same row. */
+.backlog-task-row .btn-icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.backlog-task-row .btn-icon:disabled:hover {
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+/* ── Edit mode (5b-6) ────────────────────────────────────────── */
+/* Tap on .backlog-task-text swaps text div for this input. Cyan
+   accent indicates "editing" state. Same font/size/weight as the
+   text div so the swap feels stable in place. */
+.backlog-task-row .backlog-task-input {
+  grid-column: 2;
+  align-self: center;
+  width: 100%;
+  /* box-sizing: border-box + min-width: 0 prevent overflow of the
+     grid cell. Without border-box, width:100% + horizontal padding +
+     border would push beyond grid column width and collide with the
+     actions column. min-width:0 lets flex/grid children shrink below
+     their content's intrinsic min-width (input's preferred width is
+     based on size attribute, defaulting too wide). Codex 5b-6 flagged. */
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--s-2) var(--s-3);
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  /* iOS Safari prevents zoom-on-focus only if font-size >= 16px.
+     var(--t-base) is 0.9rem = ~14.4px which would trigger zoom.
+     Bump to 16px explicitly on input only; visual difference vs
+     surrounding text is negligible at this size. */
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--text);
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid var(--cyan);
+  border-radius: var(--r-sm);
+  outline: none;
+  box-shadow: 0 0 8px var(--cyan-dim);
+}
+
+.backlog-task-row .backlog-task-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+
+/* ── Save-failed state (5b-6) ────────────────────────────────── */
+/* Per Daily-driver-tool hard requirement (reviewer-context.md):
+   save failures surface visibly at the row level when modal is
+   still open. Red border + retry button gives clear signal +
+   recovery path. */
+.backlog-task-row.save-failed {
+  border-color: var(--red);
+  background: rgba(255, 0, 60, 0.04);
+}
+
+.backlog-task-row.save-failed::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--red);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--red-glow);
+}
+
+.backlog-task-row .backlog-task-retry {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  align-self: stretch;
+  margin: 0 var(--s-2) var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--red);
+  border-radius: var(--r-sm);
+  background: rgba(255, 0, 60, 0.08);
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-shadow: 0 0 6px var(--red-glow);
+}
+
+.backlog-task-row .backlog-task-retry:hover {
+  background: rgba(255, 0, 60, 0.14);
+}
+
+/* Save-failed rows need an explicit grid layout addition: retry
+   button lives on a second row spanning all columns. Add row track
+   to the grid when .save-failed is present. */
+.backlog-task-row.save-failed {
+  grid-template-rows: auto auto;
 }
 
 /* Urgent state — amber left rail ON the row + amber-tinted handle

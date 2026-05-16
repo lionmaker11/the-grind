@@ -371,9 +371,14 @@ export async function reorder(newOrderIds) {
   }
 }
 
+// Returns Promise<{ ok: true } | { ok: false, error: string }>.
+// Phase 5b-6 needs the outcome to render row-level save-failure state
+// per Daily-driver-tool hard requirement (reviewer-context.md). Other
+// mutators (complete, toggleUrgent, delete, reorder) currently return
+// void — consistency upgrade is deferred to a future refactor.
 export async function editText(taskId, newText) {
   const before = backlogStore.get();
-  if (!before.openProjectId) return;
+  if (!before.openProjectId) return { ok: false, error: 'No project open' };
   const projectId = before.openProjectId;
   const myGen = generation;
   const snapshot = before.tasks;
@@ -383,7 +388,7 @@ export async function editText(taskId, newText) {
   // re-validates regardless; pre-normalizing here keeps optimistic
   // state matching what the server will store.
   const cleanText = String(newText || '').trim().slice(0, 200);
-  if (cleanText.length === 0) return; // bail silently — caller should guard
+  if (cleanText.length === 0) return { ok: false, error: 'Empty text' };
 
   const optimistic = snapshot.map(t =>
     t.id === taskId ? { ...t, text: cleanText } : t
@@ -403,13 +408,16 @@ export async function editText(taskId, newText) {
       text: cleanText
     });
     fetchBoard(); // unconditional cross-store sync — see completeTask comment
+    return { ok: true };
   } catch (e) {
-    if (myGen !== generation) return;
+    const errorMessage = String(e?.message || e);
+    if (myGen !== generation) return { ok: false, error: errorMessage };
     backlogStore.set({
       ...backlogStore.get(),
       tasks: snapshot,
-      error: String(e?.message || e)
+      error: errorMessage
     });
+    return { ok: false, error: errorMessage };
   }
 }
 

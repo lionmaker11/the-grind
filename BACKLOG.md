@@ -152,11 +152,13 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
   Status: defer — UX design needed. Recurring-task workflow hasn't been formally designed in the V2 spec set. Could pair with the boardStore fix above.
 
-- [ ] **Concurrent same-modal mutator rollback — RE-RATED severity** — Originally logged in 5b-3 as low-frequency-in-practice. Codex 5b-5 Phase 3 argued that 5b-5's rapid check/delete row controls make this LESS rare: user can easily tap completeTask on row A then deleteTask on row B in ~300ms window. If one succeeds and one fails, snapshot-based rollback resurrects the other.
+- [ ] **Concurrent same-modal mutator rollback — RE-RATED SEVERITY (3x now)** — Originally logged in 5b-3 as low-frequency-in-practice. Codex 5b-5 Phase 3 elevated when rapid check/delete sequences became normal use. Codex 5b-6 Phase 3 elevated AGAIN: 5b-6's edit-text turns this into a TRIVIAL 2-tap workflow — user edits row A, blurs (commits A async), edits row B, blurs (commits B async). Both editText calls capture whole-array snapshots concurrently. If A's commit fails after B's succeeds, A's rollback restores the snapshot from before B's edit, erasing B's successful optimistic text from the modal display.
 
-  Single-user single-tenant context still bounds the issue (one finger, one tap at a time), but the window is wider than 5b-3 estimated. Watch dogfood especially closely during 5b-9 phone test — if T.J. reports "I completed/deleted something and it came back," prioritize per-row mutation lock or patch-based rollback fix.
+  5b-6 mitigations applied: disabled check + delete + drag-handle while editing prevents same-row edit→destructive races AND same-row edit→reorder races. Two-row sequential edits remain unguarded — they're the natural flow.
 
-  Status: dogfood-watch priority elevated. Still deferred until signal.
+  Single-user single-tenant context still bounds the issue (one finger, one tap at a time), but the window is wider with each new sub-step. By 5b-7 chevron + 5b-8 tests this will be the most-frequently-triggered race in the codebase.
+
+  Status: **prioritize after 5b-9 phone test** — if T.J. reports ANY of "edit reverted", "deleted task came back", "completed task reappeared", implement patch-based rollback (each mutator records its specific change and reverses just that change on failure) as a dedicated commit before merge. Estimate: ~80 lines across 5 mutators.
 
 - [ ] **In-flight drag silently canceled if section membership changes** — Codex 5b-5 Phase 3 flagged. `BacklogList` rebuilds urgent/normal drag controllers when section id lists change. If a separate mutator (long-press toggle on another row, complete/delete on another row) changes section membership mid-drag, the old controller is destroyed and the user's pointer-down is orphaned. Drag doesn't corrupt state — it just dies; user lifts finger and re-drags.
 
