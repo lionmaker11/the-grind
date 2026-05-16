@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from 'preact/hooks';
 import { createListDragController } from '../../lib/drag.js';
 import { reorderTopThree, boardStore } from '../../state/board.js';
+import { openProject } from '../../state/backlog.js';
 import { HeartbeatDot } from './HeartbeatDot.jsx';
 import { TaskRow } from './TaskRow.jsx';
 import './ProjectCard.css';
@@ -9,7 +10,14 @@ export function ProjectCard({ project }) {
   const top = project.top || [];
   const urgentCount = project.urgent_count || 0;
   const totalCount = project.task_count || 0;
-  const name = (project.project_name || '').toUpperCase();
+  // Belt-and-suspenders defensive fallback: project_name should always
+  // be present from backend, project_id always present from registry.
+  // If a malformed entry slips through with both missing OR non-string,
+  // String() coercion + literal fallback prevents render crash on the
+  // .toUpperCase() call (Codex 5b-7 Phase 3 flagged the residual crash
+  // path after Phase 2 added the basic OR fallback).
+  const displayName = String(project.project_name || project.project_id || 'Untitled project');
+  const name = displayName.toUpperCase();
 
   // Drag controller — one per project. Keyed on project_id so the
   // controller identity is stable across boardStore re-renders (any
@@ -67,6 +75,17 @@ export function ProjectCard({ project }) {
           <span class="slash">/</span>
           {totalCount}
         </span>
+        {/* Phase 5b-7: chevron opens BacklogDetail modal per spec
+            Decision 3. Visible affordance (Krug's position) — card
+            body stays non-tappable. Explicit aria-label includes
+            project name for screen reader context. */}
+        <button
+          type="button"
+          class="project-card-chevron"
+          onClick={() => openProject(project.project_id)}
+          data-testid={`board-project-chevron-${project.project_id}`}
+          aria-label={`Open backlog detail for ${displayName}`}
+        >›</button>
       </div>
       {top.length === 0
         ? <div class="task-empty">// empty</div>
