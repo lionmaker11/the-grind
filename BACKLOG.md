@@ -75,3 +75,35 @@ Operational backlog for items committed to ship but not yet placed in a specific
 - [ ] **Extract assignBucketedPriorities + sortByPriority to lib/sort.js** — Council 4 (5b-3) flagged: same logic now triplicated in `api/_lib/vault.js`, `v2/src/state/board.js`, `v2/src/state/backlog.js`. YAGNI threshold passed at 3. Extract to a shared util when a fourth caller appears (likely Phase 6 Focus surface).
 
   Status: defer until fourth caller. Note: extraction may want to live in a shared `lib/` accessible to both /api/* (Node) and /v2/src/* (browser bundle), which means picking a path that works for both runtime targets. Currently no shared lib exists — `api/_lib/` is /api/* private, `v2/src/lib/` is bundle private.
+
+## 2026-05-15 — captured during 5b-4 (BacklogDetail modal frame)
+
+- [ ] **Keyboard + screen-reader accessibility for BacklogDetail modal** — Codex 5b-4 Phase 3 flagged 4 related a11y gaps in the modal frame: (1) no focus management on mount or close (focus stays on Board control that opened it); (2) no Escape key handler to dismiss; (3) background (Board + Muse) not marked `inert` while modal open, so screen reader can navigate beyond the dialog; (4) urgent/task counts in header are not aria-live, so SR users don't hear updates when fetch resolves or mutations land.
+
+  All four are standard dialog-pattern requirements per WCAG 2.1. Voice-first principle and iPhone-only deployment make these lower priority than usual (T.J. is the user; touch is primary), but if any of these surface as friction during dogfood or if accessibility audit becomes a phase gate, fix all four together.
+
+  Status: defer — single solo-operator user, touch-primary device. Revisit if anyone with assistive tech ever uses the app or if accessibility becomes a phase gate.
+
+- [ ] **One-frame Board flash when `?force-backlog` URL override is used** — Codex 5b-4 Phase 3 flagged. The dev override runs in `useEffect` which fires AFTER initial render, so the first paint shows Board, then openProject() flips to modal. On slow JS / first paint this is visible.
+
+  Fix: initialize backlogStore.openProjectId synchronously from URL before App component renders (e.g. in main.jsx or as a default-state hook). Cost: small refactor; benefit: cosmetic only.
+
+  Status: defer — affects dev override only; the production trigger (5b-7 chevron) is user-initiated tap so no flash. If `?force-backlog` becomes a permanent deep-link affordance, revisit.
+
+- [ ] **Duplicate fetchBoard on modal close** — Codex 5b-4 Phase 3 flagged. close() calls fetchBoard(); then Board remounts and its own useEffect also calls fetchBoard(). Two identical /api/backlog summary requests race on slow connections.
+
+  Fix: either drop fetchBoard from close() (Board's mount-time fetch handles it), OR drop Board's mount fetch (rely on backlogStore.close having done it). Former is safer (existing Board mount path is the canonical refresh).
+
+  Status: defer — race noise only, both requests return the same data. Revisit if rate-limit pressure surfaces or if observable loading flicker behind modal.
+
+- [ ] **Stale Board data window between modal close and fetchBoard resolution** — Codex 5b-4 Phase 3 flagged. close() flips openProjectId to null synchronously; Board mounts with whatever boardStore.summary had before modal opened. fetchBoard's response arrives ~200-500ms later and updates Board.
+
+  Window is normally invisible (modal mutations already called fetchBoard during the session). Surfaces when user opens modal, makes no edits, external vault state changes, then closes. Single-user solo-operator scope makes this near-zero frequency.
+
+  Status: defer — accept the stale window. Revisit if dogfood reports "I closed the modal and the board didn't update."
+
+- [ ] **Stacked-modal accessibility ambiguity (Muse over BacklogDetail)** — Codex 5b-4 Phase 3 flagged. Both `<BacklogDetail role="dialog" aria-modal="true">` and `<MuseSheet role="dialog" aria-modal="true">` can be simultaneously active. Visual z-index handles it; accessibility tree does not.
+
+  Related to existing dogfood watch entry ("Muse FAB covers stuff in modal"). If the Muse-FAB-hide decision lands, this stacked-modal issue resolves as a side effect.
+
+  Status: defer — same root cause as the FAB-overlap dogfood entry.

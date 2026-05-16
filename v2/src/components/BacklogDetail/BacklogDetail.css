@@ -1,0 +1,164 @@
+/* BacklogDetail.css — Phase 5b-4 modal frame.
+ *
+ * Overlay pattern locked in by Phase 5a-10 followup 3 (Focus blank-screen
+ * fix on iOS Safari): position:fixed + 100vh/100dvh + explicit background.
+ * Do NOT use min-height:100% — requires explicit parent height that #app
+ * does not consistently provide.
+ *
+ * Mockup reference: 23-backlog-detail.html, simplified per phase5b-spec.md
+ * — pomo aggregate panel + 4-dot rail removed (Phase 6 / Focus scope).
+ * Background is solid var(--bg), not blurred — modal occupies full viewport
+ * and Board mounted beneath isn't visible, so no backdrop-filter needed.
+ * (Council 4 noted this avoids the backdrop-filter repaint cost concern.)
+ */
+
+.backlog-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 50;
+  padding-top: var(--top-bar-h);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ─── Header ────────────────────────────────────────────────────── */
+
+.backlog-modal-header {
+  position: relative;
+  padding: var(--s-6) var(--s-5) var(--s-5);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.04), transparent);
+  flex-shrink: 0;
+}
+
+/* Cyan hairline at top of header, matches mockup 23's ::before */
+.backlog-modal-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0.4;
+}
+
+.backlog-modal-close {
+  position: absolute;
+  top: var(--s-4);
+  right: var(--s-4);
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--t-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  /* 44x44 hit target meets iOS HIG and matches Phase 5a-10 lesson on
+   * touch target sizes on long-press / tap interactions */
+}
+
+.backlog-modal-close:hover {
+  color: var(--cyan);
+  border-color: var(--border-bright);
+}
+
+.backlog-modal-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--s-2);
+}
+
+.backlog-modal-project {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--t-lg);
+  letter-spacing: 3px;
+  color: var(--text);
+  line-height: 1.1;
+  text-transform: uppercase;
+  /* Allow truncation of long project names without breaking the
+   * close-button position; close has position:absolute with right: var(--s-4) */
+  padding-right: 56px;
+}
+
+.backlog-modal-urgent-line {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: var(--s-2);
+}
+
+.backlog-modal-urgent-line .n {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-glow);
+}
+
+.backlog-modal-urgent-line .dim {
+  color: var(--text-muted);
+}
+
+/* ─── Body ──────────────────────────────────────────────────────── */
+
+.backlog-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-3) var(--s-5) var(--s-12);
+  /* -webkit-overflow-scrolling: touch deprecated in iOS 13+; modern
+   * iOS Safari uses momentum scrolling on overflow:auto by default */
+}
+
+.backlog-modal-loading,
+.backlog-modal-empty,
+.backlog-modal-list-stub {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  text-align: center;
+  padding: var(--s-8) var(--s-4);
+}
+
+.backlog-modal-error {
+  padding: var(--s-5);
+  border: 1px solid var(--red);
+  border-radius: var(--r-sm);
+  background: rgba(255, 0, 60, 0.04);
+  margin-top: var(--s-4);
+}
+
+.backlog-modal-error-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2.5px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: var(--s-2);
+  text-shadow: 0 0 6px var(--red-glow);
+}
+
+.backlog-modal-error-message {
+  font-family: var(--font-body);
+  font-size: var(--t-base);
+  color: var(--text);
+  line-height: 1.4;
+  word-wrap: break-word;
+}

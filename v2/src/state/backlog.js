@@ -201,6 +201,25 @@ export function close() {
   fetchBoard();
 }
 
+// Variant of close() used by onboard lifecycle (openOnboard / closeOnboard)
+// to clear modal state without triggering a Board refresh. Onboard owns
+// its own transitions and will fetchBoard at its 'done' step, so we
+// avoid the redundant fetch + race window. Codex 5b-4 Phase 3 flagged
+// that closeOnboard was clearing Focus but not BacklogDetail, leaving
+// modal armed behind an active onboard session.
+export function clearBacklog() {
+  generation++; // expire any in-flight mutators
+  backlogStore.set({
+    openProjectId: null,
+    tasks: [],
+    projectName: '',
+    taskCount: 0,
+    urgentCount: 0,
+    loading: false,
+    error: null
+  });
+}
+
 // ─── mutators ────────────────────────────────────────────────────────
 
 export async function completeTask(taskId) {

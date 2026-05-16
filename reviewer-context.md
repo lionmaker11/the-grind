@@ -71,10 +71,25 @@ Watch for these reports during single-user dogfood; if any surfaces, the listed 
 - **"Modal scrolling is janky on iPhone"** OR **"Board flickered while I was editing"** → triggers fetchBoard debouncing + iOS profiling. BACKLOG item (loading flicker + GitHub API pressure entries).
 - **"I deleted a task and there was no error but it stayed there"** → triggers closed-modal-failure surfacing (boardStore.error, toast, or inline retry). BACKLOG item.
 - **"I made an edit and it never saved"** → 5b-6 implementation must surface save-failure visibly. NOT a BACKLOG item; this is a hard requirement for 5b-6 spec implementation.
+- **"Muse FAB covers stuff in the backlog modal"** OR **"I keep tapping Muse by accident in the modal"** → triggers Muse-FAB hide-while-modal-open decision. Currently kept mounted per voice-first principle (Codex 5b-4 standard review flagged); flip to `!isActive && !openProjectId && <Muse />` in app.jsx if overlap surfaces. The bottom-right corner of the modal is where mockup 23 places the `+ ADD TASK` affordance (5b-5+ scope) — overlap with FAB is plausible.
 
 ## Pattern promotion candidates
 
 - **`assignBucketedPriorities` / `sortByPriority` triplication** — same logic now duplicated in `api/_lib/vault.js`, `v2/src/state/board.js`, and `v2/src/state/backlog.js`. Three copies of bucket math + urgent-first sort. YAGNI threshold passed. Promote to `v2/src/lib/sort.js` when a fourth caller appears (likely Phase 6 Focus surface). Logged as a backlog item below.
+
+- **Modal overlay pattern (Focus, BacklogDetail, MuseSheet, OnboardExitConfirm)** — `position: fixed; inset: 0; height: 100vh; height: 100dvh; z-index: N; padding-top: var(--top-bar-h); background: var(--bg);` is now established across 4 surfaces. Reusable as a CSS class `.modal-overlay` or a component primitive when a 5th surface lands.
+
+  **IMPORTANT (Accessibility Engineer, 5b-4 council):** A11y deferrals are NOT part of the reusable pattern. Each new modal surface must re-decide: focus management on mount/close, Escape handler, inert background for assistive tech, aria-live for dynamic counts. BacklogDetail ships these as deferred per voice-first + iPhone-only context; do NOT copy the deferral by default when implementing a new modal surface.
+
+## Stacked-surface lifecycle ownership (established 5b-4)
+
+When a top-precedence surface opens (currently: Onboard), it MUST hard-reset lower surfaces:
+- `openOnboard()` calls `clearFocus()` + `clearBacklog()` before mounting
+- `closeOnboard()` calls `clearFocus()` + `clearBacklog()` before resetting onboard state
+
+Each store with state that could outlive a transition exposes a non-fetching `clear*()` export distinct from its user-facing `close()` (which may trigger cross-store sync via fetchBoard). The clear variant is for lifecycle orchestration; the close variant is for user-initiated dismissal.
+
+If a 4th surface lands (e.g. Phase 7 PWA install dialog) with top-precedence, the openOnboard / closeOnboard pattern is the template. At 5+ surfaces, consider a surface-registry refactor.
 
 ## Things Previous Reviews Have Caught
 
@@ -94,5 +109,9 @@ Pre-Dev-Loop history (worth remembering even though not formally captured by the
 - 2026-05-15: optimistic reorder MUST mirror backend priority-rewriting, otherwise subsequent local sorts re-shuffle dragged tasks back. Caught by Codex standard review (5b-3 Phase 2).
 - 2026-05-15: drag-layer contract should be documented in the receiving store, not just the drag.js implementation — prevents downstream sub-steps from constructing malformed payloads. Caught by Concurrency Engineer (5b-3 council).
 - 2026-05-15: closed-modal silent failure of destructive ops needs UI-level surface in the implementing component, not just store-level error setting — a 30x/day tool loses trust after 2-3 silent failures. Caught by Daily-driver-tool product specialist (5b-3 council).
+- 2026-05-15: top-precedence surface (Onboard) must hard-reset lower surfaces (Focus, BacklogDetail) on both open AND close — left-armed state from a previous session can pop up unexpectedly when the top surface dismisses. Caught by Codex adversarial review (5b-4 Phase 3).
+- 2026-05-15: dev-override URL params (?force-onboard, ?force-backlog) need explicit cross-flag guards — independent useEffects can race and create hidden-modal-behind-other-modal state. Caught by Codex adversarial review (5b-4 Phase 3).
+- 2026-05-15: a non-fetching `clear*()` variant of a store's `close()` is the right primitive when another store's lifecycle needs to orchestrate clearance without triggering side effects. Pattern: `close()` for user-initiated dismissal (may fetchBoard); `clearBacklog()` for lifecycle-orchestrated dismissal (no side effects). Caught by State Lifecycle Architect (5b-4 council).
+- 2026-05-15: modal pattern is reusable as CSS/component primitive, but a11y deferrals (focus management, Escape, inert background, aria-live) are explicitly NOT part of the reusable pattern — each new modal surface must re-decide. Caught by Accessibility Engineer (5b-4 council).
 
 ---
