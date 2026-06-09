@@ -63,9 +63,10 @@ test.describe('Phase 5a Board — board-flow', () => {
     // Complete a non-urgent task first ('Ship V2 onboarding' = t-lm-1).
     await page.getByTestId('board-task-check-t-lm-1').click();
 
-    // POST captured with correct shape.
+    // POST captured with correct shape. Poll: the motion-polish
+    // fade-out defers the store call ~200ms past the click.
+    await expect.poll(() => capture.backlog.filter(b => b.op === 'complete').length).toBe(1);
     const completeOps = capture.backlog.filter(b => b.op === 'complete');
-    expect(completeOps).toHaveLength(1);
     expect(completeOps[0]).toMatchObject({
       op: 'complete',
       project_id: 'lionmaker-systems',
@@ -80,8 +81,8 @@ test.describe('Phase 5a Board — board-flow', () => {
     // Now complete the urgent task. Header should decrement urgent_count too.
     await page.getByTestId('board-task-check-t-lm-urgent').click();
 
+    await expect.poll(() => capture.backlog.filter(b => b.op === 'complete').length).toBe(2);
     const completeOpsAfter = capture.backlog.filter(b => b.op === 'complete');
-    expect(completeOpsAfter).toHaveLength(2);
     expect(completeOpsAfter[1]).toMatchObject({
       op: 'complete',
       project_id: 'lionmaker-systems',

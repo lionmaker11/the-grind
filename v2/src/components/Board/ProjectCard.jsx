@@ -71,9 +71,9 @@ export function ProjectCard({ project }) {
         <HeartbeatDot lastTouched={project.last_touched} />
         <span class="project-name">{name}</span>
         <span class={`urgent-count${urgentCount === 0 ? ' urgent-count--zero' : ''}`}>
-          <span class="n-urgent">{urgentCount} URGENT</span>
+          <span class="n-urgent"><span class="count-tick" key={urgentCount}>{urgentCount}</span> URGENT</span>
           <span class="slash">/</span>
-          {totalCount}
+          <span class="count-tick" key={`t${totalCount}`}>{totalCount}</span>
         </span>
         {/* Phase 5b-7: chevron opens BacklogDetail modal per spec
             Decision 3. Visible affordance (Krug's position) — card

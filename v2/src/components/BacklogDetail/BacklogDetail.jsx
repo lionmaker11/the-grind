@@ -33,7 +33,7 @@ export function BacklogDetail() {
 
   return (
     <main
-      class="backlog-modal"
+      class="backlog-modal modal-enter"
       data-testid="backlog-modal-root"
       role="dialog"
       aria-modal="true"
@@ -54,8 +54,8 @@ export function BacklogDetail() {
           {projectName || '...'}
         </div>
         <div class="backlog-modal-urgent-line">
-          <span class="n">{urgentCount} URGENT</span>
-          <span class="dim"> / {taskCount} TASKS</span>
+          <span class="n"><span class="count-tick" key={urgentCount}>{urgentCount}</span> URGENT</span>
+          <span class="dim"> / <span class="count-tick" key={`t${taskCount}`}>{taskCount}</span> TASKS</span>
         </div>
       </header>
 

@@ -1,4 +1,4 @@
-import { useMemo } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 import { createLongPress } from '../../lib/longpress.js';
 import { completeTask, toggleTaskUrgent, launchTask } from '../../state/board.js';
 import './TaskRow.css';
@@ -23,6 +23,11 @@ import './TaskRow.css';
 // controller and would throw if rendered without one — that's a
 // programming error, not a runtime case.
 export function TaskRow({ projectId, task, tIdx, taskDrag }) {
+  // Motion polish: 200ms fade-out before the store removes the row.
+  // Recurring tasks never leave the list (boardStore keeps them per
+  // the 5b-10 mirror fix landing in the same sweep), so no fade.
+  const [completing, setCompleting] = useState(false);
+
   const longpress = useMemo(
     () => createLongPress({
       onLongPress: () => toggleTaskUrgent(projectId, task.id, !task.urgent),
@@ -30,10 +35,20 @@ export function TaskRow({ projectId, task, tIdx, taskDrag }) {
     [projectId, task.id, task.urgent]
   );
 
+  function onCheck() {
+    if (completing) return;
+    if (task.recurring === 'daily') {
+      completeTask(projectId, task.id);
+      return;
+    }
+    setCompleting(true);
+    setTimeout(() => completeTask(projectId, task.id), 200);
+  }
+
   return (
     <div
       {...taskDrag.itemProps(tIdx)}
-      class={`task-row wrap2${task.urgent ? ' urgent' : ''}`}
+      class={`task-row wrap2${task.urgent ? ' urgent' : ''}${completing ? ' completing' : ''}`}
       data-testid={`board-task-${task.id}`}
     >
       <span
@@ -61,7 +76,7 @@ export function TaskRow({ projectId, task, tIdx, taskDrag }) {
           type="button"
           class="btn-icon check"
           aria-label="Complete task"
-          onClick={() => completeTask(projectId, task.id)}
+          onClick={onCheck}
           data-testid={`board-task-check-${task.id}`}
         >✓</button>
       </div>

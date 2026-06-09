@@ -48,7 +48,10 @@ export function Onboard() {
 
   return (
     <div class="onboard-root" data-testid="onboard-root" data-step={step}>
-      {body}
+      {/* Motion polish: keying on step remounts the wrapper per step
+          transition, restarting the shared entry animation (was a
+          hard snap between drive-states). */}
+      <div class="surface-enter onboard-step-wrap" key={step}>{body}</div>
       {showClose && (
         <button
           type="button"

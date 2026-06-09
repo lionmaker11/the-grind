@@ -133,7 +133,7 @@ export function Focus() {
 
   return (
     <main
-      class={`focus ${modeClass}`}
+      class={`focus surface-enter ${modeClass}`}
       data-testid="focus-root"
       data-mode={t.mode}
     >

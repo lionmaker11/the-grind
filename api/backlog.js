@@ -150,7 +150,7 @@ export default async function handler(req, res) {
         task_count: pending.length,
         urgent_count: pending.filter(t => Boolean(t.urgent)).length,
         last_touched: p.last_touched || null,
-        top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) }))
+        top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent), recurring: t.recurring || null }))
       };
     }));
     const summary = rows.filter(Boolean);
@@ -176,7 +176,7 @@ export default async function handler(req, res) {
           task_count: pending.length,
           urgent_count: pending.filter(t => Boolean(t.urgent)).length,
           last_touched: null,
-          top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent) })),
+          top: pending.slice(0, 3).map(t => ({ id: t.id, text: t.text, priority: t.priority, urgent: Boolean(t.urgent), recurring: t.recurring || null })),
           unregistered: true
         });
       }

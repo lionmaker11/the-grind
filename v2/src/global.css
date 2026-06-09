@@ -325,3 +325,123 @@ body::after {
   cursor: pointer;
   width: 100%;
 }
+
+/* ============================================================
+   MOTION POLISH — final sweep (V2 committed deliverable)
+   CSS transitions + transforms only; every animation killed by
+   prefers-reduced-motion at the bottom of this block.
+   ============================================================ */
+
+/* Surface entry — shared by Board, Focus, BacklogDetail, Onboard
+   steps. Fade + 8px rise over --dur-base. Entry-only (exit anims
+   would need unmount orchestration; not worth the state machine). */
+@keyframes surface-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.surface-enter {
+  animation: surface-enter 350ms var(--ease-out) backwards;
+}
+
+/* Modal slide-up variant (mockup 23: "slides up over Board"). */
+@keyframes modal-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-enter {
+  animation: modal-enter 350ms var(--ease-out) backwards;
+}
+
+/* Row completing — fade-out before the store removes it (200ms,
+   matched by the setTimeout in TaskRow/BacklogTaskRow onCheck). */
+.task-row.completing,
+.backlog-task-row.completing {
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+  pointer-events: none;
+}
+
+/* Header count tick — keyed span remounts on value change and pops. */
+@keyframes count-tick {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.count-tick {
+  display: inline-block;
+  animation: count-tick 240ms var(--ease-out);
+}
+
+/* Ghost slot — injected by drag.js at the dragged row's origin
+   (mockup 33B "DROP ZONE"; Decision 10, Board + modal together). */
+.drag-ghost-slot {
+  position: absolute;
+  border: 1px dashed rgba(0, 240, 255, 0.4);
+  border-radius: var(--r-sm);
+  background: rgba(0, 240, 255, 0.03);
+  pointer-events: none;
+  z-index: 1;
+  animation: ghost-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes ghost-blink {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface-enter,
+  .modal-enter,
+  .count-tick,
+  .drag-ghost-slot {
+    animation: none;
+  }
+  .task-row.completing,
+  .backlog-task-row.completing {
+    transition: none;
+  }
+}
+
+/* Long-press fill ring (mockup 33D, Decision 10 — Board + modal
+   together). longpress.js applies .longpress-active to the text
+   target from pointerdown; the ::after ring fills over the same
+   500ms the gesture needs to fire. Amber per the urgent semantic. */
+/* The text targets are overflow-clipped (wrap2 line clamp), so the
+   ring renders on the ROW via :has() — over the drag-handle rail per
+   mockup 33D. iOS Safari 16+ and Chromium support :has(); older
+   engines simply skip the decoration. */
+.task-row:has(.task-text.longpress-active)::after,
+.backlog-task-row:has(.backlog-task-text.longpress-active)::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: conic-gradient(var(--amber) 0deg, transparent 0deg);
+  animation: longpress-fill 500ms linear forwards;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes longpress-fill {
+  0% { background: conic-gradient(var(--amber) 0deg, rgba(255, 167, 38, 0.15) 0deg); }
+  25% { background: conic-gradient(var(--amber) 90deg, rgba(255, 167, 38, 0.15) 90deg); }
+  50% { background: conic-gradient(var(--amber) 180deg, rgba(255, 167, 38, 0.15) 180deg); }
+  75% { background: conic-gradient(var(--amber) 270deg, rgba(255, 167, 38, 0.15) 270deg); }
+  100% { background: conic-gradient(var(--amber) 360deg, rgba(255, 167, 38, 0.15) 360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-row:has(.task-text.longpress-active)::after,
+  .backlog-task-row:has(.backlog-task-text.longpress-active)::after {
+    animation: none;
+    background: rgba(255, 167, 38, 0.3);
+  }
+}
