@@ -4,12 +4,19 @@ Authoritative record of phase-by-phase state, approved exceptions, and patterns
 observed during the rebuild. Read this file first in any new Claude Code
 session before touching code.
 
-## Current state (14 May 2026)
+## Current state (16 May 2026)
 
-- Production: the-grind-gold.vercel.app (main branch, HEAD 02e4ece — Phase 5a-11 merge)
-- Active branch: main (v2-phase4 merged + scheduled for deletion post-verification)
+- Production: the-grind-gold.vercel.app (main branch, HEAD 6c31fc8 — Phase 5b merge)
+- Active branch: main (v2-phase5b merged + deleted post-verification)
 - Architecture: V2 served at `/` via Vite build at `v2/dist/`, `/api/*` same-origin, all Vercel serverless functions
 - Lighthouse accessibility baseline: 100/100 (Phase 2 close, holds)
+- Dev Loop Protocol active since 2026-05-15 (see CLAUDE.md) — replaces /api/* + /vault/** strict-mode carve-outs; per-task Codex review + council; BACKLOG.md + reviewer-context.md at repo root
+
+Phase 5b (Backlog Detail modal) shipped via the v2-phase5b → main merge on 16 May 2026 (10 commits, 25 files, ~3.5k insertions). Modal launched from project-card chevrons; full per-project task list with URGENT/NORMAL sections, drag-reorder (nearest-center slot targeting handles mixed-height rows), long-press urgent toggle, tap-to-edit with visible save-failure + retry, recurring-aware check-off with acknowledgment flash, delete. Backend ops update_task_text + delete_task consumed Pattern-1 slot 1 of 2. Pomodoro estimates were DESCOPED from 5b to Phase 6 (session state at launch, not planning state per task — Council 3). Patch-based optimistic rollback closed the concurrent-mutator race class. Physical phone test substituted with Playwright iPhone-13/WebKit emulation project (5 mobile tests) + proactive fixes of all phone-test-agenda items per autonomous-completion directive; real-device verification remains worthwhile but is no longer gating.
+
+Specs/status: /vault/build/phase5b-spec.md (10 decisions), /vault/build/phase5b-status.md. Test suite at merge: 38/38 (33 chromium + 5 iphone). Bundle 25.01 KB JS gz / 8.92 KB CSS gz.
+
+Current step: Phase 6 — Focus surface + Ring timer (mockups 06-09) + pomodoro session UX relocated from 5b.
 
 Phase 4 (Onboarding rebuild — R5b flow) and Phase 5a (Board interactions) shipped together via the v2-phase4 → main merge on 14 May 2026 (73 commits, 98 files). The merge bundled R5b's onboarding rebuild (capture/clarify/parsing/review + error states + OnboardExitConfirm + OrphanPicker) with Phase 5a's full Board interactivity (TaskRow rebuild, drag-reorder controller, long-press gestures, complete/urgent/launch ops, optimistic-update + rollback store convention, Focus stub surface, EXECUTE button wiring, urgent-first sort on backend). Two `/api/*` exceptions consumed within Pattern-1 budget: backlog.js (urgent-first sort + urgent flag in GET payload) and project.js (pending-count fix in 5a-7).
 
