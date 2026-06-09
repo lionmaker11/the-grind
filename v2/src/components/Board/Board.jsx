@@ -60,7 +60,7 @@ export function Board() {
       ? `CACHED · LAST SYNC ${formatTime(lastFetchAt)}`
       : 'CACHED · NO SYNC YET';
     return (
-      <main class="board">
+      <main class="board surface-enter">
         <div class="section-title">IN CONTEXT</div>
         <div class="section-sub section-sub--offline">{syncLabel}</div>
         {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}
@@ -83,7 +83,7 @@ export function Board() {
 
   if (allEmpty) {
     return (
-      <main class="board">
+      <main class="board surface-enter">
         <div class="section-title">IN CONTEXT</div>
         <div class="section-sub">0 PENDING · BOARD CLEAR</div>
         <EmptyState />
@@ -94,7 +94,7 @@ export function Board() {
   const totalPending = summary.reduce((n, p) => n + (p.task_count || 0), 0);
 
   return (
-    <main class="board">
+    <main class="board surface-enter">
       <div class="section-title">IN CONTEXT</div>
       <div class="section-sub">{summary.length} PROJECTS · {totalPending} PENDING</div>
       {summary.map((p) => <ProjectCard key={p.project_id} project={p} />)}

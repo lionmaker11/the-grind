@@ -88,18 +88,27 @@ export async function completeTask(projectId, taskId) {
   // absent if the caller passed stale IDs.
   const project = snapshot.find(p => p.project_id === projectId);
   const task = project?.top?.find(t => t.id === taskId);
-  const taskWasUrgent = Boolean(task?.urgent);
+  if (!task) return; // stale tap (row already gone — e.g. deleted during fade)
+  const taskWasUrgent = Boolean(task.urgent);
 
-  const optimistic = snapshot.map(p =>
-    p.project_id === projectId
-      ? {
-          ...p,
-          top: (p.top || []).filter(t => t.id !== taskId),
-          task_count: Math.max(0, (p.task_count || 0) - 1),
-          urgent_count: Math.max(0, (p.urgent_count || 0) - (taskWasUrgent ? 1 : 0))
-        }
-      : p
-  );
+  // Recurring daily tasks stay pending in vault (backend stamps
+  // last_completed only) — the optimistic filter must keep them or
+  // they vanish from top[] and reappear on the next fetch. Mirror of
+  // the backlogStore fix from 5b-5 (BACKLOG item closed here).
+  const isRecurring = task?.recurring === 'daily';
+
+  const optimistic = isRecurring
+    ? snapshot
+    : snapshot.map(p =>
+        p.project_id === projectId
+          ? {
+              ...p,
+              top: (p.top || []).filter(t => t.id !== taskId),
+              task_count: Math.max(0, (p.task_count || 0) - 1),
+              urgent_count: Math.max(0, (p.urgent_count || 0) - (taskWasUrgent ? 1 : 0))
+            }
+          : p
+      );
 
   boardStore.setKey('summary', optimistic);
 

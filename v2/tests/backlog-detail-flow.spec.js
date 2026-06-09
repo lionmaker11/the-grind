@@ -180,9 +180,10 @@ test.describe('Phase 5b Backlog Detail — backlog-detail-flow', () => {
     // Tap check on the non-urgent t-lm-2.
     await page.getByTestId('backlog-task-check-t-lm-2').click();
 
-    // POST captured.
+    // POST captured. Poll: motion-polish fade-out defers the store
+    // call ~200ms past the click.
+    await expect.poll(() => capture.backlog.filter(b => b.op === 'complete').length).toBe(1);
     const completeOps = capture.backlog.filter(b => b.op === 'complete');
-    expect(completeOps).toHaveLength(1);
     expect(completeOps[0]).toMatchObject({
       op: 'complete',
       project_id: 'lionmaker-systems',

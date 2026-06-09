@@ -36,3 +36,9 @@
 .backlog-section-label.urgent::after {
   background: linear-gradient(90deg, var(--amber-glow), transparent);
 }
+
+/* Motion polish: positioned so drag.js's ghost slot (absolute, offset
+   geometry) anchors to the scrolling list, not the fixed modal. */
+.backlog-list {
+  position: relative;
+}

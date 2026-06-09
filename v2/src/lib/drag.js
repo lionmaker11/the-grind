@@ -124,6 +124,7 @@ export function createListDragController({
       rowHeight: 0,
       originCenterY: 0,
       slotCenters: [],
+      ghostEl: null,
     };
 
     window.addEventListener('pointermove', onPointerMove);
@@ -157,6 +158,27 @@ export function createListDragController({
     drag.slotCenters.sort((a, b) => a.idx - b.idx);
 
     el.classList.add(draggingClass);
+
+    // Motion polish (mockup 33B / phase5b spec Decision 10): dashed
+    // "vacated slot" indicator at the drag origin. The dragged row
+    // translates with the finger but its layout box stays in flow —
+    // the ghost overlays that box via offset geometry inside the
+    // nearest positioned ancestor (offsetParent). Pure decoration:
+    // removed on cleanup, pointer-events none, no layout impact.
+    try {
+      const parent = el.offsetParent;
+      if (parent) {
+        const slot = document.createElement('div');
+        slot.className = 'drag-ghost-slot';
+        slot.style.top = `${el.offsetTop}px`;
+        slot.style.left = `${el.offsetLeft}px`;
+        slot.style.width = `${el.offsetWidth}px`;
+        slot.style.height = `${el.offsetHeight}px`;
+        parent.appendChild(slot);
+        drag.ghostEl = slot;
+      }
+    } catch { /* decoration only — never block the drag */ }
+
     drag.engaged = true;
     return true;
   }
@@ -235,6 +257,9 @@ export function createListDragController({
     items.forEach((node) => {
       node.style.transform = '';
     });
+    if (drag.ghostEl) {
+      try { drag.ghostEl.remove(); } catch { /* already gone */ }
+    }
     try {
       if (handleEl && handleEl.hasPointerCapture?.(pointerId)) {
         handleEl.releasePointerCapture(pointerId);

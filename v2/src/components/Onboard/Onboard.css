@@ -369,3 +369,14 @@
   height: 76px;
   font-size: 1.6rem;
 }
+
+/* Motion polish: step wrapper must be layout-transparent — the root
+   is a flex column and step components expect to be its direct
+   children (flex:1 layouts inside). display:contents would break the
+   entry animation (no box), so mirror the column and grow. */
+.onboard-step-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}

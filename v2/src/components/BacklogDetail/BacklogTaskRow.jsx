@@ -151,6 +151,9 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
   // Non-recurring rows unmount on first tap, so this guard only
   // matters for recurring.
   const [completing, setCompleting] = useState(false);
+  // Motion polish: drives the .completing fade-out class on the row
+  // for the 200ms before the store removes it (non-recurring only).
+  const [fadingOut, setFadingOut] = useState(false);
 
   async function onCheck() {
     if (completing) return;
@@ -158,9 +161,14 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
     if (isRecurring) {
       setCompleting(true);
       setCompleteFlash(true);
+      await completeTask(task.id);
+      if (mountedRef.current) setCompleting(false);
+      return;
     }
-    await completeTask(task.id);
-    if (isRecurring && mountedRef.current) setCompleting(false);
+    // Motion polish: 200ms fade-out before the store removes the row.
+    setCompleting(true);
+    setFadingOut(true);
+    setTimeout(() => completeTask(task.id), 200);
   }
 
   async function commitEdit() {
@@ -222,6 +230,7 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
     task.urgent ? 'urgent' : '',
     saveFailed ? 'save-failed' : '',
     completeFlash ? 'complete-flash' : '',
+    fadingOut ? 'completing' : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -284,7 +293,7 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
           type="button"
           class="btn-icon delete"
           aria-label="Delete task"
-          disabled={editing}
+          disabled={editing || completing}
           onClick={() => deleteTask(task.id)}
           data-testid={`backlog-task-delete-${task.id}`}
         >×</button>
