@@ -10,6 +10,7 @@ import { boardStore, fetchBoard } from './state/board.js';
 import { onboardStore, openOnboard, closeOnboard } from './state/onboard.js';
 import { focusStore } from './state/focus.js';
 import { backlogStore, openProject } from './state/backlog.js';
+import { timerStore } from './state/timer.js';
 
 // Auto-open onboarding when the board finishes loading and registry
 // shows zero active projects. There is no manual launcher from Board —
@@ -49,7 +50,16 @@ export function App() {
   const { isActive } = useStore(onboardStore);
   const { activeTaskId } = useStore(focusStore);
   const { openProjectId } = useStore(backlogStore);
+  const { mode: timerMode } = useStore(timerStore);
   useAutoOnboard();
+
+  // Ambient gradient shifts with timer mode (DESIGN.md §247 / Phase 6
+  // D8). 'select' keeps the neutral ambient; work/break/long-break get
+  // their tints.
+  const ambientClass =
+    timerMode === 'work' || timerMode === 'break' || timerMode === 'long-break'
+      ? ` ${timerMode}`
+      : '';
 
   // Dev-only override: `?force-onboard=1` opens onboarding regardless of
   // registry state. Lets phase-4 phone testing exercise the full flow on an
@@ -95,7 +105,7 @@ export function App() {
   //   but state could theoretically have both via stale render or race).
   return (
     <>
-      <div class="bg-gradient" />
+      <div class={`bg-gradient${ambientClass}`} />
       <div class="grid-overlay" />
       {!isActive && <TopBar />}
       {!isActive && (

@@ -10,6 +10,7 @@ import { map } from 'nanostores';
 import { projectOp, backlogOp } from '../lib/api.js';
 import { clear as clearFocus } from './focus.js';
 import { clearBacklog } from './backlog.js';
+import { exitSession as exitTimerSession } from './timer.js';
 
 // ─── Constants ────────────────────────────────────────────────────────
 
@@ -174,10 +175,12 @@ function mutateOrphanAssignments(fn) {
 
 export function openOnboard() {
   // Hard reset of lower UI surfaces before onboard takes over. Onboard
-  // owns top precedence; entering it should invalidate Focus and
-  // BacklogDetail so they don't pop up when onboard closes. Codex 5b-4
-  // Phase 3 flagged this for BacklogDetail.
+  // owns top precedence; entering it should invalidate Focus, the
+  // pomodoro session, and BacklogDetail so they don't pop up when
+  // onboard closes. (Stacked-surface lifecycle convention; timer added
+  // Phase 6 per spec D10.)
   clearFocus();
+  exitTimerSession();
   clearBacklog();
   reset();
   patch({ isActive: true, step: 'intro' });
@@ -185,10 +188,11 @@ export function openOnboard() {
 
 export function closeOnboard(force = false) {
   // Treat onboard close as a hard reset of UI surfaces. Clear any
-  // stale Focus session or BacklogDetail modal so the user lands on
-  // Board (not a re-mounted Focus or modal from before onboarding
-  // interrupted). BacklogDetail clearing added 5b-4 Phase 3 per Codex.
+  // stale Focus session, pomodoro session, or BacklogDetail modal so
+  // the user lands on Board (not a re-mounted surface from before
+  // onboarding interrupted).
   clearFocus();
+  exitTimerSession();
   clearBacklog();
   const cur = onboardStore.get();
   if (force || cur.step === 'intro' || cur.step === 'idle' || cur.step === 'done') {

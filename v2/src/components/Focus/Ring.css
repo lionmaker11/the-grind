@@ -1,0 +1,103 @@
+/* Ring.css — sacred SVG timer styles (Phase 6, from mockup 06 +
+ * shared.css ring vocabulary). Color flows from --ring-color, set per
+ * mode on .focus (Focus.css). */
+
+.ring-wrap {
+  position: relative;
+  width: var(--ring-size, 250px);
+  height: var(--ring-size, 250px);
+  margin: 0 auto;
+}
+
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Decorative rotation — only meaningful motion while the session is
+ * alive; reduced-motion kills it entirely (D7). */
+.ring-hex-outer {
+  transform-origin: 125px 125px;
+  animation: ring-rot 20s linear infinite;
+}
+
+.ring-hex-inner {
+  transform-origin: 125px 125px;
+  animation: ring-rot-rev 30s linear infinite;
+}
+
+.ring-pulse {
+  transform-origin: 125px 125px;
+}
+
+.ring-wrap.running .ring-pulse {
+  animation: ring-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ring-rot {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ring-rot-rev {
+  from { transform: rotate(0); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { stroke-opacity: 0.1; }
+  50% { stroke-opacity: 0.35; }
+}
+
+/* Progress ring eases between tick updates so the 1s jumps read as a
+ * sweep, not a stutter (--dur-slow per DESIGN.md ring updates). */
+[data-testid='ring-progress'] {
+  transition: stroke-dashoffset 500ms linear;
+}
+
+/* Inner display */
+.ring-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-1);
+  pointer-events: none;
+}
+
+.ring-time {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--t-xl);
+  letter-spacing: 2px;
+  color: var(--text);
+  text-shadow: 0 0 24px var(--ring-glow-color, var(--cyan-glow));
+  font-variant-numeric: tabular-nums;
+}
+
+.ring-time.paused {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
+.ring-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  letter-spacing: 3px;
+  color: var(--ring-color, var(--cyan));
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-hex-outer,
+  .ring-hex-inner,
+  .ring-wrap.running .ring-pulse {
+    animation: none;
+  }
+  [data-testid='ring-progress'] {
+    transition: none;
+  }
+}
