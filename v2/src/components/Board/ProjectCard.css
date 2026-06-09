@@ -69,3 +69,43 @@
   color: var(--text-dim);
   text-shadow: none;
 }
+
+/* Project-card chevron — Phase 5b-7 backlog detail trigger.
+   Right-edge of project-head, after .urgent-count. Real 44x44
+   button for iOS HIG compliance + accessibility tool compatibility
+   (Codex 5b-7 Phase 3 preferred over the pseudo-element hit-area
+   trick). Negative margins pull adjacent items closer and prevent
+   the larger button from inflating header layout box vertically.
+   Krug's "visible affordance over invisible tap target" — chevron
+   is explicit, card body is non-tappable. */
+.project-card-chevron {
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 120ms ease-out, background 120ms ease-out;
+  border-radius: var(--r-sm);
+}
+
+.project-card-chevron:hover,
+.project-card-chevron:active {
+  color: var(--cyan);
+  background: rgba(0, 240, 255, 0.06);
+  text-shadow: 0 0 6px var(--cyan-glow);
+}
+
+.project-card-chevron:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+}

@@ -1,0 +1,38 @@
+/* BacklogList.css — Phase 5b-5 section labels + list container.
+ * Row styles live in BacklogTaskRow.css. */
+
+.backlog-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section labels — render unconditionally per spec Decision 8. URGENT
+ * uses amber accent; NORMAL is dim mono. Hairline after the label text
+ * extends to the right edge of the body for a "section divider"
+ * feel that matches mockup 23. */
+.backlog-section-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: var(--s-4) 0 var(--s-2);
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.backlog-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.backlog-section-label.urgent {
+  color: var(--amber);
+}
+
+.backlog-section-label.urgent::after {
+  background: linear-gradient(90deg, var(--amber-glow), transparent);
+}

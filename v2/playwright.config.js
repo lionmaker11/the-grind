@@ -16,7 +16,20 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: '**/mobile-*.spec.js'
+    },
+    // iPhone emulation (WebKit engine + touch + 390x844 viewport).
+    // Substitutes for the physical phone test where emulation is
+    // meaningful: layout at mobile width, touch taps, scroll
+    // geometry, drag slot targeting with mixed-height rows, edit
+    // input keyboard-occlusion defense (scrollIntoView). True
+    // device behaviors (rubber-band scroll, haptics, real keyboard,
+    // PWA install) remain un-emulatable.
+    {
+      name: 'iphone',
+      use: { ...devices['iPhone 13'] },
+      testMatch: '**/mobile-*.spec.js'
     }
   ],
   webServer: {

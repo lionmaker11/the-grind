@@ -186,6 +186,9 @@ voice → Muse response → task on Board in <10s.
   - **Drag-reorder race with concurrent fetchBoard** — Codex flagged during 5a-7 review: the drag controller stores fromIdx/toIdx from pointer-down through pointer-release; if fetchBoard or another mutator changes top[] mid-drag, the reorder applies stale indices to fresh data and could move the wrong task. Defensive bounds check in ProjectCard catches the list-shrunk case. Full fix requires drag.js extension (onDragStart callback) which would ripple to OnboardReview — out of scope for 5a-7. Log here for phone test (5a-10) verification: if wrong-task-reordered behavior surfaces in real use, address in a dedicated commit before 5a-11 merge. Otherwise ship and revisit in Phase 6+ if needed.
   - **Ghost-row drop indicator** — original 5a-8 deferred during reading pass. phase5a-spec.md Decision 6 is internally inconsistent (prose describes pointer-following; linked mockup shows stationary-at-origin). Implementing either requires picking one over the other arbitrarily, AND for a 3-row top-3 list the existing drag feedback is already informative. Verify need via phone test (5a-10); implement based on observed user confusion if any, or close as no-fix if not. See phase5a-spec.md Decision 6 for full rationale.
 - **Phase 5b — Backlog detail + pom glyphs.** Modal overlay launched from Board project tap. Full task list with URGENT/NORMAL grouping, drag-to-reorder primary priority mechanism, inline pomodoro estimate glyphs, aggregate pom counter in header. Mockups 23 (detail), 24 (glyph study), 33 (reorder + urgent storyboard) in /design/mockups/. Scope tightened by simplification pass: drag-to-reorder (previously Phase 8 polish) now primary Phase 5b work. Depends on Phase 4 rebuild merging first and Phase 5a shipping the basic interaction primitives.
+
+  Known issues inherited from Phase 5b backend additions:
+  - **Latent parallel-write race expanded** — Phase 5b-2 adds op:update_task_text + op:delete_task to api/backlog.js, both inheriting the existing `Promise.all([writeBacklog(...), touchRegistry(...)])` pattern. The latent race documented in archived open-item #8 (vault/build/archive/phase4-open-items.md:64) now applies to all 8 mutating ops in api/backlog.js: add, remove, set_priority, toggle_urgent, complete, reorder, update_task_text, delete_task. When the dedicated fix for item #8 lands, it should address all op handlers in api/backlog.js in one commit for consistency.
 - **Phase 6 — Focus surface + Ring timer.** Port sacred SVG from mockup 06.
 - **Phase 7 — PWA manifest + service worker + iOS install.** Killswitch SW
   to clean up V1 ghost.
@@ -194,33 +197,7 @@ voice → Muse response → task on Board in <10s.
 
 ## Future considerations
 
-Forward-looking work items committed to V2 ship but not yet placed in a specific phase. Filed here so they survive across sessions and don't get lost in chat history.
-
-**Motion polish — final sweep before V2 ship.** V2 currently has
-binary state transitions throughout (instant mount/unmount,
-immediate appear/disappear, snap reorders). The app feels rigid.
-A dedicated motion-polish pass smooths every surface as the final
-step before V2 is considered shipped.
-
-Not gamification, not dopamine architecture, just craft. Target:
-the app flows between states rather than snapping.
-
-Scope (non-exhaustive — to be expanded as surfaces are built):
-- Row fade-out on ✓ tap (~200ms ease-out)
-- Board ↔ Focus transition (currently jarring mount/unmount)
-- Sibling-row settle animation after drag-release
-- Header count number tweens (urgent/total animate up/down rather than swap)
-- Project card expand/collapse if Phase 5b adds Backlog detail
-- Onboard step transitions (currently snap between drive-states)
-- Focus surface state transitions once Phase 6 builds the real one
-- Any other surface added in Phase 6, 7, 8 — all in scope for the final sweep
-
-Timing: AFTER all functional V2 phases ship. This is the last pass before V2 is declared shipped. Doing it earlier means re-doing it each time a new surface lands. Doing it last means one comprehensive sweep with the full app in front of us.
-
-Implementation: CSS transitions + transform animations primarily. Possible useTransition/AnimatePresence-equivalent for Preact if needed for mount/unmount transitions. Low JS-state-machine change.
-
-Not deferred or optional — committed deliverable for V2 ship. If
-V2 ships without this pass, V2 isn't fully shipped.
+> Forward-looking work items now live in `/BACKLOG.md` (Dev Loop Protocol convention as of 2026-05-15). Migrated chips: motion polish, latent parallel-write race in api/backlog.js, drag-reorder vs concurrent fetchBoard race.
 
 ## Patterns observed during the build
 

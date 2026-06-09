@@ -1,0 +1,287 @@
+/* ============================================================
+   BacklogTaskRow.css — Phase 5b-5 modal task row
+   Self-contained: mirrors Board's TaskRow.css vocabulary so the
+   two surfaces stay visually consistent without invisible
+   global-scope coupling. Following the same self-containment
+   pattern TaskRow.css uses (which mirrors OnboardReview.css).
+   If TaskRow.css's primitives change, this file does NOT
+   auto-update — that's by design.
+   ============================================================ */
+
+/* Drag affordance — drag.js CSS contract. Inline transform written
+   by drag.js wins over class transforms; .dragging uses background
+   + shadow + border for visual lift only (no transform: scale —
+   the inline translateY would override it). Transition on the base
+   .backlog-task-row lets displaced sibling rows ease into their new
+   positions during drag. */
+.backlog-task-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: stretch;
+  gap: 10px;
+  padding: 10px 10px 10px 0;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  min-height: 56px;
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.backlog-task-row.dragging {
+  transition: none;
+  background: rgba(0, 240, 255, 0.04);
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px var(--cyan-dim);
+  z-index: 5;
+}
+
+/* Drag handle — empty span decorated via ::before glyph ≡. */
+.backlog-task-row .backlog-task-drag {
+  grid-column: 1;
+  width: 32px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--t-md);
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: color 120ms ease-out;
+}
+
+.backlog-task-row .backlog-task-drag::before { content: '≡'; }
+.backlog-task-row .backlog-task-drag:hover { color: var(--cyan); }
+.backlog-task-row.dragging .backlog-task-drag { color: var(--cyan); cursor: grabbing; }
+
+/* While editing, suppress drag on this row to prevent the drag+edit
+   rollback race (Codex 5b-6 Phase 3 flagged): blur-on-pointerdown
+   commits edit, drag fires reorder, if edit fails the snapshot
+   rollback can undo the reorder. pointer-events:none on the handle
+   blocks the drag controller from receiving pointerdown. Visual cue:
+   handle dims to match other disabled affordances during edit. */
+.backlog-task-row .backlog-task-drag.editing-suppressed {
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* Task text — middle column. iOS Safari text-selection menu
+   suppressed per Phase 5a-10 lesson on long-press targets. */
+.backlog-task-row .backlog-task-text {
+  grid-column: 2;
+  padding: var(--s-2) 0;
+  align-self: center;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--t-base);
+  line-height: 1.35;
+  color: var(--text);
+  text-wrap: pretty;
+  word-break: break-word;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.backlog-task-text.wrap2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* longpress-active class applied by lib/longpress.js during hold
+   (0–500ms), cleared on fire/cancel/release. Amber outline gives
+   visual feedback. NOTE: amber filling ring per mockup 33 deferred
+   to motion-polish sweep (longpress.js doesn't render progress). */
+.backlog-task-text.longpress-active {
+  outline: 2px solid var(--amber-glow);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+  transition: outline-color 80ms ease-out;
+}
+
+/* Action buttons — check + delete. .btn-icon base in global.css. */
+.backlog-task-row .backlog-task-actions {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 2px;
+  align-self: center;
+}
+
+/* Delete button — slightly muted compared to check; intent is destructive
+   but row position (right-most) plus × glyph signals it. No red highlight
+   at rest — would draw too much attention on every row. Red appears on
+   hover for visual feedback that this is destructive. */
+.backlog-task-row .btn-icon.delete {
+  color: var(--text-muted);
+}
+.backlog-task-row .btn-icon.delete:hover {
+  color: var(--red);
+  text-shadow: 0 0 6px var(--red-glow);
+}
+
+/* Disabled state — applied while editing (5b-6) to prevent the
+   concurrent-mutator rollback race from edit→check or edit→delete
+   sequences. User must commit/cancel edit (Enter / Esc / blur) before
+   destructive actions on the same row. */
+.backlog-task-row .btn-icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.backlog-task-row .btn-icon:disabled:hover {
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+/* ── Edit mode (5b-6) ────────────────────────────────────────── */
+/* Tap on .backlog-task-text swaps text div for this input. Cyan
+   accent indicates "editing" state. Same font/size/weight as the
+   text div so the swap feels stable in place. */
+.backlog-task-row .backlog-task-input {
+  grid-column: 2;
+  align-self: center;
+  width: 100%;
+  /* box-sizing: border-box + min-width: 0 prevent overflow of the
+     grid cell. Without border-box, width:100% + horizontal padding +
+     border would push beyond grid column width and collide with the
+     actions column. min-width:0 lets flex/grid children shrink below
+     their content's intrinsic min-width (input's preferred width is
+     based on size attribute, defaulting too wide). Codex 5b-6 flagged. */
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--s-2) var(--s-3);
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  /* iOS Safari prevents zoom-on-focus only if font-size >= 16px.
+     var(--t-base) is 0.9rem = ~14.4px which would trigger zoom.
+     Bump to 16px explicitly on input only; visual difference vs
+     surrounding text is negligible at this size. */
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--text);
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid var(--cyan);
+  border-radius: var(--r-sm);
+  outline: none;
+  box-shadow: 0 0 8px var(--cyan-dim);
+}
+
+.backlog-task-row .backlog-task-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+
+/* ── Save-failed state (5b-6) ────────────────────────────────── */
+/* Per Daily-driver-tool hard requirement (reviewer-context.md):
+   save failures surface visibly at the row level when modal is
+   still open. Red border + retry button gives clear signal +
+   recovery path. */
+.backlog-task-row.save-failed {
+  border-color: var(--red);
+  background: rgba(255, 0, 60, 0.04);
+}
+
+.backlog-task-row.save-failed::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--red);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--red-glow);
+}
+
+.backlog-task-row .backlog-task-retry {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  align-self: stretch;
+  margin: 0 var(--s-2) var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--red);
+  border-radius: var(--r-sm);
+  background: rgba(255, 0, 60, 0.08);
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-shadow: 0 0 6px var(--red-glow);
+}
+
+.backlog-task-row .backlog-task-retry:hover {
+  background: rgba(255, 0, 60, 0.14);
+}
+
+/* Save-failed rows need an explicit grid layout addition: retry
+   button lives on a second row spanning all columns. Add row track
+   to the grid when .save-failed is present. */
+.backlog-task-row.save-failed {
+  grid-template-rows: auto auto;
+}
+
+/* ── Recurring-complete acknowledgment flash (5b-10) ─────────── */
+/* Applied for ~700ms when ✓ is tapped on a recurring task whose row
+   intentionally stays visible. Green pulse signals "registered" —
+   matches --green's "done, healthy" semantic from tokens.css.
+   Respects reduced-motion: falls back to a static green border. */
+.backlog-task-row.complete-flash {
+  border-color: var(--green);
+  animation: complete-flash-pulse 700ms ease-out;
+}
+
+@keyframes complete-flash-pulse {
+  0% {
+    background: rgba(57, 255, 20, 0.18);
+    box-shadow: 0 0 16px var(--green-glow);
+  }
+  100% {
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backlog-task-row.complete-flash {
+    animation: none;
+    background: rgba(57, 255, 20, 0.08);
+  }
+}
+
+/* Urgent state — amber left rail ON the row + amber-tinted handle
+   border. Mirrors Board TaskRow.css conventions. */
+.backlog-task-row.urgent {
+  border-color: var(--amber-glow);
+  background: linear-gradient(90deg, var(--amber-wash), rgba(255, 255, 255, 0.02) 30%);
+}
+
+.backlog-task-row.urgent .backlog-task-drag {
+  border-right: 1px solid var(--amber-glow);
+  color: var(--amber);
+}
+
+.backlog-task-row.urgent::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--amber);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--amber-glow);
+}
