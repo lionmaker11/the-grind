@@ -234,6 +234,34 @@
   grid-template-rows: auto auto;
 }
 
+/* ── Recurring-complete acknowledgment flash (5b-10) ─────────── */
+/* Applied for ~700ms when ✓ is tapped on a recurring task whose row
+   intentionally stays visible. Green pulse signals "registered" —
+   matches --green's "done, healthy" semantic from tokens.css.
+   Respects reduced-motion: falls back to a static green border. */
+.backlog-task-row.complete-flash {
+  border-color: var(--green);
+  animation: complete-flash-pulse 700ms ease-out;
+}
+
+@keyframes complete-flash-pulse {
+  0% {
+    background: rgba(57, 255, 20, 0.18);
+    box-shadow: 0 0 16px var(--green-glow);
+  }
+  100% {
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backlog-task-row.complete-flash {
+    animation: none;
+    background: rgba(57, 255, 20, 0.08);
+  }
+}
+
 /* Urgent state — amber left rail ON the row + amber-tinted handle
    border. Mirrors Board TaskRow.css conventions. */
 .backlog-task-row.urgent {

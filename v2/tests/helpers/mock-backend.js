@@ -76,6 +76,11 @@ const DEFAULT_EXTRACTION = { projects: [], orphan_tasks: [] };
  *   If POST /api/backlog op:update_task_text comes in with this exact
  *   text (case-sensitive, post-trim), return 500. Used by 5b-8 to
  *   exercise the save-failed row state introduced in 5b-6.
+ * @property {number} [backlogEditDelayMs]
+ *   Delay (ms) before responding to op:update_task_text. Used by the
+ *   5b-10 concurrent-mutator regression test to hold an edit in flight
+ *   while a second mutation lands, then fail the edit and verify the
+ *   patch-based rollback does NOT undo the second mutation.
  */
 
 /**
@@ -103,6 +108,7 @@ export async function setupMockBackend(page, options = {}) {
   const projectFail = options.projectAddFailOnName || null;
   const backlogFail = options.backlogAddFailOnText || null;
   const editFail = options.backlogEditFailOnText || null;
+  const editDelayMs = options.backlogEditDelayMs || 0;
   const projectFailedOnce = new Set();
 
   const capture = { chief: [], transcribe: [], projects: [], backlog: [] };
@@ -186,6 +192,11 @@ export async function setupMockBackend(page, options = {}) {
         const cleanText = typeof body.text === 'string'
           ? body.text.trim().slice(0, 200)
           : body.text;
+        // Optional delay holds the edit in flight so a concurrent
+        // mutation can land first (5b-10 regression test).
+        if (editDelayMs > 0) {
+          await new Promise((r) => setTimeout(r, editDelayMs));
+        }
         // Test-only failure trigger: if backlogEditFailOnText was supplied
         // and matches, return 500 to exercise the save-failed row state
         // introduced in 5b-6.

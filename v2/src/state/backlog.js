@@ -13,7 +13,8 @@
 //       subscribers via useStore key off identity changes)
 //   (3) write to store via setKey/set (never direct property writes)
 //   (4) await the backlogOp call
-//   (5) on error AND if generation still matches: restore from snapshot,
+//   (5) on error AND if generation still matches: apply the INVERSE
+//       patch to CURRENT store state (see patch-based rollback below),
 //       set error
 //   (6) on success: trigger fetchBoard() so Board's top-3 stays in sync
 //       with modal-originated mutations (cross-store propagation)
@@ -25,13 +26,22 @@
 //   the mutator silently aborts its store write. Prevents stale async
 //   writes from corrupting a closed or re-opened modal.
 //
-// Concurrent same-modal mutator rollback (deferred):
-//   If two mutators run concurrently (e.g. completeTask(A) succeeds,
-//   then toggleUrgent(A) which started before fails), the failing
-//   mutator's whole-array snapshot restore can resurrect A. This is
-//   logged in BACKLOG.md; patch-based rollback is the proper fix.
-//   Single-user single-tenant scope makes this low-frequency in
-//   practice — defer to dogfood signal.
+// Patch-based rollback (5b-10; closes the concurrent-mutator class
+// elevated 3x across 5b-3/5b-5/5b-6):
+//   Whole-array snapshot restore could resurrect/undo OTHER mutations
+//   that succeeded between a mutator's start and its failure (e.g.
+//   completeTask(A) succeeds, then a previously-started toggleUrgent(B)
+//   fails and restores the pre-complete array, resurrecting A). Each
+//   mutator now reverses ONLY its own change against CURRENT state:
+//   - completeTask/deleteTask failure: re-insert the removed task at
+//     its sorted position in the CURRENT array
+//   - toggleUrgent failure: restore the captured original urgent flag
+//     by id (no-op if the task has since been removed)
+//   - editText failure: restore the captured original text by id
+//     (no-op if removed)
+//   - reorder failure: restore the captured original relative order +
+//     priorities for tasks still present; tasks added/removed since
+//     keep their current membership
 //
 // Pre-rebuild tasks (no urgent field) are sorted as urgent:false via
 // Boolean(t.urgent) coercion — matches sortByPriority in api/_lib/vault.js
@@ -226,30 +236,42 @@ export function clearBacklog() {
 
 // ─── mutators ────────────────────────────────────────────────────────
 
+// Apply an inverse patch to the CURRENT store state and recompute
+// counts. All rollback paths funnel through here so the "read current,
+// patch, derive, set error" shape stays consistent.
+function rollbackWith(patchFn, errorMessage) {
+  const current = backlogStore.get();
+  const patchedTasks = patchFn(current.tasks);
+  backlogStore.set({
+    ...current,
+    tasks: patchedTasks,
+    ...deriveCounts(patchedTasks),
+    error: errorMessage
+  });
+}
+
 export async function completeTask(taskId) {
   const before = backlogStore.get();
   if (!before.openProjectId) return;
   const projectId = before.openProjectId;
   const myGen = generation;
-  const snapshot = before.tasks;
 
   // Recurring daily tasks stay pending in vault per api/backlog.js
-  // op:complete (line 350-352). Backend stamps last_completed without
-  // flipping status. Optimistic filter MUST NOT remove recurring tasks
-  // or they'll vanish from the modal until next fetch — Codex 5b-5
+  // op:complete. Backend stamps last_completed without flipping
+  // status. Optimistic filter MUST NOT remove recurring tasks or
+  // they'll vanish from the modal until next fetch — Codex 5b-5
   // Phase 3 flagged as user-visible bug (real recurring task exists
   // at vault/projects/fitness/fit-001).
-  const targetTask = snapshot.find(t => t.id === taskId);
-  const isRecurring = targetTask?.recurring === 'daily';
+  const removedTask = before.tasks.find(t => t.id === taskId);
+  if (!removedTask) return; // stale tap on an already-removed row
+  const isRecurring = removedTask.recurring === 'daily';
   const optimistic = isRecurring
-    ? snapshot // recurring task stays visible; backend stamps last_completed
-    : snapshot.filter(t => t.id !== taskId);
-  const { taskCount, urgentCount } = deriveCounts(optimistic);
+    ? before.tasks // recurring task stays visible; backend stamps last_completed
+    : before.tasks.filter(t => t.id !== taskId);
   backlogStore.set({
     ...before,
     tasks: optimistic,
-    taskCount,
-    urgentCount,
+    ...deriveCounts(optimistic),
     error: null // clear any previous error on new mutation
   });
 
@@ -263,12 +285,21 @@ export async function completeTask(taskId) {
     fetchBoard();
   } catch (e) {
     if (myGen !== generation) return; // modal closed; abandon rollback
-    backlogStore.set({
-      ...backlogStore.get(),
-      tasks: snapshot,
-      ...deriveCounts(snapshot),
-      error: String(e?.message || e)
-    });
+    // Inverse patch: re-insert the removed task at its sorted position
+    // in the CURRENT array (recurring case removed nothing → no-op
+    // guard via includes check). Mutations that landed since are kept.
+    // Accepted residual: if an edit/toggle on THIS task was in flight
+    // when it was optimistically removed and succeeded on the backend,
+    // the re-inserted object carries pre-edit fields — display-stale
+    // until next openProject; backend state is correct.
+    rollbackWith(
+      (tasks) => {
+        if (isRecurring) return tasks; // nothing was removed
+        if (tasks.some(t => t.id === taskId)) return tasks; // already back
+        return sortUrgentFirst([...tasks, removedTask]);
+      },
+      String(e?.message || e)
+    );
   }
 }
 
@@ -277,19 +308,23 @@ export async function toggleUrgent(taskId, urgent) {
   if (!before.openProjectId) return;
   const projectId = before.openProjectId;
   const myGen = generation;
-  const snapshot = before.tasks;
   const willBeUrgent = Boolean(urgent);
 
-  const patched = snapshot.map(t =>
+  // Capture the original flag for inverse patch (not just !willBeUrgent:
+  // a redundant set-to-same-value call should roll back to the true
+  // original, which equals current in that case anyway).
+  const targetTask = before.tasks.find(t => t.id === taskId);
+  if (!targetTask) return; // stale tap
+  const originalUrgent = Boolean(targetTask.urgent);
+
+  const patched = before.tasks.map(t =>
     t.id === taskId ? { ...t, urgent: willBeUrgent } : t
   );
   const optimistic = sortUrgentFirst(patched);
-  const { taskCount, urgentCount } = deriveCounts(optimistic);
   backlogStore.set({
     ...before,
     tasks: optimistic,
-    taskCount,
-    urgentCount,
+    ...deriveCounts(optimistic),
     error: null
   });
 
@@ -303,12 +338,22 @@ export async function toggleUrgent(taskId, urgent) {
     fetchBoard(); // unconditional cross-store sync — see completeTask comment
   } catch (e) {
     if (myGen !== generation) return;
-    backlogStore.set({
-      ...backlogStore.get(),
-      tasks: snapshot,
-      ...deriveCounts(snapshot),
-      error: String(e?.message || e)
-    });
+    // Inverse patch: restore the original urgent flag by id —
+    // CONDITIONAL on the task still carrying MY optimistic value. If a
+    // later toggle on the same task succeeded in between, its value
+    // wins and this rollback is a no-op (Codex 5b-10: unconditional
+    // restore clobbered later same-entity successes). Removed-since
+    // tasks are a map no-op — nothing resurrects.
+    rollbackWith(
+      (tasks) => sortUrgentFirst(
+        tasks.map(t =>
+          t.id === taskId && Boolean(t.urgent) === willBeUrgent
+            ? { ...t, urgent: originalUrgent }
+            : t
+        )
+      ),
+      String(e?.message || e)
+    );
   }
 }
 
@@ -355,6 +400,10 @@ export async function reorder(newOrderIds) {
   // dragged tasks back toward their old positions.
   const withPriorities = assignBucketedPriorities(reordered);
 
+  // Capture original order + priorities for the inverse patch.
+  const originalOrderIds = snapshot.map(t => t.id);
+  const originalPriorityById = new Map(snapshot.map(t => [t.id, t.priority]));
+
   // Counts unchanged by reorder; skip recompute.
   backlogStore.set({
     ...before,
@@ -367,11 +416,42 @@ export async function reorder(newOrderIds) {
     fetchBoard(); // unconditional cross-store sync — see completeTask comment
   } catch (e) {
     if (myGen !== generation) return;
-    backlogStore.set({
-      ...backlogStore.get(),
-      tasks: snapshot,
-      error: String(e?.message || e)
-    });
+    // Inverse patch — CONDITIONAL: only restore the original order if
+    // the CURRENT order still matches MY optimistic order (for the ids
+    // we both know about). If a later reorder succeeded in between,
+    // its order wins and this rollback is a no-op (Codex 5b-10:
+    // unconditional restore clobbered later same-entity successes).
+    const myOptimisticIds = withPriorities.map(t => t.id);
+    rollbackWith(
+      (tasks) => {
+        const currentIds = tasks.map(t => t.id);
+        const currentSharedOrder = currentIds.filter(id => originalPriorityById.has(id));
+        const mySharedOrder = myOptimisticIds.filter(id => currentIds.includes(id));
+        const stillMine =
+          currentSharedOrder.length === mySharedOrder.length &&
+          currentSharedOrder.every((id, i) => id === mySharedOrder[i]);
+        if (!stillMine) return tasks; // a later reorder landed — keep it
+
+        // Restore ORIGINAL relative order + priorities for tasks still
+        // present. Removed-since stay removed; added-since append.
+        const currentById = new Map(tasks.map(t => [t.id, t]));
+        const restored = [];
+        for (const id of originalOrderIds) {
+          const t = currentById.get(id);
+          if (!t) continue;
+          const origPriority = originalPriorityById.get(id);
+          restored.push(
+            origPriority === undefined ? t : { ...t, priority: origPriority }
+          );
+          currentById.delete(id);
+        }
+        for (const t of tasks) {
+          if (currentById.has(t.id)) restored.push(t);
+        }
+        return restored;
+      },
+      String(e?.message || e)
+    );
   }
 }
 
@@ -385,7 +465,6 @@ export async function editText(taskId, newText) {
   if (!before.openProjectId) return { ok: false, error: 'No project open' };
   const projectId = before.openProjectId;
   const myGen = generation;
-  const snapshot = before.tasks;
 
   // Frontend defense in depth: trim + slice mirrors backend
   // op:update_task_text validation (api/backlog.js). Backend
@@ -394,7 +473,12 @@ export async function editText(taskId, newText) {
   const cleanText = String(newText || '').trim().slice(0, 200);
   if (cleanText.length === 0) return { ok: false, error: 'Empty text' };
 
-  const optimistic = snapshot.map(t =>
+  // Capture original text for inverse patch.
+  const targetTask = before.tasks.find(t => t.id === taskId);
+  if (!targetTask) return { ok: false, error: 'Task not found' };
+  const originalText = targetTask.text;
+
+  const optimistic = before.tasks.map(t =>
     t.id === taskId ? { ...t, text: cleanText } : t
   );
   // Counts unchanged by text edit; skip recompute.
@@ -416,11 +500,19 @@ export async function editText(taskId, newText) {
   } catch (e) {
     const errorMessage = String(e?.message || e);
     if (myGen !== generation) return { ok: false, error: errorMessage };
-    backlogStore.set({
-      ...backlogStore.get(),
-      tasks: snapshot,
-      error: errorMessage
-    });
+    // Inverse patch: restore the original text by id — CONDITIONAL on
+    // the task still carrying MY optimistic text. If a later edit on
+    // the same task succeeded in between, its text wins (Codex 5b-10:
+    // unconditional restore clobbered later same-entity successes).
+    // No-op if the task was removed since.
+    rollbackWith(
+      (tasks) => tasks.map(t =>
+        t.id === taskId && t.text === cleanText
+          ? { ...t, text: originalText }
+          : t
+      ),
+      errorMessage
+    );
     return { ok: false, error: errorMessage };
   }
 }
@@ -430,15 +522,15 @@ export async function deleteTask(taskId) {
   if (!before.openProjectId) return;
   const projectId = before.openProjectId;
   const myGen = generation;
-  const snapshot = before.tasks;
 
-  const optimistic = snapshot.filter(t => t.id !== taskId);
-  const { taskCount, urgentCount } = deriveCounts(optimistic);
+  const removedTask = before.tasks.find(t => t.id === taskId);
+  if (!removedTask) return; // stale tap on an already-removed row
+
+  const optimistic = before.tasks.filter(t => t.id !== taskId);
   backlogStore.set({
     ...before,
     tasks: optimistic,
-    taskCount,
-    urgentCount,
+    ...deriveCounts(optimistic),
     error: null
   });
 
@@ -447,11 +539,15 @@ export async function deleteTask(taskId) {
     fetchBoard(); // unconditional cross-store sync — see completeTask comment
   } catch (e) {
     if (myGen !== generation) return;
-    backlogStore.set({
-      ...backlogStore.get(),
-      tasks: snapshot,
-      ...deriveCounts(snapshot),
-      error: String(e?.message || e)
-    });
+    // Inverse patch: re-insert the removed task at its sorted position
+    // in the CURRENT array. Concurrent mutations that landed since are
+    // preserved.
+    rollbackWith(
+      (tasks) => {
+        if (tasks.some(t => t.id === taskId)) return tasks; // already back
+        return sortUrgentFirst([...tasks, removedTask]);
+      },
+      String(e?.message || e)
+    );
   }
 }

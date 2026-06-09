@@ -64,6 +64,13 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
   // task.text (which is now rolled-back to pre-edit value), losing the
   // user's typed work. Solo-operator daily-driver friction unacceptable.
   const [lastAttempt, setLastAttempt] = useState(null);
+  // Brief acknowledgment flash when completing a RECURRING task — the
+  // row intentionally stays visible (backend keeps it pending, stamps
+  // last_completed), so without feedback the tap looks like a no-op.
+  // 30x/day tool; silent no-ops erode trust (5b-5 Domain Expert; flash
+  // approved as the minimal treatment until recurring-task UX is
+  // properly designed in Phase 6+).
+  const [completeFlash, setCompleteFlash] = useState(false);
   const inputRef = useRef(null);
   // Guard against double-commit: Enter → setEditing(false) → input
   // unmounts → blur fires during removal → second commitEdit. Codex
@@ -116,10 +123,45 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
       if (inputRef.current === el) {
         el.focus();
         el.select();
+        // Keyboard-occlusion defense (iOS Safari): if this row sits in
+        // the lower portion of the modal, the software keyboard
+        // (~330px) can cover the input. Centering it in the scrollable
+        // modal body keeps it visible. No-op when already centered or
+        // on desktop. (5b-6 council iOS Safari specialist concern.)
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }
     }, 0);
     return () => clearTimeout(timerId);
   }, [editing]);
+
+  // Recurring-task complete acknowledgment: flash the row briefly,
+  // then clear. Timer cleaned up on unmount/re-trigger.
+  useEffect(() => {
+    if (!completeFlash) return undefined;
+    const timerId = setTimeout(() => {
+      if (mountedRef.current) setCompleteFlash(false);
+    }, 700);
+    return () => clearTimeout(timerId);
+  }, [completeFlash]);
+
+  // In-flight guard for recurring completes: the row stays mounted, so
+  // a rapid double-tap would fire two op:complete POSTs — and two
+  // parallel GitHub Contents writes can conflict on SHA, surfacing a
+  // spurious failure for an intent that succeeded (Codex 5b-10).
+  // Non-recurring rows unmount on first tap, so this guard only
+  // matters for recurring.
+  const [completing, setCompleting] = useState(false);
+
+  async function onCheck() {
+    if (completing) return;
+    const isRecurring = task.recurring === 'daily';
+    if (isRecurring) {
+      setCompleting(true);
+      setCompleteFlash(true);
+    }
+    await completeTask(task.id);
+    if (isRecurring && mountedRef.current) setCompleting(false);
+  }
 
   async function commitEdit() {
     // Double-commit guard: Enter handler calls commitEdit, then sets
@@ -179,6 +221,7 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
     'backlog-task-row',
     task.urgent ? 'urgent' : '',
     saveFailed ? 'save-failed' : '',
+    completeFlash ? 'complete-flash' : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -233,8 +276,8 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
           type="button"
           class="btn-icon check"
           aria-label="Complete task"
-          disabled={editing}
-          onClick={() => completeTask(task.id)}
+          disabled={editing || completing}
+          onClick={onCheck}
           data-testid={`backlog-task-check-${task.id}`}
         >✓</button>
         <button

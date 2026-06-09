@@ -114,11 +114,68 @@ const FITNESS_FULL = {
   ]
 };
 
+// Mixed-height fixture — used by mobile-backlog.spec.js to verify the
+// 5b-10 drag.js nearest-center fix. Task 1 has deliberately long text
+// that wraps to 2 lines at the iPhone viewport width (390px), creating
+// a tall row between short rows. All non-urgent so they share one
+// section (single drag controller).
+const MIXED_HEIGHT_FULL = {
+  schema_version: 1,
+  project_id: 'mixed-height',
+  project_name: 'Mixed Height',
+  tasks: [
+    {
+      id: 'mx-1',
+      text: 'Short task one',
+      priority: 1,
+      urgent: false,
+      status: 'pending',
+      created: '2026-05-15'
+    },
+    {
+      id: 'mx-2',
+      text: 'A deliberately long task description that wraps onto a second line at mobile viewport widths to create a taller row for drag slot-targeting verification purposes',
+      priority: 2,
+      urgent: false,
+      status: 'pending',
+      created: '2026-05-15'
+    },
+    {
+      id: 'mx-3',
+      text: 'Short task three',
+      priority: 3,
+      urgent: false,
+      status: 'pending',
+      created: '2026-05-15'
+    },
+    {
+      id: 'mx-4',
+      text: 'Short task four',
+      priority: 4,
+      urgent: false,
+      status: 'pending',
+      created: '2026-05-15'
+    },
+    // mx-5..mx-12: filler rows so the modal body overflows the iPhone
+    // 844px viewport and M2 can assert real scrolling (Codex 5b-10:
+    // a 4-row fixture made the scroll assertion conditional/vacuous).
+    ...Array.from({ length: 8 }, (_, i) => ({
+      id: `mx-${i + 5}`,
+      text: `Filler task number ${i + 5} for scroll overflow`,
+      priority: 5,
+      urgent: false,
+      status: 'pending',
+      created: '2026-05-15'
+    }))
+  ]
+};
+
 export const BACKLOG_FIXTURES = {
   'lionmaker-systems': LIONMAKER_FULL,
   '708-pallister': PALLISTER_FULL,
   'motor-city-deals': MOTOR_CITY_FULL,
-  'fitness': FITNESS_FULL
+  'fitness': FITNESS_FULL,
+  'mixed-height': MIXED_HEIGHT_FULL
 };
 
 // Registry summary that matches the BACKLOG_FIXTURES projects (so
@@ -170,6 +227,19 @@ export const BACKLOG_REGISTRY = {
       last_touched: '2026-05-14',
       top: [
         { id: 'fit-001', text: '30 minute minimum workout', priority: 1, urgent: false }
+      ]
+    },
+    {
+      project_id: 'mixed-height',
+      project_name: 'Mixed Height',
+      priority: 5,
+      task_count: 12,
+      urgent_count: 0,
+      last_touched: '2026-05-15',
+      top: [
+        { id: 'mx-1', text: 'Short task one', priority: 1, urgent: false },
+        { id: 'mx-2', text: 'A deliberately long task description that wraps onto a second line at mobile viewport widths to create a taller row for drag slot-targeting verification purposes', priority: 2, urgent: false },
+        { id: 'mx-3', text: 'Short task three', priority: 3, urgent: false }
       ]
     }
   ]

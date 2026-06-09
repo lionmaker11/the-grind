@@ -477,4 +477,51 @@ test.describe('Phase 5b Backlog Detail — backlog-detail-flow', () => {
     await expect(row).not.toHaveClass(/save-failed/);
     await expect(page.getByTestId('backlog-task-retry-fit-001')).toHaveCount(0);
   });
+
+  // ─── Test 14 — Patch-based rollback preserves concurrent mutations ──
+  // Regression test for the 5b-10 fix. Previously: a failing mutator's
+  // whole-array snapshot restore would resurrect/undo OTHER mutations
+  // that succeeded between its start and failure. The scenario was
+  // deliberately NOT codified in 5b-8 ("don't test for known-broken
+  // behavior"); 5b-10's patch-based rollback fixed it, so this test now
+  // codifies the CORRECT behavior.
+  test('14 patch rollback: failing edit does NOT resurrect a concurrently-deleted task', async ({ page }) => {
+    const capture = await setupMockBackend(page, {
+      registry: BACKLOG_REGISTRY,
+      backlogs: BACKLOG_FIXTURES,
+      backlogEditFailOnText: 'Pizza',
+      backlogEditDelayMs: 600 // hold the edit in flight while delete lands
+    });
+    await page.goto('/');
+    await page.getByTestId('board-project-chevron-lionmaker-systems').click();
+    await expect(page.getByTestId('backlog-task-t-lm-1')).toBeVisible();
+
+    // Start the doomed edit on t-lm-1 (commits async, held 600ms, fails).
+    await page.getByTestId('backlog-task-text-t-lm-1').click();
+    const input = page.getByTestId('backlog-task-input-t-lm-1');
+    await input.fill('Pizza');
+    await input.press('Enter');
+
+    // While the edit is in flight, delete t-lm-3 (fast, succeeds).
+    await page.getByTestId('backlog-task-delete-t-lm-3').click();
+    await expect(page.getByTestId('backlog-task-t-lm-3')).toHaveCount(0);
+
+    // Wait for the edit failure to surface (retry button on t-lm-1).
+    await expect(page.getByTestId('backlog-task-retry-t-lm-1')).toBeVisible({ timeout: 3000 });
+
+    // THE FIX: t-lm-3 STAYS deleted. Old whole-array rollback restored
+    // the pre-edit snapshot (which contained t-lm-3), resurrecting it.
+    await expect(page.getByTestId('backlog-task-t-lm-3')).toHaveCount(0);
+
+    // And the edit itself rolled back: t-lm-1 shows original text.
+    await expect(page.getByTestId('backlog-task-text-t-lm-1')).toContainText('Ship V2 onboarding');
+
+    // Both ops actually fired.
+    expect(capture.backlog.filter(b => b.op === 'update_task_text')).toHaveLength(1);
+    expect(capture.backlog.filter(b => b.op === 'delete_task')).toHaveLength(1);
+
+    // Counts reflect: 4 original - 1 deleted = 3 (edit rollback doesn't
+    // change counts).
+    await expect(page.locator('.backlog-modal-urgent-line')).toContainText('3 TASKS');
+  });
 });

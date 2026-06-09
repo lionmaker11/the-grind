@@ -91,7 +91,8 @@ export function createListDragController({
   const items = new Map();
 
   // Mutable drag state; null when no drag is in flight.
-  // { fromIdx, toIdx, startY, pointerId, handleEl, engaged, rowHeight }
+  // { fromIdx, toIdx, startY, pointerId, handleEl, engaged, rowHeight,
+  //   originCenterY, slotCenters: [{idx, centerY}] }
   let drag = null;
 
   function setItem(idx, el) {
@@ -121,6 +122,8 @@ export function createListDragController({
       handleEl,
       engaged: false,
       rowHeight: 0,
+      originCenterY: 0,
+      slotCenters: [],
     };
 
     window.addEventListener('pointermove', onPointerMove);
@@ -135,7 +138,24 @@ export function createListDragController({
       cleanup();
       return false;
     }
-    drag.rowHeight = el.getBoundingClientRect().height;
+    const rect = el.getBoundingClientRect();
+    drag.rowHeight = rect.height;
+    drag.originCenterY = rect.top + rect.height / 2;
+
+    // Snapshot every row's static center Y at engage time (before any
+    // transforms are written). Mixed-height rows (wrap2 two-line vs
+    // one-line) make the old uniform-height quantization skip slots —
+    // a short row dragged across tall rows crossed "one rowHeight" of
+    // pixels before visually crossing one row. Nearest-center matching
+    // against these static centers is height-agnostic. (5b-10; flagged
+    // by Codex 5b-5 Phase 2.)
+    drag.slotCenters = [];
+    items.forEach((node, i) => {
+      const r = node.getBoundingClientRect();
+      drag.slotCenters.push({ idx: i, centerY: r.top + r.height / 2 });
+    });
+    drag.slotCenters.sort((a, b) => a.idx - b.idx);
+
     el.classList.add(draggingClass);
     drag.engaged = true;
     return true;
@@ -156,15 +176,22 @@ export function createListDragController({
     // Move the dragged row with the finger.
     draggedEl.style.transform = `translateY(${delta}px)`;
 
-    // Compute target slot assuming uniform row height (the dragged
-    // row's own height). Works well for lists where rows are visually
-    // similar; slightly imprecise for wildly heterogeneous rows but
-    // still correct in the final fromIdx/toIdx pair on release.
-    const offset = Math.round(delta / drag.rowHeight);
-    const count = items.size;
-    let toIdx = drag.fromIdx + offset;
-    if (toIdx < 0) toIdx = 0;
-    if (toIdx > count - 1) toIdx = count - 1;
+    // Compute target slot by nearest static slot center: the dragged
+    // row's translated center is compared against each row's engage-
+    // time center. Height-agnostic — correct for mixed one-line /
+    // two-line rows where uniform-height quantization skipped slots.
+    // For uniform rows this reduces to the old Math.round(delta /
+    // rowHeight) behavior (centers are evenly spaced).
+    const draggedCenterY = drag.originCenterY + delta;
+    let toIdx = drag.fromIdx;
+    let bestDist = Infinity;
+    for (const slot of drag.slotCenters) {
+      const dist = Math.abs(slot.centerY - draggedCenterY);
+      if (dist < bestDist) {
+        bestDist = dist;
+        toIdx = slot.idx;
+      }
+    }
     drag.toIdx = toIdx;
 
     // Displace non-dragged rows to open a gap at the insertion point.

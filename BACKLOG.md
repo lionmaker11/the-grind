@@ -40,13 +40,9 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
 ## 2026-05-15 — captured during 5b-3 (backlogStore)
 
-- [ ] **Concurrent same-modal mutator rollback can resurrect/undo later mutations** — Codex flagged during 5b-3 Phase 2 review. backlogStore mutators snapshot the whole `tasks` array at start; on failure, they restore the snapshot. If two mutators run concurrently (e.g. `completeTask(A)` removes A and succeeds, then a previously-started `toggleUrgent(A)` fails and restores the older snapshot containing A), the failed rollback resurrects A. Same shape: `editText(A)` followed by `deleteTask(A)` — edit failure can resurrect the deleted task.
+- [x] **Concurrent same-modal mutator rollback can resurrect/undo later mutations** — **FIXED in 5b-10.** Patch-based rollback implemented across all 5 backlogStore mutators: each captures its specific change (removed task object, original urgent flag, original text, original order+priorities) and reverses ONLY that change against CURRENT store state on failure. Same-entity overlaps additionally guarded with conditional rollback ("only restore if current still equals my optimistic value"). Regression test: backlog-detail-flow test 14 (failing edit does NOT resurrect a concurrently-deleted task).
 
-  Generation guard added in 5b-3 covers modal-close + project-switch races; this remaining race is concurrent same-modal mutators on overlapping rows. Single-user single-tenant scope makes it low-frequency in practice.
-
-  Fix when surfaced: per-row mutation lock (UI disables actions while in flight) OR patch-based rollback (each mutator records its specific change and reverses just that change on failure, instead of whole-array snapshot restore). Latter is cleaner but ~80 lines of additional defensive code per mutator.
-
-  Status: defer — revisit if observed in dogfood (look for "task that I deleted reappeared" or "edit that I made reverted" reports).
+  Accepted residual (documented in backlog.js): complete/delete rollback re-insertion can carry pre-edit fields if an edit on the SAME task was in flight when removed — display-stale until next openProject; backend correct.
 
 - [ ] **boardStore.fetchBoard out-of-order response race** — Codex 5b-3 Phase 3 flagged. Multiple rapid modal mutations each fire `fetchBoard()`; if response #4 arrives after response #10, the older summary overwrites the newer. Visual result: Board momentarily reverts to an older state. Fix needs request-generation guard inside `fetchBoard()` itself (boardStore module change, not backlogStore).
 
@@ -110,11 +106,7 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
 ## 2026-05-15 — captured during 5b-5 (TaskRow inside BacklogDetail)
 
-- [ ] **drag.js mixed-height row drop-index inaccuracy** — Codex 5b-5 Phase 2 flagged. `lib/drag.js` measures only the dragged row's height (line 138) and computes `toIdx` via `Math.round(delta / drag.rowHeight)` (line 163), assuming uniform row heights. Backlog detail rows wrap to 2 lines via `.wrap2` class, so a short row dragged through tall rows can skip slots earlier than the visual midpoint suggests.
-
-  Pre-existing drag.js limitation; affects Board too but is more visible in modal where rows tend to be longer text. Fix: extend drag.js to use actual element bounding rects per row instead of the uniform assumption.
-
-  Status: defer — library work, not 5b-5 scope. Verify in 5b-9 phone test on iPhone with mixed-length tasks; if dogfood signals "wrong row moved" reports, prioritize.
+- [x] **drag.js mixed-height row drop-index inaccuracy** — **FIXED in 5b-10.** engage() now snapshots every row's static center Y; toIdx is the nearest slot center to the dragged row's translated center (height-agnostic; reduces to old behavior for uniform rows). Regression test: mobile-backlog M3 (short row dragged just past a tall 2-line row's center swaps ONE slot — old math skipped two). Benefits Board automatically (shared library).
 
 - [ ] **longpress.js timer can fire on detached element** — Codex 5b-5 Phase 2 flagged. `lib/longpress.js` has no destroy hook (line 86 acknowledges this); timer set on pointerdown can fire after the row unmounts (e.g. concurrent complete/delete removes the row mid-hold, or modal closes mid-hold).
 
@@ -146,19 +138,11 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
   Status: pre-existing bug, not in 5b-5 scope. Fix in a focused boardStore commit OR fold into motion-polish sweep when recurring-task UX is designed properly.
 
-- [ ] **Recurring task done-today visual indicator in modal + Board** — Frontend fix above keeps recurring tasks visible after completion. But the user has no visual signal that their tap registered. Backend stamps `last_completed = today`; frontend could compare to today's date and render a "✓ DONE TODAY" indicator on the row.
+- [ ] **Recurring task done-today visual indicator in modal + Board** — Frontend fix above keeps recurring tasks visible after completion. **Partial fix in 5b-10:** modal rows now show a 700ms green acknowledgment flash on recurring ✓ (CSS pulse, reduced-motion fallback) + in-flight guard prevents double-POST SHA conflicts. Remaining: a PERSISTENT "✓ DONE TODAY" indicator comparing last_completed to today, designed properly with the recurring-task UX (Phase 6+; Board parity then too).
 
-  Requires CSS rule + small markup addition to BacklogTaskRow (and Board TaskRow when that fix lands). Plus a `today()` helper or date-fns dependency.
+  Status: flash shipped; persistent indicator deferred to recurring-task UX design.
 
-  Status: defer — UX design needed. Recurring-task workflow hasn't been formally designed in the V2 spec set. Could pair with the boardStore fix above.
-
-- [ ] **Concurrent same-modal mutator rollback — RE-RATED SEVERITY (3x now)** — Originally logged in 5b-3 as low-frequency-in-practice. Codex 5b-5 Phase 3 elevated when rapid check/delete sequences became normal use. Codex 5b-6 Phase 3 elevated AGAIN: 5b-6's edit-text turns this into a TRIVIAL 2-tap workflow — user edits row A, blurs (commits A async), edits row B, blurs (commits B async). Both editText calls capture whole-array snapshots concurrently. If A's commit fails after B's succeeds, A's rollback restores the snapshot from before B's edit, erasing B's successful optimistic text from the modal display.
-
-  5b-6 mitigations applied: disabled check + delete + drag-handle while editing prevents same-row edit→destructive races AND same-row edit→reorder races. Two-row sequential edits remain unguarded — they're the natural flow.
-
-  Single-user single-tenant context still bounds the issue (one finger, one tap at a time), but the window is wider with each new sub-step. By 5b-7 chevron + 5b-8 tests this will be the most-frequently-triggered race in the codebase.
-
-  Status: **prioritize after 5b-9 phone test** — if T.J. reports ANY of "edit reverted", "deleted task came back", "completed task reappeared", implement patch-based rollback (each mutator records its specific change and reverses just that change on failure) as a dedicated commit before merge. Estimate: ~80 lines across 5 mutators.
+- [x] **Concurrent same-modal mutator rollback — RE-RATED SEVERITY (3x)** — **FIXED in 5b-10** (see the resolved 5b-3 entry above for implementation details: patch-based rollback + conditional same-entity guards + regression test 14). This duplicate-tracking entry closed with it.
 
 - [ ] **In-flight drag silently canceled if section membership changes** — Codex 5b-5 Phase 3 flagged. `BacklogList` rebuilds urgent/normal drag controllers when section id lists change. If a separate mutator (long-press toggle on another row, complete/delete on another row) changes section membership mid-drag, the old controller is destroyed and the user's pointer-down is orphaned. Drag doesn't corrupt state — it just dies; user lifts finger and re-drags.
 
