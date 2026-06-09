@@ -1,3 +1,8 @@
+/* Focus.css — Phase 6 full surface (5a-10 overlay pattern preserved:
+ * position:fixed + 100vh/100dvh + explicit background. Do NOT use
+ * min-height:100%). Mode classes set --ring-color / --ring-glow-color
+ * consumed by Ring.css and the accents below. */
+
 .focus {
   position: fixed;
   top: 0;
@@ -12,9 +17,22 @@
   padding-top: calc(var(--top-bar-h) + var(--s-4));
   display: flex;
   flex-direction: column;
+  align-items: center;
   background: var(--bg);
   color: var(--text);
   overflow-y: auto;
+  --ring-color: var(--cyan);
+  --ring-glow-color: var(--cyan-glow);
+}
+
+.focus.mode-break {
+  --ring-color: var(--green);
+  --ring-glow-color: var(--green-glow);
+}
+
+.focus.mode-reboot {
+  --ring-color: var(--magenta);
+  --ring-glow-color: var(--magenta-glow);
 }
 
 .focus-back {
@@ -26,32 +44,232 @@
   cursor: pointer;
   padding: var(--s-2);
   align-self: flex-start;
-  margin-bottom: var(--s-6);
+  margin-bottom: var(--s-4);
 }
 
 .focus-back:hover {
   color: var(--cyan);
 }
 
-.focus-stub-content {
-  flex: 1;
+/* Task + project lines (mockups: .focus-task / .focus-proj) */
+.focus-task-line {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--t-md);
+  color: var(--text);
+  text-align: center;
+  max-width: 340px;
+  line-height: 1.35;
+  margin-bottom: var(--s-2);
+}
+
+.mode-break .focus-task-line { color: var(--green); }
+.mode-reboot .focus-task-line { color: var(--magenta); }
+
+.focus-proj-line {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: var(--s-5);
+}
+
+.focus-proj-dot {
+  color: var(--amber);
+  text-shadow: 0 0 6px var(--amber-glow);
+}
+
+/* ── Pomo picker (select mode, D4) ───────────────────────────── */
+.pomo-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+  margin-top: var(--s-8);
+}
+
+.pomo-picker-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.pomo-picker-row {
+  display: flex;
+  gap: var(--s-3);
+}
+
+.pomo-glyph-btn {
+  width: 72px;
+  height: 84px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--s-4);
-  text-align: center;
-}
-
-.focus-task-text {
-  font-family: var(--font-body);
-  font-size: var(--t-lg);
+  gap: var(--s-2);
+  background: rgba(0, 240, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
   color: var(--text);
-  max-width: 600px;
+  cursor: pointer;
+  transition: border-color 120ms ease-out, background 120ms ease-out,
+    box-shadow 120ms ease-out;
 }
 
-.focus-stub-note {
+.pomo-glyph-btn:hover,
+.pomo-glyph-btn:active {
+  border-color: var(--cyan);
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: 0 0 16px var(--cyan-dim);
+}
+
+.pomo-glyph-count {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--t-lg);
+  color: var(--cyan);
+  text-shadow: 0 0 12px var(--cyan-dim);
+}
+
+.pomo-glyph-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.pomo-mini-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  opacity: 0.6;
+}
+
+.pomo-picker-sub {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── Mode tabs (mockups; shared.css vocabulary) ──────────────── */
+.mode-tabs {
+  display: flex;
+  gap: var(--s-2);
+  margin-bottom: var(--s-6);
+}
+
+.mode-tab {
+  padding: var(--s-2) var(--s-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.mode-tab.active.focus-mode {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-dim);
+}
+
+.mode-tab.active.break-mode {
+  color: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+
+.mode-tab.active.reboot-mode {
+  color: var(--magenta);
+  border-color: var(--magenta);
+  box-shadow: 0 0 12px var(--magenta-glow);
+}
+
+/* ── Controls ────────────────────────────────────────────────── */
+.focus-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin-top: var(--s-6);
+}
+
+.ctrl-btn {
+  min-width: 52px;
+  height: 52px;
+  padding: 0 var(--s-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: var(--t-base);
-  color: var(--text-dim);
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.ctrl-btn:hover {
+  color: var(--ring-color);
+  border-color: var(--ring-color);
+}
+
+.ctrl-btn.primary {
+  background: linear-gradient(135deg, var(--cyan), #00b8d4);
+  border: none;
+  color: #001318;
+  font-weight: 700;
+  box-shadow: 0 0 24px var(--cyan-dim);
+  min-width: 120px;
+}
+
+.ctrl-btn.primary.paused {
+  background: linear-gradient(135deg, var(--yellow), #e6cf00);
+  box-shadow: 0 0 24px var(--yellow-glow);
+}
+
+.ctrl-btn.primary.break {
+  background: linear-gradient(135deg, var(--green), #2ecc5a);
+  box-shadow: 0 0 24px var(--green-glow);
+}
+
+.ctrl-btn.primary.reboot {
+  background: linear-gradient(135deg, var(--magenta), #c400a8);
+  color: #fff;
+  box-shadow: 0 0 24px var(--magenta-glow);
+}
+
+/* ── Session dots ────────────────────────────────────────────── */
+.session-dots {
+  display: flex;
+  gap: var(--s-3);
+  margin-top: var(--s-6);
+}
+
+.session-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--border-bright);
+  background: transparent;
+}
+
+.session-dot.filled {
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan-glow);
+  border-color: var(--cyan);
+}
+
+.session-dot.filled.reboot {
+  background: var(--magenta);
+  box-shadow: 0 0 8px var(--magenta-glow);
+  border-color: var(--magenta);
 }

@@ -30,6 +30,7 @@
 import { map } from 'nanostores';
 import { getBacklog, backlogOp } from '../lib/api.js';
 import { setActive as setFocusActive } from './focus.js';
+import { launch as timerLaunch } from './timer.js';
 
 export const boardStore = map({
   summary: [],
@@ -207,4 +208,13 @@ export function launchTask(projectId, taskId) {
   const task = (project.top || []).find(t => t.id === taskId);
   if (!task) return;
   setFocusActive(taskId, task.text, projectId);
+  // Phase 6: arm the pomodoro session. Same-task launch while a
+  // session is running is a no-op inside timer.launch (re-entry, D6);
+  // different-task launch replaces the session.
+  timerLaunch({
+    id: task.id,
+    text: task.text,
+    project_id: projectId,
+    project_name: project.project_name || projectId
+  });
 }

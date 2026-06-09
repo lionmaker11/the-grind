@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import { boardStore } from '../../state/board.js';
 import { museStore } from '../../state/muse.js';
+import { timerStore } from '../../state/timer.js';
 import './TopBar.css';
 
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -16,6 +17,7 @@ function formatClock(d) {
 export function TopBar() {
   const { error } = useStore(boardStore);
   const { lastAction, lastActionAt } = useStore(museStore);
+  const timer = useStore(timerStore);
   const [clock, setClock] = useState(() => formatClock(new Date()));
   const [now, setNow] = useState(() => Date.now());
 
@@ -37,11 +39,31 @@ export function TopBar() {
 
   const actionActive = lastAction && (now - lastActionAt) < ACTION_WINDOW_MS;
 
+  // Phase 6: session status per mockups 06/07 — `POMO n / m` running,
+  // `:: PAUSED` suffix when paused. break/reboot show their own labels.
+  // Priority: action > pomo > offline > clock.
+  const inSession =
+    timer.mode === 'work' || timer.mode === 'break' || timer.mode === 'long-break';
+  let pomoText = null;
+  if (inSession) {
+    if (timer.mode === 'work') {
+      const n = Math.min(timer.sessionPomos + 1, timer.plannedPomos);
+      pomoText = `POMO ${n} / ${timer.plannedPomos}${timer.running ? '' : ' :: PAUSED'}`;
+    } else if (timer.mode === 'break') {
+      pomoText = 'BREAK';
+    } else {
+      pomoText = 'REBOOT';
+    }
+  }
+
   let statusClass = 'topbar-status';
   let statusText;
   if (actionActive) {
     statusClass = 'topbar-status action';
     statusText = `// ACTION · ${lastAction}`;
+  } else if (pomoText) {
+    statusClass = 'topbar-status pomo';
+    statusText = pomoText;
   } else if (error) {
     statusClass = 'topbar-status offline';
     statusText = '// OFFLINE';

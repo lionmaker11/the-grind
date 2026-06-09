@@ -66,3 +66,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Phase 6: pomodoro session status (mockups 06/07 show it magenta) */
+.topbar-status.pomo {
+  color: var(--magenta);
+  text-shadow: 0 0 8px var(--magenta-dim);
+}
