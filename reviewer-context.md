@@ -157,4 +157,10 @@ Pre-Dev-Loop history (worth remembering even though not formally captured by the
 - 2026-05-15: status documents written from memory get numerical claims wrong — bundle "growth ~9KB JS / ~7KB CSS" was actually ~2KB / ~1KB. Compute deltas explicitly from the prior status doc baseline rather than estimating. Caught by Codex 5b-9 Phase 3.
 - 2026-05-15: status documents should hedge unverified facts rather than presenting them as concrete — "preview URL is X" should be "TBD; run vercel ls" if the deployment hasn't happened. Caught by Codex 5b-9 Phase 3.
 
+- 2026-05-16: stale dev servers poison Playwright runs — reuseExistingServer:true + a server started under older code serves a stale module graph; symptoms are nondeterministic cross-run failure counts and absurd durations. Kill port 5173 + playwright processes before judging a "flaky" suite. Caught during V2 hardening pass.
+- 2026-05-16: window-level key listeners + component-level key handlers on the same key need stopPropagation at the inner handler — activeElement guards can race synchronous Preact re-renders that unmount the focused element mid-dispatch. Caught by intermittent test failure during hardening.
+- 2026-05-16: fire-and-forget async work after res.json() on Vercel serverless can be frozen before completing — await side effects (they can still swallow their own errors) before returning the response. Caught by Codex hardening review.
+- 2026-05-16: live timer ticks need the same multi-segment catch-up chain as hydration — a backgrounded tab waking after several segment durations otherwise gifts the away-time back (startSegment anchors to now). Caught by Codex Phase 6 review.
+- 2026-05-16: animation fill-mode 'both' leaves a terminal transform applied, creating a containing block that breaks position:fixed descendants — use 'backwards' for entry animations on wrappers that can contain fixed overlays. Caught by Codex motion review.
+
 ---
