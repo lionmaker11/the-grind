@@ -4,7 +4,12 @@ Authoritative record of phase-by-phase state, approved exceptions, and patterns
 observed during the rebuild. Read this file first in any new Claude Code
 session before touching code.
 
-## Current state (16 May 2026 — V2 FUNCTIONALLY COMPLETE)
+## Current state (9 June 2026 — V2 FUNCTIONALLY COMPLETE)
+
+> Date correction (9 June 2026): the project paused 16 May – 9 June after 5b-9.
+> The autonomous completion session (5b-10 → close-out) ran 9 June 2026 but
+> originally stamped its records "16 May" — anchored on stale document dates
+> instead of the wall clock. Dates below corrected against git timestamps.
 
 - Production: the-grind-gold.vercel.app (main branch — Phases 4 through 7 + motion polish + hardening all merged and deploy-verified)
 - Active branch: main
@@ -15,10 +20,10 @@ session before touching code.
 
 All planned functional phases are shipped:
 - **Phase 4 + 5a** (onboarding rebuild + Board interactions) — merged 14 May (02e4ece)
-- **Phase 5b** (Backlog Detail modal) — merged 16 May (6c31fc8); patch-based optimistic rollback; mobile-emulation verification substituted for the physical phone test per the autonomous-completion directive
-- **Phase 6** (Focus surface + Ring timer + pomodoro sessions) — merged 16 May (693d21f); sacred Ring SVG, drift-free wall-clock state machine, at-launch pomo picker, localStorage session persistence with re-anchored catch-up
-- **Phase 7** (PWA) — merged 16 May (1188877); manifest + icons + hand-rolled SW (offline-first, /api/ never cached, V1-ghost killswitch) + iOS install meta
-- **Motion polish sweep** (committed V2 deliverable) — merged 16 May (6f2fb0b); surface entries, row fade-outs, count ticks, Decision-10 ghost-slot + longpress fill-ring on Board + modal together, ambient mode tints, reduced-motion respected
+- **Phase 5b** (Backlog Detail modal) — merged 9 June (6c31fc8); patch-based optimistic rollback; mobile-emulation verification substituted for the physical phone test per the autonomous-completion directive
+- **Phase 6** (Focus surface + Ring timer + pomodoro sessions) — merged 9 June (693d21f); sacred Ring SVG, drift-free wall-clock state machine, at-launch pomo picker, localStorage session persistence with re-anchored catch-up
+- **Phase 7** (PWA) — merged 9 June (1188877); manifest + icons + hand-rolled SW (offline-first, /api/ never cached, V1-ghost killswitch) + iOS install meta
+- **Motion polish sweep** (committed V2 deliverable) — merged 9 June (6f2fb0b); surface entries, row fade-outs, count ticks, Decision-10 ghost-slot + longpress fill-ring on Board + modal together, ambient mode tints, reduced-motion respected
 - **Hardening pass** — api/backlog.js parallel-write race serialized across all 8 ops (archived item #8 closed), fetchBoard out-of-order guard + silent syncs, longpress detached-element guard, modal focus + Escape a11y
 
 Remaining work is dogfood-driven (Phase 8): real-device usage feedback, the open BACKLOG.md polish items (all consciously deferred with criteria), and any UX findings only real use surfaces. The codebase is built to spec, tested, and production-verified.
@@ -192,8 +197,8 @@ voice → Muse response → task on Board in <10s.
 
   Known issues inherited from Phase 5b backend additions:
   - **Latent parallel-write race expanded** — Phase 5b-2 adds op:update_task_text + op:delete_task to api/backlog.js, both inheriting the existing `Promise.all([writeBacklog(...), touchRegistry(...)])` pattern. The latent race documented in archived open-item #8 (vault/build/archive/phase4-open-items.md:64) now applies to all 8 mutating ops in api/backlog.js: add, remove, set_priority, toggle_urgent, complete, reorder, update_task_text, delete_task. When the dedicated fix for item #8 lands, it should address all op handlers in api/backlog.js in one commit for consistency.
-- **Phase 6 — Focus surface + Ring timer.** ✅ SHIPPED 16 May (see Current state). Sacred SVG ported; pomodoro session UX (relocated from 5b) included.
-- **Phase 7 — PWA manifest + service worker + iOS install.** ✅ SHIPPED 16 May. Killswitch SW included (activate clears all non-current caches).
+- **Phase 6 — Focus surface + Ring timer.** ✅ SHIPPED 9 June (see Current state). Sacred SVG ported; pomodoro session UX (relocated from 5b) included.
+- **Phase 7 — PWA manifest + service worker + iOS install.** ✅ SHIPPED 9 June. Killswitch SW included (activate clears all non-current caches).
 - **Phase 8 — Dogfood + polish.** ONGOING — the only remaining phase, inherently requiring real use. Open BACKLOG.md items carry explicit dogfood-watch criteria; motion polish (previously the gating deliverable) is shipped.
 
 ## Future considerations

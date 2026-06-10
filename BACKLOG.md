@@ -98,3 +98,7 @@ Operational backlog for items committed to ship but not yet placed in a specific
   Fix if needed: virtualized list (react-window equivalent for Preact) OR pagination ("show all" affordance with lazy-render in batches of 50).
 
   Status: 5b-9 phone test verification. Defer until profile shows actual jank.
+
+## 2026-06-09 — captured during close-out date correction
+
+- [ ] **reviewer-context.md auto-learning section over cap (29 entries vs 20)** — Dev Loop's Auto-Learning rule requires consolidating the oldest entries into higher-level patterns when the list hits 20; keeping it scannable preserves its value for future council assembly.
