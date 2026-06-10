@@ -4,34 +4,8 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
 ## Migrated from PHASES.md "Future considerations" (2026-05-15)
 
-- [ ] **Motion polish — final sweep before V2 ship** — V2 currently has binary state transitions throughout (instant mount/unmount, immediate appear/disappear, snap reorders). The app feels rigid. A dedicated motion-polish pass smooths every surface as the final step before V2 is considered shipped.
-
-  Not gamification, not dopamine architecture, just craft. Target: the app flows between states rather than snapping.
-
-  Scope (non-exhaustive — to be expanded as surfaces are built):
-  - Row fade-out on ✓ tap (~200ms ease-out)
-  - Board ↔ Focus transition (currently jarring mount/unmount)
-  - Sibling-row settle animation after drag-release
-  - Header count number tweens (urgent/total animate up/down rather than swap)
-  - Project card expand/collapse if Phase 5b adds Backlog detail
-  - Onboard step transitions (currently snap between drive-states)
-  - Focus surface state transitions once Phase 6 builds the real one
-  - Any other surface added in Phase 6, 7, 8 — all in scope for the final sweep
-
-  Timing: AFTER all functional V2 phases ship. Doing it earlier means re-doing it each time a new surface lands. Doing it last means one comprehensive sweep with the full app in front of us.
-
-  Implementation: CSS transitions + transform animations primarily. Possible useTransition/AnimatePresence-equivalent for Preact if needed for mount/unmount transitions. Low JS-state-machine change.
-
-  Status: **committed deliverable for V2 ship** — if V2 ships without this pass, V2 isn't fully shipped.
-
-- [ ] **Latent parallel-write race in api/backlog.js** — All 8 mutating ops (add, remove, set_priority, toggle_urgent, complete, reorder, update_task_text, delete_task) share `Promise.all([writeBacklog, touchRegistry])` pattern. Same shape that caused the 899c02d parallel-write race in api/project.js — two GitHub Contents API writes against the same branch ref, independent tree computations, GitHub silently dropping one under load.
-
-  Fix when surfaced: serialize — backlog first, registry touch second, registry only if backlog landed. Mirror the api/project.js fix pattern. **When fixed, address all 8 op handlers in one commit for consistency** — partial fix obscures the systemic issue.
-
-  Originally documented: archived `vault/build/archive/phase4-open-items.md` item #8 (filed Phase 4 R5b).
-
-  Status: latent (no observable bug yet — likely because writes are less frequent than onboarding's project-creation burst); revisit if any write loss surfaces in dogfood.
-
+- [x] **Motion polish — final sweep before V2 ship** — **SHIPPED (v2-motion merge).** Surface entry animations (Board/Focus/modal/Onboard steps), row fade-out on ✓, header count ticks, ghost-slot + longpress fill-ring (Decision 10, Board + modal together), ambient mode tints (Phase 6), all under prefers-reduced-motion kill. The committed deliverable for V2 ship is delivered.
+- [x] **Latent parallel-write race in api/backlog.js** — **FIXED in V2 hardening pass.** All 8 mutating op handlers serialized: writeBacklog first, touchRegistry only after it lands — and AWAITED, not fire-and-forget (Vercel can freeze the function once the response returns; Codex flagged). Mirrors the 899c02d api/project.js fix per archived open-item #8's prescription. Single commit, all handlers, per this entry's own requirement.
 - [ ] **Drag-reorder race with concurrent fetchBoard** — Codex flagged during 5a-7 review. Drag controller stores `fromIdx`/`toIdx` from pointer-down through pointer-release; if `fetchBoard` or another mutator changes `top[]` mid-drag, the reorder applies stale indices to fresh data and could move the wrong task.
 
   Defensive bounds check in ProjectCard catches the list-shrunk case (partial mitigation). Full fix requires `drag.js` extension (onDragStart callback) which would ripple to OnboardReview — out of scope for 5a-7.
@@ -44,14 +18,8 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
   Accepted residual (documented in backlog.js): complete/delete rollback re-insertion can carry pre-edit fields if an edit on the SAME task was in flight when removed — display-stale until next openProject; backend correct.
 
-- [ ] **boardStore.fetchBoard out-of-order response race** — Codex 5b-3 Phase 3 flagged. Multiple rapid modal mutations each fire `fetchBoard()`; if response #4 arrives after response #10, the older summary overwrites the newer. Visual result: Board momentarily reverts to an older state. Fix needs request-generation guard inside `fetchBoard()` itself (boardStore module change, not backlogStore).
-
-  Status: defer — backlogStore now sends fetchBoard pings; the race is in fetchBoard's lack of guard. Fix when this surfaces or as part of broader fetch-orchestration cleanup.
-
-- [ ] **fetchBoard sets `loading: true` causing flicker on modal-action sync** — Codex 5b-3 Phase 3 flagged. Each modal save triggers fetchBoard which sets `loading: true`; Board may render skeleton/spinner behind/after the modal. Fix: add `silent: true` option to fetchBoard that skips loading flag for background sync calls. Module change in board.js.
-
-  Status: defer — UX concern only. Verify in dogfood if Board behind modal has visible loading state.
-
+- [x] **boardStore.fetchBoard out-of-order response race** — **FIXED in V2 hardening pass.** fetchGen generation counter inside fetchBoard; only the latest in-flight fetch may write. Older responses landing late are discarded.
+- [x] **fetchBoard loading flicker on modal-action sync** — **FIXED in V2 hardening pass.** fetchBoard({silent:true}) skips the loading flag; all 6 backlogStore cross-store sync sites use it. Initial loads keep the flag.
 - [ ] **GitHub API request pressure under modal-action spam** — Codex 5b-3 Phase 3 flagged. Each successful modal mutation calls fetchBoard which triggers ~N+1 GitHub Contents API calls (registry + per-project backlog). 10 modal actions × 20 active projects = ~200 reads. No rate-limit hit yet, but worth coalescing. Fix: debounce fetchBoard to fire at most once per N seconds, OR batch-fire after a quiet period.
 
   Status: defer — single-user dogfood is unlikely to spam at this scale; revisit if rate limits trigger or if Vercel cold-start latency becomes noticeable.
@@ -74,12 +42,7 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
 ## 2026-05-15 — captured during 5b-4 (BacklogDetail modal frame)
 
-- [ ] **Keyboard + screen-reader accessibility for BacklogDetail modal** — Codex 5b-4 Phase 3 flagged 4 related a11y gaps in the modal frame: (1) no focus management on mount or close (focus stays on Board control that opened it); (2) no Escape key handler to dismiss; (3) background (Board + Muse) not marked `inert` while modal open, so screen reader can navigate beyond the dialog; (4) urgent/task counts in header are not aria-live, so SR users don't hear updates when fetch resolves or mutations land.
-
-  All four are standard dialog-pattern requirements per WCAG 2.1. Voice-first principle and iPhone-only deployment make these lower priority than usual (T.J. is the user; touch is primary), but if any of these surface as friction during dogfood or if accessibility audit becomes a phase gate, fix all four together.
-
-  Status: defer — single solo-operator user, touch-primary device. Revisit if anyone with assistive tech ever uses the app or if accessibility becomes a phase gate.
-
+- [ ] **Keyboard + screen-reader accessibility for BacklogDetail modal** — **PARTIALLY closed in V2 hardening pass:** (1) focus moves to the close button on mount ✓; (2) Escape dismisses the modal (row-edit Esc consumes its event first via stopPropagation) ✓. Remaining: (3) background inert for assistive tech; (4) aria-live counts. Both stay deferred per the original single-user/touch-primary rationale.
 - [ ] **One-frame Board flash when `?force-backlog` URL override is used** — Codex 5b-4 Phase 3 flagged. The dev override runs in `useEffect` which fires AFTER initial render, so the first paint shows Board, then openProject() flips to modal. On slow JS / first paint this is visible.
 
   Fix: initialize backlogStore.openProjectId synchronously from URL before App component renders (e.g. in main.jsx or as a default-state hook). Cost: small refactor; benefit: cosmetic only.
@@ -108,36 +71,10 @@ Operational backlog for items committed to ship but not yet placed in a specific
 
 - [x] **drag.js mixed-height row drop-index inaccuracy** — **FIXED in 5b-10.** engage() now snapshots every row's static center Y; toIdx is the nearest slot center to the dragged row's translated center (height-agnostic; reduces to old behavior for uniform rows). Regression test: mobile-backlog M3 (short row dragged just past a tall 2-line row's center swaps ONE slot — old math skipped two). Benefits Board automatically (shared library).
 
-- [ ] **longpress.js timer can fire on detached element** — Codex 5b-5 Phase 2 flagged. `lib/longpress.js` has no destroy hook (line 86 acknowledges this); timer set on pointerdown can fire after the row unmounts (e.g. concurrent complete/delete removes the row mid-hold, or modal closes mid-hold).
-
-  Scenario: user holds task text while another action removes the row → spurious `toggleUrgent(missingTaskId)` → backend 404 → store error state. Same class as the deferred concurrent same-modal mutator rollback issue.
-
-  Fix when surfaced: add destroy hook to longpress.js, call from BacklogTaskRow unmount via useEffect cleanup. Or accept and rely on backend 404 + frontend rollback handling.
-
-  Status: defer — low-frequency in single-user single-tenant use. Variant of the existing "Concurrent same-modal mutator rollback" BACKLOG entry.
-
-- [ ] **Modal-only ghost-row drop indicator (mockup 33 spec)** — Spec Decision 10 aspirational: "Mockup 33's drag/longpress storyboards (ghost-slot at drag origin, amber longpress-ring 1.2s fill) apply to both Board and modal, but Phase 5b ships them on modal only."
-
-  Technical reality: `lib/drag.js` does not currently render a placeholder element at the drag origin (it translates the dragged row visually but the original DOM slot still contains the row). Implementing ghost-row requires either:
-  - Extending drag.js with optional `renderPlaceholder` callback (ripples to Board's controller; gated by per-call option so Board behavior unchanged unless opted in)
-  - Hand-rolling a parallel drag controller for the modal
-
-  Both options exceed 5b-5 scope per Solo-operator velocity. Defer to motion-polish sweep where ghost-row + Board parity land together.
-
-  Status: defer to motion-polish sweep. Existing drag visual (translateY + .dragging class with cyan glow) provides functional drag feedback without the ghost-row.
-
-- [ ] **Modal-only amber longpress-ring (mockup 33 spec)** — Companion to the ghost-row item above. Mockup 33 shows a 36×36 amber ring filling around the long-press target over 1.2s. `lib/longpress.js` currently fires only at 500ms with no visual progress indicator (just adds `.longpress-active` class for outline feedback).
-
-  Implementing requires extending longpress.js with progress callback or hand-rolling the ring in BacklogTaskRow (setInterval/raf updating a CSS conic-gradient or SVG arc).
-
-  Status: defer to motion-polish sweep. Existing `.longpress-active` amber outline provides adequate feedback for functional gesture confirmation.
-
-- [ ] **boardStore.completeTask has the same recurring-task filter bug as backlogStore had** — Codex 5b-5 Phase 3 surfaced the bug in backlogStore (fixed); same pattern exists in `v2/src/state/board.js` completeTask. When user completes a daily recurring task from Board's top-3, the optimistic update removes it from top[]; backend keeps it pending (stamps last_completed only); next fetchBoard re-includes it. User sees it disappear then come back.
-
-  Fix: mirror backlogStore's `isRecurring` check in boardStore.completeTask. Keep recurring tasks in top[] optimistically; don't decrement task_count.
-
-  Status: pre-existing bug, not in 5b-5 scope. Fix in a focused boardStore commit OR fold into motion-polish sweep when recurring-task UX is designed properly.
-
+- [x] **longpress.js timer can fire on detached element** — **FIXED in V2 hardening pass.** Timer callback checks `state.el.isConnected` before firing onLongPress; gesture dropped if the row unmounted mid-hold. No more doomed mutations on removed rows.
+- [x] **Ghost-row drop indicator (mockup 33 / Decision 10)** — **SHIPPED in motion-polish sweep**, Board + modal together via drag.js (.drag-ghost-slot injected at the dragged row's origin box, dashed cyan, ghost-blink). Decoration-only, try/catch-guarded, removed on cleanup.
+- [x] **Amber longpress fill-ring (mockup 33 / Decision 10)** — **SHIPPED in motion-polish sweep**, Board + modal together via :has()-based row ::after over the handle rail (conic-gradient stepped fill matching the 500ms gesture; reduced-motion fallback).
+- [x] **boardStore.completeTask recurring-task filter bug** — **FIXED in motion-polish sweep.** Optimistic complete keeps daily-recurring rows in top[]; api/backlog.js GET top[] entries now carry `recurring` so the frontend can know. Board TaskRow skips the completion fade for recurring rows.
 - [ ] **Recurring task done-today visual indicator in modal + Board** — Frontend fix above keeps recurring tasks visible after completion. **Partial fix in 5b-10:** modal rows now show a 700ms green acknowledgment flash on recurring ✓ (CSS pulse, reduced-motion fallback) + in-flight guard prevents double-POST SHA conflicts. Remaining: a PERSISTENT "✓ DONE TODAY" indicator comparing last_completed to today, designed properly with the recurring-task UX (Phase 6+; Board parity then too).
 
   Status: flash shipped; persistent indicator deferred to recurring-task UX design.

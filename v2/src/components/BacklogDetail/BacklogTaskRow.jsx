@@ -215,6 +215,12 @@ export function BacklogTaskRow({ task, tIdx, taskDrag }) {
       commitEdit();
     } else if (e.key === 'Escape') {
       e.preventDefault();
+      // Consume the event: the modal's window-level Escape listener
+      // (BacklogDetail a11y) must not also fire — cancel-edit and
+      // close-modal are different intents, and the activeElement guard
+      // there can race a synchronous Preact re-render unmounting this
+      // input mid-dispatch.
+      e.stopPropagation();
       cancelEdit();
     }
   }

@@ -39,10 +39,21 @@ export const boardStore = map({
   lastFetchAt: null
 });
 
-export async function fetchBoard() {
-  boardStore.setKey('loading', true);
+// Out-of-order guard: rapid modal mutations each ping fetchBoard; if
+// response #4 lands after #10, the older summary must not overwrite
+// the newer (BACKLOG item, Codex 5b-3 Phase 3). Only the latest
+// in-flight fetch is allowed to write.
+let fetchGen = 0;
+
+// silent=true skips the loading flag — background cross-store syncs
+// (backlogStore mutators, modal close) shouldn't flash Board into a
+// skeleton state behind the modal (BACKLOG flicker item).
+export async function fetchBoard({ silent = false } = {}) {
+  const myGen = ++fetchGen;
+  if (!silent) boardStore.setKey('loading', true);
   try {
     const data = await getBacklog();
+    if (myGen !== fetchGen) return; // superseded by a newer fetch
     boardStore.set({
       summary: Array.isArray(data?.summary) ? data.summary : [],
       loading: false,
@@ -50,6 +61,7 @@ export async function fetchBoard() {
       lastFetchAt: Date.now()
     });
   } catch (e) {
+    if (myGen !== fetchGen) return;
     boardStore.setKey('loading', false);
     boardStore.setKey('error', String(e?.message || e));
   }
