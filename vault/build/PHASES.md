@@ -4,30 +4,26 @@ Authoritative record of phase-by-phase state, approved exceptions, and patterns
 observed during the rebuild. Read this file first in any new Claude Code
 session before touching code.
 
-## Current state (16 May 2026)
+## Current state (16 May 2026 — V2 FUNCTIONALLY COMPLETE)
 
-- Production: the-grind-gold.vercel.app (main branch, HEAD 6c31fc8 — Phase 5b merge)
-- Active branch: main (v2-phase5b merged + deleted post-verification)
-- Architecture: V2 served at `/` via Vite build at `v2/dist/`, `/api/*` same-origin, all Vercel serverless functions
+- Production: the-grind-gold.vercel.app (main branch — Phases 4 through 7 + motion polish + hardening all merged and deploy-verified)
+- Active branch: main
+- Architecture: V2 served at `/` via Vite build at `v2/dist/`, `/api/*` same-origin serverless, GitHub-backed vault, PWA (manifest + offline-first SW + iOS install)
 - Lighthouse accessibility baseline: 100/100 (Phase 2 close, holds)
-- Dev Loop Protocol active since 2026-05-15 (see CLAUDE.md) — replaces /api/* + /vault/** strict-mode carve-outs; per-task Codex review + council; BACKLOG.md + reviewer-context.md at repo root
+- Dev Loop Protocol active since 2026-05-15 (CLAUDE.md); BACKLOG.md + reviewer-context.md at repo root
+- Test suite: 53 Playwright tests (44 chromium desktop + 5 iPhone-13/WebKit emulation + 4 PWA contracts)
 
-Phase 5b (Backlog Detail modal) shipped via the v2-phase5b → main merge on 16 May 2026 (10 commits, 25 files, ~3.5k insertions). Modal launched from project-card chevrons; full per-project task list with URGENT/NORMAL sections, drag-reorder (nearest-center slot targeting handles mixed-height rows), long-press urgent toggle, tap-to-edit with visible save-failure + retry, recurring-aware check-off with acknowledgment flash, delete. Backend ops update_task_text + delete_task consumed Pattern-1 slot 1 of 2. Pomodoro estimates were DESCOPED from 5b to Phase 6 (session state at launch, not planning state per task — Council 3). Patch-based optimistic rollback closed the concurrent-mutator race class. Physical phone test substituted with Playwright iPhone-13/WebKit emulation project (5 mobile tests) + proactive fixes of all phone-test-agenda items per autonomous-completion directive; real-device verification remains worthwhile but is no longer gating.
+All planned functional phases are shipped:
+- **Phase 4 + 5a** (onboarding rebuild + Board interactions) — merged 14 May (02e4ece)
+- **Phase 5b** (Backlog Detail modal) — merged 16 May (6c31fc8); patch-based optimistic rollback; mobile-emulation verification substituted for the physical phone test per the autonomous-completion directive
+- **Phase 6** (Focus surface + Ring timer + pomodoro sessions) — merged 16 May (693d21f); sacred Ring SVG, drift-free wall-clock state machine, at-launch pomo picker, localStorage session persistence with re-anchored catch-up
+- **Phase 7** (PWA) — merged 16 May (1188877); manifest + icons + hand-rolled SW (offline-first, /api/ never cached, V1-ghost killswitch) + iOS install meta
+- **Motion polish sweep** (committed V2 deliverable) — merged 16 May (6f2fb0b); surface entries, row fade-outs, count ticks, Decision-10 ghost-slot + longpress fill-ring on Board + modal together, ambient mode tints, reduced-motion respected
+- **Hardening pass** — api/backlog.js parallel-write race serialized across all 8 ops (archived item #8 closed), fetchBoard out-of-order guard + silent syncs, longpress detached-element guard, modal focus + Escape a11y
 
-Specs/status: /vault/build/phase5b-spec.md (10 decisions), /vault/build/phase5b-status.md. Test suite at merge: 38/38 (33 chromium + 5 iphone). Bundle 25.01 KB JS gz / 8.92 KB CSS gz.
+Remaining work is dogfood-driven (Phase 8): real-device usage feedback, the open BACKLOG.md polish items (all consciously deferred with criteria), and any UX findings only real use surfaces. The codebase is built to spec, tested, and production-verified.
 
-Current step: Phase 6 — Focus surface + Ring timer (mockups 06-09) + pomodoro session UX relocated from 5b.
-
-Phase 4 (Onboarding rebuild — R5b flow) and Phase 5a (Board interactions) shipped together via the v2-phase4 → main merge on 14 May 2026 (73 commits, 98 files). The merge bundled R5b's onboarding rebuild (capture/clarify/parsing/review + error states + OnboardExitConfirm + OrphanPicker) with Phase 5a's full Board interactivity (TaskRow rebuild, drag-reorder controller, long-press gestures, complete/urgent/launch ops, optimistic-update + rollback store convention, Focus stub surface, EXECUTE button wiring, urgent-first sort on backend). Two `/api/*` exceptions consumed within Pattern-1 budget: backlog.js (urgent-first sort + urgent flag in GET payload) and project.js (pending-count fix in 5a-7).
-
-Original Phase 4 starter commits 5448a95, 05ceba8, 285b1c9, c928abf preserved as branch archaeology — no force-push, no history rewrite.
-
-Phase 5a-10 phone test surfaced two issues, both resolved before merge: Focus blank-screen blocker (resolved with `position: fixed` overlay in commit 86b4dd4) and iOS Safari long-press text-selection conflict (resolved with `user-select` / `-webkit-touch-callout` suppression on long-press targets in b675ca7). Phase 5a-7 Codex review flagged a drag-reorder vs concurrent fetchBoard race; deferred to phase 6+ pending real-use signal (logged below under Phase 5a roadmap).
-
-Canonical specs from this band: /vault/build/phase4-redesign-spec.md (Council 1), /vault/build/phase4-flow-redesign.md (Council 2), /vault/build/phase5a-spec.md (Phase 5a 7-decision spec, Decision 6 ghost-row deferred). Pre-merge status: /vault/build/phase4-r5b-status.md and /vault/build/phase5a-status.md. Working docs (phase4-open-items.md, phase4-session-handoff.md) archived to /vault/build/archive/ post-merge.
-Design asset set: /design/mockups/ (full replacement landed in f56f5e0; 5a additions: 22-board-with-cta, 23-backlog-detail, 24-pomodoro-glyph-study, 33-reorder-animation, 34-board-returning, 35-board-task-wrap).
-
-Current step: Phase 5b (Backlog detail + pomodoro glyphs) is the next planned phase. Mockups 23 + 24 + 33 govern the visual + interaction spec. Council planning + spec authoring is the first move when Phase 5b begins.
+Specs: phase4-redesign-spec.md, phase4-flow-redesign.md, phase5a-spec.md, phase5b-spec.md, phase6-spec.md. Status docs: phase4-r5b-status.md, phase5a-status.md, phase5b-status.md.
 
 ## April 2026 simplification pass
 
@@ -196,11 +192,9 @@ voice → Muse response → task on Board in <10s.
 
   Known issues inherited from Phase 5b backend additions:
   - **Latent parallel-write race expanded** — Phase 5b-2 adds op:update_task_text + op:delete_task to api/backlog.js, both inheriting the existing `Promise.all([writeBacklog(...), touchRegistry(...)])` pattern. The latent race documented in archived open-item #8 (vault/build/archive/phase4-open-items.md:64) now applies to all 8 mutating ops in api/backlog.js: add, remove, set_priority, toggle_urgent, complete, reorder, update_task_text, delete_task. When the dedicated fix for item #8 lands, it should address all op handlers in api/backlog.js in one commit for consistency.
-- **Phase 6 — Focus surface + Ring timer.** Port sacred SVG from mockup 06.
-- **Phase 7 — PWA manifest + service worker + iOS install.** Killswitch SW
-  to clean up V1 ghost.
-- **Phase 8 — Dogfood + polish.** V2 already live at `/`; Phase 8 is real
-  use + polish items accumulated from phone tests.
+- **Phase 6 — Focus surface + Ring timer.** ✅ SHIPPED 16 May (see Current state). Sacred SVG ported; pomodoro session UX (relocated from 5b) included.
+- **Phase 7 — PWA manifest + service worker + iOS install.** ✅ SHIPPED 16 May. Killswitch SW included (activate clears all non-current caches).
+- **Phase 8 — Dogfood + polish.** ONGOING — the only remaining phase, inherently requiring real use. Open BACKLOG.md items carry explicit dogfood-watch criteria; motion polish (previously the gating deliverable) is shipped.
 
 ## Future considerations
 

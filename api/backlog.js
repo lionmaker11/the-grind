@@ -275,10 +275,16 @@ export default async function handler(req, res) {
     }
 
     const msg = `backlog: add "${newTask.text.slice(0, 60)}" to ${project_id}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true, task: newTask });
   }
@@ -292,10 +298,16 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
     }
     const msg = `backlog: remove ${task_id} from ${project_id}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true });
   }
@@ -312,10 +324,16 @@ export default async function handler(req, res) {
     taskObj.priority = pri;
     backlog.tasks = sortByPriority(backlog.tasks);
     const msg = `backlog: ${task_id} priority → P${pri}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true, task: taskObj });
   }
@@ -332,10 +350,16 @@ export default async function handler(req, res) {
     if (!taskObj) return res.status(404).json({ error: `Task ${task_id} not found in ${project_id}` });
     taskObj.urgent = urgent;
     const msg = `backlog: ${task_id} urgent → ${urgent ? 'on' : 'off'}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true, task: taskObj });
   }
@@ -359,10 +383,16 @@ export default async function handler(req, res) {
     taskObj.text = cleanText;
 
     const msg = `backlog: edit text on ${task_id} in ${project_id}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true, task: taskObj });
   }
@@ -382,10 +412,16 @@ export default async function handler(req, res) {
       taskObj.completed = today();
     }
     const msg = `backlog: complete ${task_id} in ${project_id}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true, task: taskObj });
   }
@@ -405,10 +441,16 @@ export default async function handler(req, res) {
     backlog.tasks = backlog.tasks.filter(t => t.id !== task_id);
 
     const msg = `backlog: delete ${task_id} from ${project_id}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true });
   }
@@ -430,10 +472,16 @@ export default async function handler(req, res) {
     }
     backlog.tasks = assignBucketedPriorities(reordered);
     const msg = `backlog: reorder ${project_id}`;
-    const [result] = await Promise.all([
-      writeBacklog(project_id, backlog, sha, msg),
-      touchRegistry(project_id)
-    ]);
+    // Serialized (was Promise.all): two parallel GitHub Contents writes
+    // against the same branch ref can silently drop one under load —
+    // the 899c02d api/project.js race, archived open-item #8. Backlog
+    // write first; registry touch only after it lands (fire-and-forget:
+    // touchRegistry already swallows its own failures).
+    const result = await writeBacklog(project_id, backlog, sha, msg);
+    // Awaited (not fire-and-forget): Vercel can freeze the function the
+    // moment the response returns, dropping a detached touch. touchRegistry
+    // swallows its own failures, so awaiting never changes the response.
+    if (result.ok) await touchRegistry(project_id);
     if (!result.ok) return res.status(result.status || 500).json({ error: result.error });
     return res.status(200).json({ ok: true });
   }

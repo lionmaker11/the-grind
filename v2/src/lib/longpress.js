@@ -129,6 +129,14 @@ export function createLongPress({
 
     state.timer = setTimeout(() => {
       if (!state || state.moved) return;
+      // Detached-element guard (BACKLOG item): the row can unmount
+      // mid-hold (concurrent complete/delete, modal close). Firing
+      // onLongPress against a gone row sends a doomed mutation
+      // (backend 404 → spurious error state). Drop the gesture.
+      if (state.el && !state.el.isConnected) {
+        state = null;
+        return;
+      }
       state.fired = true;
       state.el.classList.remove(activeClass);
       try {

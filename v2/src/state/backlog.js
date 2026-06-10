@@ -212,7 +212,7 @@ export function close() {
   // fetchBoard() as belt-and-suspenders for any user who never landed a
   // mutation but did open the modal — keeps Board's stale-data window
   // bounded.
-  fetchBoard();
+  fetchBoard({ silent: true });
 }
 
 // Variant of close() used by onboard lifecycle (openOnboard / closeOnboard)
@@ -282,7 +282,7 @@ export async function completeTask(taskId) {
     // guard only suppresses the modal-store write, not cross-store sync
     // (Codex 5b-3 Phase 3 finding: closed-modal mutations were hidden
     // from Board until next unrelated fetch).
-    fetchBoard();
+    fetchBoard({ silent: true });
   } catch (e) {
     if (myGen !== generation) return; // modal closed; abandon rollback
     // Inverse patch: re-insert the removed task at its sorted position
@@ -335,7 +335,7 @@ export async function toggleUrgent(taskId, urgent) {
       task_id: taskId,
       urgent: willBeUrgent
     });
-    fetchBoard(); // unconditional cross-store sync — see completeTask comment
+    fetchBoard({ silent: true }); // unconditional cross-store sync — see completeTask comment
   } catch (e) {
     if (myGen !== generation) return;
     // Inverse patch: restore the original urgent flag by id —
@@ -413,7 +413,7 @@ export async function reorder(newOrderIds) {
 
   try {
     await backlogOp({ op: 'reorder', project_id: projectId, order: newOrderIds });
-    fetchBoard(); // unconditional cross-store sync — see completeTask comment
+    fetchBoard({ silent: true }); // unconditional cross-store sync — see completeTask comment
   } catch (e) {
     if (myGen !== generation) return;
     // Inverse patch — CONDITIONAL: only restore the original order if
@@ -495,7 +495,7 @@ export async function editText(taskId, newText) {
       task_id: taskId,
       text: cleanText
     });
-    fetchBoard(); // unconditional cross-store sync — see completeTask comment
+    fetchBoard({ silent: true }); // unconditional cross-store sync — see completeTask comment
     return { ok: true };
   } catch (e) {
     const errorMessage = String(e?.message || e);
@@ -536,7 +536,7 @@ export async function deleteTask(taskId) {
 
   try {
     await backlogOp({ op: 'delete_task', project_id: projectId, task_id: taskId });
-    fetchBoard(); // unconditional cross-store sync — see completeTask comment
+    fetchBoard({ silent: true }); // unconditional cross-store sync — see completeTask comment
   } catch (e) {
     if (myGen !== generation) return;
     // Inverse patch: re-insert the removed task at its sorted position

@@ -22,6 +22,7 @@
 // (modal background is solid var(--bg) per mockup, not blurred), so
 // the concern reduces to general Board re-render cost behind the modal.
 
+import { useEffect, useRef } from 'preact/hooks';
 import { useStore } from '@nanostores/preact';
 import { backlogStore, close } from '../../state/backlog.js';
 import { BacklogList } from './BacklogList.jsx';
@@ -30,6 +31,27 @@ import './BacklogDetail.css';
 export function BacklogDetail() {
   const { tasks, projectName, taskCount, urgentCount, loading, error } =
     useStore(backlogStore);
+  const closeBtnRef = useRef(null);
+
+  // Dialog a11y basics (BACKLOG item, partial burn-down): move focus
+  // into the dialog on mount (close button — the one always-present
+  // control) and dismiss on Escape. Focus restoration to the opening
+  // chevron is skipped: the chevron rerenders with Board and iOS is
+  // touch-primary; revisit if keyboard use ever matters here.
+  useEffect(() => {
+    closeBtnRef.current?.focus();
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        // Defense-in-depth: the row edit's own Esc handler consumes the
+        // event via stopPropagation; this guard covers any path where
+        // the event still reaches window while an edit input is focused.
+        if (document.activeElement?.classList?.contains('backlog-task-input')) return;
+        close();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <main
@@ -41,6 +63,7 @@ export function BacklogDetail() {
     >
       <header class="backlog-modal-header">
         <button
+          ref={closeBtnRef}
           type="button"
           class="backlog-modal-close"
           onClick={() => close()}
